@@ -1,0 +1,10 @@
+generates:
+    ./src/generated/graphql/subgraph/index.ts:
+        schema:
+            - http://localhost:4350/graphql
+        documents:
+            - ./graphql/subgraph/rollups.graphql
+        plugins:
+            - typescript
+            - typescript-operations
+            - typescript-urql

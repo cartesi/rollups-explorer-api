@@ -1,0 +1,31 @@
+manifestVersion: subsquid.io/v0.1
+name: rollups-sepolia
+version: 1
+description: 'The very first evm squid from manifest  '
+build:
+deploy:
+    addons:
+        postgres:
+    processor:
+        env:
+            USE_CHAIN_ID: 11155111
+            SEPOLIA_RPC_ENDPOINT: https://rpc.ankr.com/eth_sepolia
+        cmd:
+            - node
+            - lib/main
+    api:
+        cmd:
+            - npx
+            - squid-graphql-server
+            - '--dumb-cache'
+            - in-memory
+            - '--dumb-cache-ttl'
+            - '1000'
+            - '--dumb-cache-size'
+            - '100'
+            - '--dumb-cache-max-age'
+            - '1000'
+            - '--max-root-fields'
+            - '10'
+            - '--max-response-size'
+            - '1000'
