@@ -3,7 +3,7 @@ import { Store } from '@subsquid/typeorm-store';
 import { events } from '../abi/CartesiDAppFactory';
 import { LogRecord } from '../abi/abi.support';
 import { EventConfig, NetworkConfig, eventConfigs } from '../configs';
-import { DApp, DAppFactory } from '../model';
+import { Application, ApplicationFactory } from '../model';
 import Handler from './Handler';
 
 export default class ApplicationCreated implements Handler {
@@ -12,8 +12,8 @@ export default class ApplicationCreated implements Handler {
     constructor(
         private readonly ctx: DataHandlerContext<Store>,
         private readonly config: NetworkConfig,
-        private factoryStorage: Map<string, DAppFactory>,
-        private dappsStorage: Map<String, DApp>,
+        private factoryStorage: Map<string, ApplicationFactory>,
+        private dappsStorage: Map<String, Application>,
     ) {
         this.eventConfig = eventConfigs;
     }
@@ -37,7 +37,7 @@ export default class ApplicationCreated implements Handler {
             );
             const { application, dappOwner } = this.decodeFactory(e);
 
-            const dappFactory = new DAppFactory({ id: e.address });
+            const dappFactory = new ApplicationFactory({ id: e.address });
 
             this.factoryStorage.set(e.address, dappFactory);
 
@@ -45,21 +45,21 @@ export default class ApplicationCreated implements Handler {
 
             let dapp =
                 this.dappsStorage.get(dappId) ??
-                (await ctx.store.get(DApp, dappId));
+                (await ctx.store.get(Application, dappId));
 
             if (dapp) {
                 if (!dapp.factory && !dapp.owner) {
                     ctx.log.warn(
-                        `Dapp:${dappId} created by event found. updating owner and factory`,
+                        `Application:${dappId} created by event found. updating owner and factory`,
                     );
                     dapp.factory = dappFactory;
                     dapp.owner = dappOwner.toLowerCase();
                 }
             } else {
                 ctx.log.info(
-                    `Dapp:${dappId} will be created and added to the Map`,
+                    `Application:${dappId} will be created and added to the Map`,
                 );
-                dapp = new DApp({
+                dapp = new Application({
                     id: dappId,
                     activityTimestamp: timestamp,
                     deploymentTimestamp: timestamp,

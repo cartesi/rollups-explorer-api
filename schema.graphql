@@ -1,13 +1,13 @@
-type DAppFactory @entity @cardinality(value: 5) {
+type ApplicationFactory @entity @cardinality(value: 5) {
     id: ID!
-    dapps: [DApp!]! @derivedFrom(field: "factory")
+    applications: [Application!] @derivedFrom(field: "factory")
 }
 
-type DApp @entity @cardinality(value: 100) {
+type Application @entity @cardinality(value: 100) {
     id: ID!
     inputCount: Int!
     deploymentTimestamp: BigInt!
     activityTimestamp: BigInt! @index
     owner: String
-    factory: DAppFactory!
+    factory: ApplicationFactory
 }

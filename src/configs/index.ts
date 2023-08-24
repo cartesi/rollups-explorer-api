@@ -1,14 +1,11 @@
 import arb_goerli_fact_deployment from '@cartesi/rollups/deployments/arbitrum_goerli/CartesiDAppFactory.json';
 import arb_goerli_inputbox_deployment from '@cartesi/rollups/deployments/arbitrum_goerli/InputBox.json';
-import goerli_fact_deployment from '@cartesi/rollups/deployments/goerli/CartesiDAppFactory.json';
-import goerli_inputbox_deployment from '@cartesi/rollups/deployments/goerli/InputBox.json';
 import sepolia_fact_deployment from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
 import sepolia_inputbox_deployment from '@cartesi/rollups/deployments/sepolia/InputBox.json';
 import { events as FactoryEvents } from '../abi/CartesiDAppFactory';
 import { events as InputBoxEvents } from '../abi/InputBox';
 
 export const SupportedNetworks = {
-    GOERLI: '5',
     ARBITRUM_GOERLI: '421613',
     SEPOLIA: '11155111',
 } as const;
@@ -23,24 +20,6 @@ export const eventConfigs = {
 } as const;
 
 export const networkConfigs = {
-    [SupportedNetworks.GOERLI]: {
-        archive: 'https://v2.archive.subsquid.io/network/ethereum-goerli',
-        chain:
-            process.env.GOERLI_RPC_ENDPOINT ??
-            'https://rpc.ankr.com/eth_goerli',
-        cartesiDAppFactory: {
-            deployment: goerli_fact_deployment,
-            address: goerli_fact_deployment.address.toLowerCase(),
-            abi: goerli_fact_deployment.abi,
-            block: goerli_fact_deployment.receipt.blockNumber,
-        },
-        inputBox: {
-            deployment: goerli_inputbox_deployment,
-            address: goerli_inputbox_deployment.address.toLowerCase(),
-            abi: goerli_inputbox_deployment.abi,
-            block: goerli_inputbox_deployment.receipt.blockNumber,
-        },
-    },
     [SupportedNetworks.ARBITRUM_GOERLI]: {
         archive: 'https://v2.archive.subsquid.io/network/arbitrum-goerli',
         chain: process.env.ARB_GOERLI_RPC_ENDPOINT,

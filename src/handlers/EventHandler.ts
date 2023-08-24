@@ -1,14 +1,14 @@
 import { DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { NetworkConfig } from '../configs';
-import { DApp, DAppFactory } from '../model';
+import { Application, ApplicationFactory } from '../model';
 import ApplicationCreated from './ApplicationCreated';
 import Handler from './Handler';
 import InputAdded from './InputAdded';
 
 export default class EventHandler {
-    private readonly dapps: Map<string, DApp>;
-    private readonly factories: Map<string, DAppFactory>;
+    private readonly dapps: Map<string, Application>;
+    private readonly factories: Map<string, ApplicationFactory>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
 

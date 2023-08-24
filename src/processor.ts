@@ -18,7 +18,7 @@ import {
 
 const logger = createLogger('sqd:startup');
 const USE_CHAIN_ID = process.env.USE_CHAIN_ID as SupportedChainId;
-const chainId: SupportedChainId = USE_CHAIN_ID ?? SupportedNetworks.GOERLI;
+const chainId: SupportedChainId = USE_CHAIN_ID ?? SupportedNetworks.SEPOLIA;
 const [name, id] =
     Object.entries(SupportedNetworks).find(([_, id]) => id === chainId) ?? [];
 
@@ -28,8 +28,11 @@ const processorConfig: ProcessorConfig = processorConfigs.get(chainId) ?? {};
 if (!USE_CHAIN_ID) {
     logger.warn(`Environment variable USE_CHAIN_ID not defined.`);
 }
+
+logger.info(`Using chain-id:${id} network name: ${name}`);
+
 logger.info(
-    `Using chain-id:${id} network name: ${name}\nRPC-configured: ${config.chain} Archive-node configured: ${config.archive}`,
+    `RPC-configured: ${config.chain} Archive-node configured: ${config.archive}`,
 );
 
 export const processor = new EvmBatchProcessor()

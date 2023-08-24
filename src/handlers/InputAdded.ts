@@ -3,7 +3,7 @@ import { Store } from '@subsquid/typeorm-store';
 import { events } from '../abi/InputBox';
 import { LogRecord } from '../abi/abi.support';
 import { EventConfig, NetworkConfig, eventConfigs } from '../configs';
-import { DApp } from '../model';
+import { Application } from '../model';
 import Handler from './Handler';
 
 export default class InputAdded implements Handler {
@@ -12,7 +12,7 @@ export default class InputAdded implements Handler {
     constructor(
         private readonly ctx: DataHandlerContext<Store>,
         private readonly config: NetworkConfig,
-        private dappsStorage: Map<String, DApp>,
+        private dappsStorage: Map<String, Application>,
     ) {
         this.eventConfig = eventConfigs;
     }
@@ -34,7 +34,7 @@ export default class InputAdded implements Handler {
 
             let dapp =
                 this.dappsStorage.get(dappId) ??
-                (await ctx.store.get(DApp, dappId));
+                (await ctx.store.get(Application, dappId));
             if (dapp) {
                 ctx.log.info(`Dapp:${dappId} found`);
                 dapp.inputCount += 1;
@@ -43,7 +43,7 @@ export default class InputAdded implements Handler {
                 ctx.log.warn(
                     `Dapp:${dappId} not found... created by input event`,
                 );
-                dapp = new DApp({
+                dapp = new Application({
                     id: dappId,
                     activityTimestamp: timestamp,
                     deploymentTimestamp: timestamp,
