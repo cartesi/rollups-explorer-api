@@ -22,7 +22,7 @@
     "postsqd:deploy": "node scripts/postSquidDeploy.mjs"
   },
   "dependencies": {
-    "@cartesi/rollups": "0.9.0",
+    "@cartesi/rollups": "1.0.0",
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@mantine/core": "^6.0.19",
