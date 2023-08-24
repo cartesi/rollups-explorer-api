@@ -48,11 +48,13 @@ export default class ApplicationCreated implements Handler {
                 (await ctx.store.get(DApp, dappId));
 
             if (dapp) {
-                ctx.log.info(
-                    `Dapp:${dappId} created by event found. updating owner/factory/status`,
-                );
-                dapp.factory = dappFactory;
-                dapp.owner = dappOwner.toLowerCase();
+                if (!dapp.factory && !dapp.owner) {
+                    ctx.log.warn(
+                        `Dapp:${dappId} created by event found. updating owner and factory`,
+                    );
+                    dapp.factory = dappFactory;
+                    dapp.owner = dappOwner.toLowerCase();
+                }
             } else {
                 ctx.log.info(
                     `Dapp:${dappId} will be created and added to the Map`,
