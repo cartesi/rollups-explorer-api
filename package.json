@@ -15,9 +15,11 @@
     "sqd:down": "sqd down",
     "sqd:migration:generate": "sqd migration:generate",
     "sqd:process": "sqd process",
-    "sqd:graphql": "sqd serve",    
-    "sqd:auth": "sqd auth -k $SQD_API_KEY",
-    "sqd:deploy" : "sqd deploy -o cartesi -m squid-sepolia.yaml .",
+    "sqd:graphql": "sqd serve",
+    "sqd:auth": "sqd auth -k $SQD_API_KEY",    
+    "sqd:deploy": "sqd deploy -o cartesi -m",
+    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\"",
+    "sqd:deploy:arb-goerli": "run-s \"sqd:deploy -- {1} .\" -- \"squid-arb-goerli.yaml\"",
     "presqd:deploy": "node scripts/preSquidDeploy.mjs",
     "postsqd:deploy": "node scripts/postSquidDeploy.mjs"
   },
@@ -41,6 +43,7 @@
     "pg": "^8.11.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.16",
     "viem": "^1.6.0",
     "wagmi": "^1.3.10"
@@ -56,6 +59,7 @@
     "@subsquid/typeorm-codegen": "^1.2.0",
     "@types/node": "^18.16.17",
     "@types/react": "18.2.20",
+    "npm-run-all": "^4.1.5",
     "typescript": "~5.1.3"
   }
 }
