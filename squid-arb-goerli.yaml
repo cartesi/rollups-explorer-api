@@ -1,15 +1,16 @@
 manifestVersion: subsquid.io/v0.1
-name: rollups-sepolia
-version: 5
+name: rollups-arbitrum-goerli
+version: 1
 description: 'Indexing Cartesi Rollups contracts'
 build:
 deploy:
+    secrets:
+        - ARB_GOERLI_RPC_ENDPOINT
     addons:
         postgres:
     processor:
         env:
-            USE_CHAIN_ID: 11155111
-            SEPOLIA_RPC_ENDPOINT: https://rpc.ankr.com/eth_sepolia
+            USE_CHAIN_ID: 421613
         cmd:
             - node
             - lib/main
