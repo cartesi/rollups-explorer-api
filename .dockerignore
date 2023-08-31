@@ -7,8 +7,10 @@ npm-debug.log
 /graphql
 /pages
 /docs
+/ui
 /scripts
 /.vscode
+
 
 # OS Files
 .DS_Store

@@ -6,7 +6,7 @@ import {
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React, { useState } from 'react';
-import Layout from '../components/Layout';
+import Layout from '../ui/components/Layout';
 
 export default function App({ Component, pageProps }: AppProps) {
     const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
