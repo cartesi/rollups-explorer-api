@@ -39,13 +39,10 @@ npm install
 ```
 
 For backend commands and more information, refer to docs [here](./docs/backend-commands.MD);
+For code generation refer to docs [here](./docs/code-generation.MD);
 
 #### Frontend
 
 ```shell
 npm run dev
 ```
-
-#### Reference docs
-
-A squid template information can be found [here](./docs/squid.MD)
