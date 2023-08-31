@@ -1,0 +1,185 @@
+type Application {
+  activityTimestamp: BigInt!
+  deploymentTimestamp: BigInt!
+  factory: ApplicationFactory
+  id: String!
+  inputCount: Int!
+  owner: String
+}
+
+type ApplicationEdge {
+  cursor: String!
+  node: Application!
+}
+
+type ApplicationFactoriesConnection {
+  edges: [ApplicationFactoryEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ApplicationFactory {
+  applications(limit: Int, offset: Int, orderBy: [ApplicationOrderByInput!], where: ApplicationWhereInput): [Application!]!
+  id: String!
+}
+
+type ApplicationFactoryEdge {
+  cursor: String!
+  node: ApplicationFactory!
+}
+
+enum ApplicationFactoryOrderByInput {
+  id_ASC
+  id_DESC
+}
+
+input ApplicationFactoryWhereInput {
+  AND: [ApplicationFactoryWhereInput!]
+  OR: [ApplicationFactoryWhereInput!]
+  applications_every: ApplicationWhereInput
+  applications_none: ApplicationWhereInput
+  applications_some: ApplicationWhereInput
+  id_contains: String
+  id_containsInsensitive: String
+  id_endsWith: String
+  id_eq: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_isNull: Boolean
+  id_lt: String
+  id_lte: String
+  id_not_contains: String
+  id_not_containsInsensitive: String
+  id_not_endsWith: String
+  id_not_eq: String
+  id_not_in: [String!]
+  id_not_startsWith: String
+  id_startsWith: String
+}
+
+enum ApplicationOrderByInput {
+  activityTimestamp_ASC
+  activityTimestamp_DESC
+  deploymentTimestamp_ASC
+  deploymentTimestamp_DESC
+  factory_id_ASC
+  factory_id_DESC
+  id_ASC
+  id_DESC
+  inputCount_ASC
+  inputCount_DESC
+  owner_ASC
+  owner_DESC
+}
+
+input ApplicationWhereInput {
+  AND: [ApplicationWhereInput!]
+  OR: [ApplicationWhereInput!]
+  activityTimestamp_eq: BigInt
+  activityTimestamp_gt: BigInt
+  activityTimestamp_gte: BigInt
+  activityTimestamp_in: [BigInt!]
+  activityTimestamp_isNull: Boolean
+  activityTimestamp_lt: BigInt
+  activityTimestamp_lte: BigInt
+  activityTimestamp_not_eq: BigInt
+  activityTimestamp_not_in: [BigInt!]
+  deploymentTimestamp_eq: BigInt
+  deploymentTimestamp_gt: BigInt
+  deploymentTimestamp_gte: BigInt
+  deploymentTimestamp_in: [BigInt!]
+  deploymentTimestamp_isNull: Boolean
+  deploymentTimestamp_lt: BigInt
+  deploymentTimestamp_lte: BigInt
+  deploymentTimestamp_not_eq: BigInt
+  deploymentTimestamp_not_in: [BigInt!]
+  factory: ApplicationFactoryWhereInput
+  factory_isNull: Boolean
+  id_contains: String
+  id_containsInsensitive: String
+  id_endsWith: String
+  id_eq: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_isNull: Boolean
+  id_lt: String
+  id_lte: String
+  id_not_contains: String
+  id_not_containsInsensitive: String
+  id_not_endsWith: String
+  id_not_eq: String
+  id_not_in: [String!]
+  id_not_startsWith: String
+  id_startsWith: String
+  inputCount_eq: Int
+  inputCount_gt: Int
+  inputCount_gte: Int
+  inputCount_in: [Int!]
+  inputCount_isNull: Boolean
+  inputCount_lt: Int
+  inputCount_lte: Int
+  inputCount_not_eq: Int
+  inputCount_not_in: [Int!]
+  owner_contains: String
+  owner_containsInsensitive: String
+  owner_endsWith: String
+  owner_eq: String
+  owner_gt: String
+  owner_gte: String
+  owner_in: [String!]
+  owner_isNull: Boolean
+  owner_lt: String
+  owner_lte: String
+  owner_not_contains: String
+  owner_not_containsInsensitive: String
+  owner_not_endsWith: String
+  owner_not_eq: String
+  owner_not_in: [String!]
+  owner_not_startsWith: String
+  owner_startsWith: String
+}
+
+type ApplicationsConnection {
+  edges: [ApplicationEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+"""Big number integer"""
+scalar BigInt
+
+type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+}
+
+type Query {
+  applicationById(id: String!): Application
+  applicationByUniqueInput(where: WhereIdInput!): Application @deprecated(reason: "Use applicationById")
+  applicationFactories(limit: Int, offset: Int, orderBy: [ApplicationFactoryOrderByInput!], where: ApplicationFactoryWhereInput): [ApplicationFactory!]!
+  applicationFactoriesConnection(after: String, first: Int, orderBy: [ApplicationFactoryOrderByInput!]!, where: ApplicationFactoryWhereInput): ApplicationFactoriesConnection!
+  applicationFactoryById(id: String!): ApplicationFactory
+  applicationFactoryByUniqueInput(where: WhereIdInput!): ApplicationFactory @deprecated(reason: "Use applicationFactoryById")
+  applications(limit: Int, offset: Int, orderBy: [ApplicationOrderByInput!], where: ApplicationWhereInput): [Application!]!
+  applicationsConnection(after: String, first: Int, orderBy: [ApplicationOrderByInput!]!, where: ApplicationWhereInput): ApplicationsConnection!
+  rollupsSummary: SummaryResult!
+  squidStatus: SquidStatus
+}
+
+type SquidStatus {
+  """The height of the processed part of the chain"""
+  height: Int
+}
+
+type SummaryResult {
+  totalApplications: Float!
+  totalInputs: Float!
+}
+
+input WhereIdInput {
+  id: String!
+}

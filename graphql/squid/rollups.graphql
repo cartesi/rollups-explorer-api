@@ -1,15 +1,14 @@
-query dapps(
-    $orderBy: DApp_orderBy
-    $where_dapp: DApp_filter
-    $first: Int
-    $skip: Int
+query applications(
+    $limit: Int!
+    $offset: Int
+    $orderBy: [ApplicationOrderByInput!]
+    $where: ApplicationWhereInput
 ) {
-    dapps(
+    applications(
+        limit: $limit
+        offset: $offset
         orderBy: $orderBy
-        orderDirection: desc
-        first: $first
-        where: $where_dapp
-        skip: $skip
+        where: $where
     ) {
         id
         inputCount
@@ -18,28 +17,39 @@ query dapps(
     }
 }
 
-query factoryDApps(
-    $id: ID!
-    $orderBy: DApp_orderBy!
-    $where_dapp: DApp_filter
+query rollupsSummary {
+    rollupsSummary {
+        totalInputs
+        totalApplications
+    }
+}
+
+query applicationConnection(
     $first: Int
-    $skip: Int
+    $after: String
+    $orderBy: [ApplicationOrderByInput!]!
+    $where: ApplicationWhereInput
 ) {
-    dappFactory(id: $id) {
-        dappCount
-        inputCount
-        dapps(
-            orderBy: $orderBy
-            orderDirection: desc
-            first: $first
-            where: $where_dapp
-            skip: $skip
-        ) {
-            id
-            inputCount
-            deploymentTimestamp
-            activityTimestamp
-            owner
+    applicationsConnection(
+        orderBy: $orderBy
+        first: $first
+        after: $after
+        where: $where
+    ) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
+        edges {
+            node {
+                id
+                inputCount
+                deploymentTimestamp
+                activityTimestamp
+            }
         }
     }
 }
