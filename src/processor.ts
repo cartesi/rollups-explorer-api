@@ -44,7 +44,7 @@ export const processor = new EvmBatchProcessor()
             maxBatchCallSize: processorConfig.maxBatchCallSize,
         },
     })
-    .setFinalityConfirmation(75)
+    .setFinalityConfirmation(10)
     .setFields({
         transaction: {
             chainId: true,
