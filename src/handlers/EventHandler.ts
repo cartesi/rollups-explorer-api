@@ -1,18 +1,20 @@
 import { DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { NetworkConfig } from '../configs';
-import { Application, ApplicationFactory } from '../model';
+import { Application, ApplicationFactory, Input } from '../model';
 import ApplicationCreated from './ApplicationCreated';
 import Handler from './Handler';
 import InputAdded from './InputAdded';
 
 export default class EventHandler {
+    private readonly inputs: Map<string, Input>;
     private readonly dapps: Map<string, Application>;
     private readonly factories: Map<string, ApplicationFactory>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
 
     constructor(ctx: DataHandlerContext<Store>, config: NetworkConfig) {
+        this.inputs = new Map();
         this.dapps = new Map();
         this.factories = new Map();
         this.applicationCreated = new ApplicationCreated(
@@ -22,7 +24,7 @@ export default class EventHandler {
             this.dapps,
         );
 
-        this.inputAdded = new InputAdded(ctx, config, this.dapps);
+        this.inputAdded = new InputAdded(ctx, config, this.dapps, this.inputs);
     }
 
     async handle(e: Log) {
@@ -36,6 +38,7 @@ export default class EventHandler {
         return {
             dapps: this.dapps,
             factories: this.factories,
+            inputs: this.inputs,
         };
     }
 }

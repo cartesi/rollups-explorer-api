@@ -63,6 +63,7 @@ export const processor = new EvmBatchProcessor()
     .addLog({
         address: [config.inputBox.address],
         topic0: [eventConfigs.inputBox.inputAdded],
+        transaction: true,
     });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;

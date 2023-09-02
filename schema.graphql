@@ -11,3 +11,15 @@ type Application @entity @cardinality(value: 100) {
     owner: String
     factory: ApplicationFactory
 }
+
+type Input @entity @cardinality(value: 100) {
+    id: ID!
+    application: Application!
+    index: Int!
+    msgSender: String!
+    payload: String!
+    timestamp: BigInt!
+    blockNumber: BigInt!
+    blockHash: String!
+    transactionHash: String!
+}

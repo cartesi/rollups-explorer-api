@@ -3,7 +3,7 @@ import { Store } from '@subsquid/typeorm-store';
 import { events } from '../abi/InputBox';
 import { LogRecord } from '../abi/abi.support';
 import { EventConfig, NetworkConfig, eventConfigs } from '../configs';
-import { Application } from '../model';
+import { Application, Input } from '../model';
 import Handler from './Handler';
 
 export default class InputAdded implements Handler {
@@ -13,6 +13,7 @@ export default class InputAdded implements Handler {
         private readonly ctx: DataHandlerContext<Store>,
         private readonly config: NetworkConfig,
         private dappsStorage: Map<String, Application>,
+        private inputsStorage: Map<String, Input>,
     ) {
         this.eventConfig = eventConfigs;
     }
@@ -29,8 +30,8 @@ export default class InputAdded implements Handler {
             const timestamp = BigInt(e.block.timestamp);
             const ctx = this.ctx;
             ctx.log.info(`Indexing InputBox InputAdded event`);
-            const input = this.decodeLog(e);
-            const dappId = input.dapp.toLowerCase();
+            const inputEvent = this.decodeLog(e);
+            const dappId = inputEvent.dapp.toLowerCase();
 
             let dapp =
                 this.dappsStorage.get(dappId) ??
@@ -51,6 +52,19 @@ export default class InputAdded implements Handler {
                 });
             }
 
+            const inputId = `${dappId}-${inputEvent.inboxInputIndex}`;
+            const input = new Input({
+                id: inputId,
+                application: dapp,
+                index: Number(inputEvent.inboxInputIndex),
+                msgSender: inputEvent.sender.toLowerCase(),
+                payload: inputEvent.input,
+                timestamp: timestamp / 1000n,
+                blockNumber: BigInt(e.block.height),
+                blockHash: e.block.hash,
+                transactionHash: e.transaction?.hash,
+            });
+            this.inputsStorage.set(inputId, input);
             this.dappsStorage.set(dappId, dapp);
         }
 

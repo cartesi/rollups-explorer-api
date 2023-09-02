@@ -11,14 +11,15 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         }
     }
 
-    const { dapps, factories } = eventHandler.getValues();
+    const { dapps, factories, inputs } = eventHandler.getValues();
 
-    if (dapps.size || factories.size) {
+    if (inputs.size || dapps.size || factories.size) {
         ctx.log.warn(
-            `########GOING TO SAVE#######\n ( ${dapps.size} ) dapps and ( ${factories.size} ) factories`,
+            `########GOING TO SAVE#######\n ( ${inputs.size} ) inputs, ( ${dapps.size} ) dapps, ( ${factories.size} ) factories`,
         );
     }
 
     await ctx.store.upsert([...factories.values()]);
     await ctx.store.upsert([...dapps.values()]);
+    await ctx.store.upsert([...inputs.values()]);
 });
