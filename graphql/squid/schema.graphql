@@ -150,6 +150,177 @@ type ApplicationsConnection {
 """Big number integer"""
 scalar BigInt
 
+type Input {
+  application: Application!
+  blockHash: String!
+  blockNumber: BigInt!
+  id: String!
+  index: Int!
+  msgSender: String!
+  payload: String!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type InputEdge {
+  cursor: String!
+  node: Input!
+}
+
+enum InputOrderByInput {
+  application_activityTimestamp_ASC
+  application_activityTimestamp_DESC
+  application_deploymentTimestamp_ASC
+  application_deploymentTimestamp_DESC
+  application_id_ASC
+  application_id_DESC
+  application_inputCount_ASC
+  application_inputCount_DESC
+  application_owner_ASC
+  application_owner_DESC
+  blockHash_ASC
+  blockHash_DESC
+  blockNumber_ASC
+  blockNumber_DESC
+  id_ASC
+  id_DESC
+  index_ASC
+  index_DESC
+  msgSender_ASC
+  msgSender_DESC
+  payload_ASC
+  payload_DESC
+  timestamp_ASC
+  timestamp_DESC
+  transactionHash_ASC
+  transactionHash_DESC
+}
+
+input InputWhereInput {
+  AND: [InputWhereInput!]
+  OR: [InputWhereInput!]
+  application: ApplicationWhereInput
+  application_isNull: Boolean
+  blockHash_contains: String
+  blockHash_containsInsensitive: String
+  blockHash_endsWith: String
+  blockHash_eq: String
+  blockHash_gt: String
+  blockHash_gte: String
+  blockHash_in: [String!]
+  blockHash_isNull: Boolean
+  blockHash_lt: String
+  blockHash_lte: String
+  blockHash_not_contains: String
+  blockHash_not_containsInsensitive: String
+  blockHash_not_endsWith: String
+  blockHash_not_eq: String
+  blockHash_not_in: [String!]
+  blockHash_not_startsWith: String
+  blockHash_startsWith: String
+  blockNumber_eq: BigInt
+  blockNumber_gt: BigInt
+  blockNumber_gte: BigInt
+  blockNumber_in: [BigInt!]
+  blockNumber_isNull: Boolean
+  blockNumber_lt: BigInt
+  blockNumber_lte: BigInt
+  blockNumber_not_eq: BigInt
+  blockNumber_not_in: [BigInt!]
+  id_contains: String
+  id_containsInsensitive: String
+  id_endsWith: String
+  id_eq: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_isNull: Boolean
+  id_lt: String
+  id_lte: String
+  id_not_contains: String
+  id_not_containsInsensitive: String
+  id_not_endsWith: String
+  id_not_eq: String
+  id_not_in: [String!]
+  id_not_startsWith: String
+  id_startsWith: String
+  index_eq: Int
+  index_gt: Int
+  index_gte: Int
+  index_in: [Int!]
+  index_isNull: Boolean
+  index_lt: Int
+  index_lte: Int
+  index_not_eq: Int
+  index_not_in: [Int!]
+  msgSender_contains: String
+  msgSender_containsInsensitive: String
+  msgSender_endsWith: String
+  msgSender_eq: String
+  msgSender_gt: String
+  msgSender_gte: String
+  msgSender_in: [String!]
+  msgSender_isNull: Boolean
+  msgSender_lt: String
+  msgSender_lte: String
+  msgSender_not_contains: String
+  msgSender_not_containsInsensitive: String
+  msgSender_not_endsWith: String
+  msgSender_not_eq: String
+  msgSender_not_in: [String!]
+  msgSender_not_startsWith: String
+  msgSender_startsWith: String
+  payload_contains: String
+  payload_containsInsensitive: String
+  payload_endsWith: String
+  payload_eq: String
+  payload_gt: String
+  payload_gte: String
+  payload_in: [String!]
+  payload_isNull: Boolean
+  payload_lt: String
+  payload_lte: String
+  payload_not_contains: String
+  payload_not_containsInsensitive: String
+  payload_not_endsWith: String
+  payload_not_eq: String
+  payload_not_in: [String!]
+  payload_not_startsWith: String
+  payload_startsWith: String
+  timestamp_eq: BigInt
+  timestamp_gt: BigInt
+  timestamp_gte: BigInt
+  timestamp_in: [BigInt!]
+  timestamp_isNull: Boolean
+  timestamp_lt: BigInt
+  timestamp_lte: BigInt
+  timestamp_not_eq: BigInt
+  timestamp_not_in: [BigInt!]
+  transactionHash_contains: String
+  transactionHash_containsInsensitive: String
+  transactionHash_endsWith: String
+  transactionHash_eq: String
+  transactionHash_gt: String
+  transactionHash_gte: String
+  transactionHash_in: [String!]
+  transactionHash_isNull: Boolean
+  transactionHash_lt: String
+  transactionHash_lte: String
+  transactionHash_not_contains: String
+  transactionHash_not_containsInsensitive: String
+  transactionHash_not_endsWith: String
+  transactionHash_not_eq: String
+  transactionHash_not_in: [String!]
+  transactionHash_not_startsWith: String
+  transactionHash_startsWith: String
+}
+
+type InputsConnection {
+  edges: [InputEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type PageInfo {
   endCursor: String!
   hasNextPage: Boolean!
@@ -166,6 +337,10 @@ type Query {
   applicationFactoryByUniqueInput(where: WhereIdInput!): ApplicationFactory @deprecated(reason: "Use applicationFactoryById")
   applications(limit: Int, offset: Int, orderBy: [ApplicationOrderByInput!], where: ApplicationWhereInput): [Application!]!
   applicationsConnection(after: String, first: Int, orderBy: [ApplicationOrderByInput!]!, where: ApplicationWhereInput): ApplicationsConnection!
+  inputById(id: String!): Input
+  inputByUniqueInput(where: WhereIdInput!): Input @deprecated(reason: "Use inputById")
+  inputs(limit: Int, offset: Int, orderBy: [InputOrderByInput!], where: InputWhereInput): [Input!]!
+  inputsConnection(after: String, first: Int, orderBy: [InputOrderByInput!]!, where: InputWhereInput): InputsConnection!
   rollupsSummary: SummaryResult!
   squidStatus: SquidStatus
 }
