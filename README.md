@@ -1,6 +1,6 @@
-## Rollups Explorer
+## Rollups Explorer Backend
 
-Experimentation with subsquid as a new indexing protocol. Also using nextJS 13 but the `pages/` directory for the frontend.
+Experimentation with subsquid as a new indexing protocol.
 
 That project requires [docker](https://docker.com) to be installed so the backend can be used locally.
 
@@ -13,18 +13,6 @@ the following folders belongs to the `backend`
 -   db/
 -   lib/ (generated when building)
 -   src/
-
-The following folders are meant for the `frontend`
-
--   pages/
--   components/
--   graphql/ (definition for the graphql-tools autogeneration)
-
-The following work in conjunction with `deployment`
-
--   scripts/
-
-> There is a conflicting situation between subsquid and nextJS use of tsconfig.json. So the scripts inside this folder are used only when the deployment command is called using the [Pre & Post scripts](https://docs.npmjs.com/cli/v9/using-npm/scripts#pre--post-scripts).
 
 ### Development
 
@@ -39,10 +27,3 @@ npm install
 ```
 
 For backend commands and more information, refer to docs [here](./docs/backend-commands.MD);
-For code generation refer to docs [here](./docs/code-generation.MD);
-
-#### Frontend
-
-```shell
-npm run dev
-```

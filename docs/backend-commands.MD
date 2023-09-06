@@ -29,7 +29,7 @@ npm run sqd:up
 _Run the following only in case the schema.graphql for a change_
 
 ```shell
-npm run sqd:migration:generate
+npm run sqd:migration
 ```
 
 _That will start indexing one of the supported networks of your choosing_
