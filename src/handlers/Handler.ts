@@ -1,5 +1,5 @@
-import { Log } from '@subsquid/evm-processor';
+import { BlockHeader, Log } from '@subsquid/evm-processor';
 
 export default interface Handler {
-    handle(e: Log): Promise<boolean>;
+    handle(e: Log, header: BlockHeader): Promise<boolean>;
 }

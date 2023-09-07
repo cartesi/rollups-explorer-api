@@ -12,6 +12,20 @@ type Application @entity @cardinality(value: 100) {
     factory: ApplicationFactory
 }
 
+type Token @entity @cardinality(value: 10) {
+    id: ID!
+    name: String!
+    symbol: String!
+    decimals: Int!
+}
+
+type Erc20Deposit @entity {
+    id: ID!
+    token: Token!
+    from: String!
+    amount: BigInt!
+}
+
 type Input @entity @cardinality(value: 100) {
     id: ID!
     application: Application!
@@ -22,4 +36,5 @@ type Input @entity @cardinality(value: 100) {
     blockNumber: BigInt!
     blockHash: String!
     transactionHash: String!
+    erc20Deposit: Erc20Deposit
 }

@@ -1,6 +1,8 @@
 import arb_goerli_fact_deployment from '@cartesi/rollups/deployments/arbitrum_goerli/CartesiDAppFactory.json';
+import arb_goerli_erc20Portal_deployment from '@cartesi/rollups/deployments/arbitrum_goerli/ERC20Portal.json';
 import arb_goerli_inputbox_deployment from '@cartesi/rollups/deployments/arbitrum_goerli/InputBox.json';
 import sepolia_fact_deployment from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
+import sepolia_erc20Portal_deployment from '@cartesi/rollups/deployments/sepolia/ERC20Portal.json';
 import sepolia_inputbox_deployment from '@cartesi/rollups/deployments/sepolia/InputBox.json';
 import { events as FactoryEvents } from '../abi/CartesiDAppFactory';
 import { events as InputBoxEvents } from '../abi/InputBox';
@@ -29,6 +31,13 @@ export const networkConfigs = {
             abi: arb_goerli_fact_deployment.abi,
             block: arb_goerli_fact_deployment.receipt.blockNumber,
         },
+        erc20Portal: {
+            deployment: arb_goerli_erc20Portal_deployment,
+            address:
+                arb_goerli_erc20Portal_deployment.address.toLocaleLowerCase(),
+            abi: arb_goerli_erc20Portal_deployment.abi,
+            block: arb_goerli_erc20Portal_deployment.receipt.blockNumber,
+        },
         inputBox: {
             deployment: arb_goerli_inputbox_deployment,
             address: arb_goerli_inputbox_deployment.address.toLowerCase(),
@@ -46,6 +55,12 @@ export const networkConfigs = {
             address: sepolia_fact_deployment.address.toLowerCase(),
             abi: sepolia_fact_deployment.abi,
             block: sepolia_fact_deployment.receipt.blockNumber,
+        },
+        erc20Portal: {
+            deployment: sepolia_erc20Portal_deployment,
+            address: sepolia_erc20Portal_deployment.address.toLocaleLowerCase(),
+            abi: sepolia_erc20Portal_deployment.abi,
+            block: sepolia_erc20Portal_deployment.receipt.blockNumber,
         },
         inputBox: {
             deployment: sepolia_inputbox_deployment,
