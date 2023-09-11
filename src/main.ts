@@ -19,26 +19,40 @@ logger.info(`Starting processor for chain ${chainId}...`);
 const processor = createProcessor(chainId);
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
-    const eventHandler = new EventHandler(ctx);
+    const eventHandler = new EventHandler();
 
     for (const block of ctx.blocks) {
         for (const log of block.logs) {
-            await eventHandler.handle(log, block.header);
+            await eventHandler.handle(log, block, ctx);
         }
     }
 
-    const { tokens, dapps, factories, deposits, inputs } =
+    const { tokens, applications, factories, deposits, inputs } =
         eventHandler.getValues();
 
-    if (inputs.size || dapps.size || factories.size) {
-        ctx.log.warn(
-            `########GOING TO SAVE#######\n ( ${inputs.size} ) inputs, ( ${dapps.size} ) dapps, ( ${factories.size} ) factories`,
-        );
+    const total =
+        tokens.size +
+        applications.size +
+        factories.size +
+        deposits.size +
+        inputs.size;
+
+    if (total > 0) {
+        const summary = Object.entries({
+            tokens: tokens.size,
+            applications: applications.size,
+            factories: factories.size,
+            deposits: deposits.size,
+            inputs: inputs.size,
+        })
+            .map(([entity, count]) => `${entity}: ${count}`)
+            .join(', ');
+        ctx.log.info(`Flushing ${total} entities: ${summary}`);
     }
 
     await ctx.store.upsert([...tokens.values()]);
     await ctx.store.upsert([...factories.values()]);
-    await ctx.store.upsert([...dapps.values()]);
+    await ctx.store.upsert([...applications.values()]);
     await ctx.store.upsert([...deposits.values()]);
     await ctx.store.upsert([...inputs.values()]);
 });

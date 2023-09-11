@@ -1,5 +1,10 @@
-import { BlockHeader, Log } from '@subsquid/evm-processor';
+import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
+import { Store } from '@subsquid/typeorm-store';
 
 export default interface Handler {
-    handle(log: Log, header: BlockHeader): Promise<boolean>;
+    handle(
+        log: Log,
+        block: BlockData,
+        context: DataHandlerContext<Store>,
+    ): Promise<boolean>;
 }

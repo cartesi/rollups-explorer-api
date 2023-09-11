@@ -1,15 +1,10 @@
-import { lookupArchive } from '@subsquid/archive-registry';
-
 import CartesiDAppFactoryMainnet from '@cartesi/rollups/deployments/mainnet/CartesiDAppFactory.json';
 import InputBoxMainnet from '@cartesi/rollups/deployments/mainnet/InputBox.json';
 import CartesiDAppFactorySepolia from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
 import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json';
-
 import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
-
+import { lookupArchive } from '@subsquid/archive-registry';
 import { DataSource } from '@subsquid/evm-processor';
-import { events as CartesiDAppFactoryEvents } from './abi/CartesiDAppFactory';
-import { events as InputBoxEvents } from './abi/InputBox';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -17,15 +12,6 @@ export const CartesiDAppFactoryAddress =
 export const ERC20PortalAddress =
     mainnet.contracts.ERC20Portal.address.toLowerCase();
 export const InputBoxAddress = mainnet.contracts.InputBox.address.toLowerCase();
-
-export const Event = {
-    CartesiDAppFactory: {
-        ApplicationCreated: CartesiDAppFactoryEvents.ApplicationCreated.topic,
-    },
-    InputBox: {
-        InputAdded: InputBoxEvents.InputAdded.topic,
-    },
-} as const;
 
 export type ProcessorConfig = {
     dataSource: DataSource;
