@@ -5,12 +5,12 @@ description: 'Indexing Cartesi Rollups contracts'
 build:
 deploy:
     secrets:
-        - ARB_GOERLI_RPC_ENDPOINT
+        - RPC_ENDPOINT
     addons:
         postgres:
     processor:
         env:
-            USE_CHAIN_ID: 421613
+            CHAIN_ID: 421613
         cmd:
             - node
             - lib/main

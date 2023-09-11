@@ -17,16 +17,16 @@ import {
 } from './configs';
 
 const logger = createLogger('sqd:startup');
-const USE_CHAIN_ID = process.env.USE_CHAIN_ID as SupportedChainId;
-const chainId: SupportedChainId = USE_CHAIN_ID ?? SupportedNetworks.SEPOLIA;
+const CHAIN_ID = process.env.CHAIN_ID as SupportedChainId;
+const chainId: SupportedChainId = CHAIN_ID ?? SupportedNetworks.SEPOLIA;
 const [name, id] =
     Object.entries(SupportedNetworks).find(([_, id]) => id === chainId) ?? [];
 
 export const config = networkConfigs[chainId];
 const processorConfig: ProcessorConfig = processorConfigs.get(chainId) ?? {};
 
-if (!USE_CHAIN_ID) {
-    logger.warn(`Environment variable USE_CHAIN_ID not defined.`);
+if (!CHAIN_ID) {
+    logger.warn(`Environment variable CHAIN_ID not defined.`);
 }
 
 logger.info(`Using chain-id:${id} network name: ${name}`);
@@ -54,7 +54,11 @@ export const processor = new EvmBatchProcessor()
         },
     })
     .setBlockRange({
-        from: config.cartesiDAppFactory.block,
+        from: Math.min(
+            config.cartesiDAppFactory.block,
+            config.erc20Portal.block,
+            config.inputBox.block,
+        ),
     })
     .addLog({
         address: [config.cartesiDAppFactory.address],

@@ -2,7 +2,7 @@
   "name": "squiddy",
   "version": "0.1.0",
   "private": true,
-  "scripts": {    
+  "scripts": {
     "build": "rm -rf lib && tsc",
     "sqd": "sqd",
     "sqd:build": "sqd build",
@@ -15,12 +15,13 @@
     "sqd:graphql": "sqd serve",
     "sqd:auth": "sqd auth -k $SQD_API_KEY",
     "sqd:deploy": "sqd deploy -o cartesi -m",
+    "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {1} .\" -- \"squid-mainnet.yaml\"",
     "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\"",
     "sqd:deploy:arb-goerli": "run-s \"sqd:deploy -- {1} .\" -- \"squid-arb-goerli.yaml\""
   },
   "dependencies": {
     "@cartesi/rollups": "1.0.0",
-    "@subsquid/archive-registry": "^3.0.0",
+    "@subsquid/archive-registry": "^3.2.0",
     "@subsquid/evm-processor": "^1.4.0",
     "@subsquid/graphql-server": "^4.2.0",
     "@subsquid/typeorm-migration": "^1.2.0",
