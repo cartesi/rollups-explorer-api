@@ -1,8 +1,7 @@
 import { DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { events } from '../abi/CartesiDAppFactory';
-import { LogRecord } from '../abi/abi.support';
-import { CartesiDAppFactoryAddress, Event } from '../config';
+import { CartesiDAppFactoryAddress } from '../config';
 import { Application, ApplicationFactory } from '../model';
 import Handler from './Handler';
 
@@ -10,60 +9,39 @@ export default class ApplicationCreated implements Handler {
     constructor(
         private readonly ctx: DataHandlerContext<Store>,
         private factoryStorage: Map<string, ApplicationFactory>,
-        private dappsStorage: Map<String, Application>,
+        private applicationStorage: Map<String, Application>,
     ) {}
 
-    private decodeFactory(evmLog: LogRecord) {
-        return events.ApplicationCreated.decode(evmLog);
-    }
-
-    async handle(e: Log) {
+    async handle(log: Log) {
         if (
-            e.address === CartesiDAppFactoryAddress &&
-            e.topics[0] === Event.CartesiDAppFactory.ApplicationCreated
+            log.address === CartesiDAppFactoryAddress &&
+            log.topics[0] === events.ApplicationCreated.topic
         ) {
             const ctx = this.ctx;
-            const timestamp = BigInt(e.block.timestamp);
+            const timestamp = BigInt(log.block.timestamp);
 
-            ctx.log.info(`Indexing factory ApplicationCreated event`);
-            ctx.log.info(
-                `e.address: ${e.address} - factory address: ${CartesiDAppFactoryAddress}`,
-            );
-            const { application, dappOwner } = this.decodeFactory(e);
+            // decode event
+            const { application, dappOwner } =
+                events.ApplicationCreated.decode(log);
 
-            const dappFactory = new ApplicationFactory({ id: e.address });
+            // "create" factory
+            ctx.log.info(`Factory ${log.address} created`);
+            const factory = new ApplicationFactory({ id: log.address });
+            this.factoryStorage.set(log.address, factory);
 
-            this.factoryStorage.set(e.address, dappFactory);
+            // create application
+            const id = application.toLowerCase();
 
-            const dappId = application.toLowerCase();
-
-            let dapp =
-                this.dappsStorage.get(dappId) ??
-                (await ctx.store.get(Application, dappId));
-
-            if (dapp) {
-                if (!dapp.factory && !dapp.owner) {
-                    ctx.log.warn(
-                        `Application:${dappId} created by event found. updating owner and factory`,
-                    );
-                    dapp.factory = dappFactory;
-                    dapp.owner = dappOwner.toLowerCase();
-                }
-            } else {
-                ctx.log.info(
-                    `Application:${dappId} will be created and added to the Map`,
-                );
-                dapp = new Application({
-                    id: dappId,
-                    activityTimestamp: timestamp,
-                    deploymentTimestamp: timestamp,
-                    factory: dappFactory,
-                    inputCount: 0,
-                    owner: dappOwner.toLowerCase(),
-                });
-            }
-
-            this.dappsStorage.set(dappId, dapp);
+            ctx.log.info(`Application ${id} created`);
+            const app = new Application({
+                id,
+                activityTimestamp: timestamp,
+                deploymentTimestamp: timestamp,
+                factory,
+                inputCount: 0,
+                owner: dappOwner.toLowerCase(),
+            });
+            this.applicationStorage.set(id, app);
         }
 
         return true;
