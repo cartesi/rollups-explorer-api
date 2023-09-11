@@ -1,6 +1,5 @@
 import { BlockHeader, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
-import { NetworkConfig } from '../configs';
 import {
     Application,
     ApplicationFactory,
@@ -21,7 +20,7 @@ export default class EventHandler {
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
 
-    constructor(ctx: DataHandlerContext<Store>, config: NetworkConfig) {
+    constructor(ctx: DataHandlerContext<Store>) {
         this.tokens = new Map();
         this.deposits = new Map();
         this.inputs = new Map();
@@ -29,14 +28,12 @@ export default class EventHandler {
         this.factories = new Map();
         this.applicationCreated = new ApplicationCreated(
             ctx,
-            config,
             this.factories,
             this.dapps,
         );
 
         this.inputAdded = new InputAdded(
             ctx,
-            config,
             this.tokens,
             this.deposits,
             this.dapps,
@@ -44,9 +41,9 @@ export default class EventHandler {
         );
     }
 
-    async handle(e: Log, header: BlockHeader) {
-        await this.applicationCreated.handle(e, header);
-        await this.inputAdded.handle(e, header);
+    async handle(log: Log, header: BlockHeader) {
+        await this.applicationCreated.handle(log, header);
+        await this.inputAdded.handle(log, header);
 
         return true;
     }

@@ -4,30 +4,25 @@ import { dataSlice, getNumber, getUint } from 'ethers';
 import { Contract as ERC20 } from '../abi/ERC20';
 import { events } from '../abi/InputBox';
 import { LogRecord } from '../abi/abi.support';
-import { EventConfig, NetworkConfig, eventConfigs } from '../configs';
+import { ERC20PortalAddress, Event, InputBoxAddress } from '../config';
 import { Application, Erc20Deposit, Input, Token } from '../model';
 import Handler from './Handler';
 
 export default class InputAdded implements Handler {
-    private readonly eventConfig: EventConfig;
-
     constructor(
         private readonly ctx: DataHandlerContext<Store>,
-        private readonly config: NetworkConfig,
         private tokensStorage: Map<String, Token>,
         private depositsStorage: Map<String, Erc20Deposit>,
         private dappsStorage: Map<String, Application>,
         private inputsStorage: Map<String, Input>,
-    ) {
-        this.eventConfig = eventConfigs;
-    }
+    ) {}
 
     private decodeLog(evmLog: LogRecord) {
         return events.InputAdded.decode(evmLog);
     }
 
     async handlePayload(input: Input, header: BlockHeader) {
-        if (input.msgSender == this.config.erc20Portal.address) {
+        if (input.msgSender == ERC20PortalAddress) {
             const success = getNumber(dataSlice(input.payload, 0, 1)) == 1; // 1 byte for boolean
             const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
             const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
@@ -55,8 +50,8 @@ export default class InputAdded implements Handler {
 
     async handle(e: Log, header: BlockHeader) {
         if (
-            e.address === this.config.inputBox.address &&
-            e.topics[0] === this.eventConfig.inputBox.inputAdded
+            e.address === InputBoxAddress &&
+            e.topics[0] === Event.InputBox.InputAdded
         ) {
             const timestamp = BigInt(e.block.timestamp);
             const ctx = this.ctx;

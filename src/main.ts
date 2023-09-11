@@ -1,13 +1,29 @@
+import { createLogger } from '@subsquid/logger';
 import { TypeormDatabase } from '@subsquid/typeorm-store';
+
 import EventHandler from './handlers/EventHandler';
-import { config, processor } from './processor';
+import { createProcessor } from './processor';
+
+const logger = createLogger('sqd:startup');
+
+const defaultChainId = '31337';
+if (!process.env.CHAIN_ID) {
+    logger.warn(
+        `Undefined environment variable CHAIN_ID, defaulting to ${defaultChainId}`,
+    );
+}
+const chainId = parseInt(process.env.CHAIN_ID ?? defaultChainId);
+logger.info(`Starting processor for chain ${chainId}...`);
+
+// instantiate processor for chain
+const processor = createProcessor(chainId);
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
-    const eventHandler = new EventHandler(ctx, config);
+    const eventHandler = new EventHandler(ctx);
 
     for (const block of ctx.blocks) {
-        for (const e of block.logs) {
-            await eventHandler.handle(e, block.header);
+        for (const log of block.logs) {
+            await eventHandler.handle(log, block.header);
         }
     }
 

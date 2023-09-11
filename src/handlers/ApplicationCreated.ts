@@ -2,21 +2,16 @@ import { DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { events } from '../abi/CartesiDAppFactory';
 import { LogRecord } from '../abi/abi.support';
-import { EventConfig, NetworkConfig, eventConfigs } from '../configs';
+import { CartesiDAppFactoryAddress, Event } from '../config';
 import { Application, ApplicationFactory } from '../model';
 import Handler from './Handler';
 
 export default class ApplicationCreated implements Handler {
-    private readonly eventConfig: EventConfig;
-
     constructor(
         private readonly ctx: DataHandlerContext<Store>,
-        private readonly config: NetworkConfig,
         private factoryStorage: Map<string, ApplicationFactory>,
         private dappsStorage: Map<String, Application>,
-    ) {
-        this.eventConfig = eventConfigs;
-    }
+    ) {}
 
     private decodeFactory(evmLog: LogRecord) {
         return events.ApplicationCreated.decode(evmLog);
@@ -24,16 +19,15 @@ export default class ApplicationCreated implements Handler {
 
     async handle(e: Log) {
         if (
-            e.address === this.config.cartesiDAppFactory.address &&
-            e.topics[0] ===
-                this.eventConfig.cartesiDAppFactory.applicationCreated
+            e.address === CartesiDAppFactoryAddress &&
+            e.topics[0] === Event.CartesiDAppFactory.ApplicationCreated
         ) {
             const ctx = this.ctx;
             const timestamp = BigInt(e.block.timestamp);
 
             ctx.log.info(`Indexing factory ApplicationCreated event`);
             ctx.log.info(
-                `e.address: ${e.address} - factory address: ${this.config.cartesiDAppFactory.address}`,
+                `e.address: ${e.address} - factory address: ${CartesiDAppFactoryAddress}`,
             );
             const { application, dappOwner } = this.decodeFactory(e);
 
