@@ -26,6 +26,6 @@ npm-debug.log*
 # ide
 .idea
 
-
 # Generated folders/files
 /src/model
+/src/abi
