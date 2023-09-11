@@ -10,6 +10,7 @@ type Application @entity @cardinality(value: 100) {
     activityTimestamp: BigInt! @index
     owner: String
     factory: ApplicationFactory
+    inputs: [Input!] @derivedFrom(field: "application")
 }
 
 type Token @entity @cardinality(value: 10) {
