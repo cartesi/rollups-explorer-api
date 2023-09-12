@@ -16,8 +16,7 @@
     "sqd:auth": "sqd auth -k $SQD_API_KEY",
     "sqd:deploy": "sqd deploy -o cartesi -m",
     "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {1} .\" -- \"squid-mainnet.yaml\"",
-    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\"",
-    "sqd:deploy:arb-goerli": "run-s \"sqd:deploy -- {1} .\" -- \"squid-arb-goerli.yaml\""
+    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\""
   },
   "dependencies": {
     "@cartesi/rollups": "1.0.0",
