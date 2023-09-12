@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "rm -rf lib && tsc",
+    "build": "run-s clean sqd:typegen sqd:codegen tsc",
+    "clean": "rm -rf lib",
     "sqd": "sqd",
     "sqd:build": "sqd build",
     "sqd:codegen": "sqd codegen",
@@ -16,7 +17,8 @@
     "sqd:auth": "sqd auth -k $SQD_API_KEY",
     "sqd:deploy": "sqd deploy -o cartesi -m",
     "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {1} .\" -- \"squid-mainnet.yaml\"",
-    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\""
+    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\"",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@cartesi/rollups": "1.0.0",
