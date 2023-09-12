@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
-name: rollups-sepolia
-version: 6
-description: 'Indexing Cartesi Rollups contracts'
+name: cartesi-rollups-sepolia
+version: 1
+description: 'Indexing Cartesi Rollups contracts on Sepolia'
 build:
 deploy:
     addons:
