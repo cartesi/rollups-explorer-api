@@ -1,7 +1,8 @@
 {
-  "name": "squiddy",
+  "name": "@cartesi/rollups-explorer-api",
   "version": "0.1.0",
   "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "build": "run-s clean sqd:typegen sqd:codegen tsc",
     "clean": "rm -rf lib",
