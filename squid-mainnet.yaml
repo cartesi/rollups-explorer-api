@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: rollups-mainnet
-version: 5
+version: 6
 description: 'Indexing Cartesi Rollups contracts'
 build:
 deploy:
