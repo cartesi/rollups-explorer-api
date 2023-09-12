@@ -5,9 +5,6 @@ type ApplicationFactory @entity @cardinality(value: 5) {
 
 type Application @entity @cardinality(value: 100) {
     id: ID!
-    inputCount: Int!
-    deploymentTimestamp: BigInt!
-    activityTimestamp: BigInt! @index
     owner: String
     factory: ApplicationFactory
     inputs: [Input!] @derivedFrom(field: "application")

@@ -29,13 +29,9 @@ export default class ApplicationCreated implements Handler {
 
             // create application
             const id = application.toLowerCase();
-
             const app = new Application({
                 id,
-                activityTimestamp: timestamp,
-                deploymentTimestamp: timestamp,
                 factory,
-                inputCount: 0,
                 owner: dappOwner.toLowerCase(),
             });
             this.applicationStorage.set(id, app);
