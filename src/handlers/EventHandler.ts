@@ -10,6 +10,7 @@ import {
 import ApplicationCreated from './ApplicationCreated';
 import Handler from './Handler';
 import InputAdded from './InputAdded';
+import OwnershipTransferred from './OwnershipTransferred';
 
 export default class EventHandler {
     private readonly tokens: Map<string, Token>;
@@ -19,6 +20,7 @@ export default class EventHandler {
     private readonly factories: Map<string, ApplicationFactory>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
+    private readonly ownershipTransferred: Handler;
 
     constructor() {
         this.tokens = new Map();
@@ -37,11 +39,14 @@ export default class EventHandler {
             this.applications,
             this.inputs,
         );
+
+        this.ownershipTransferred = new OwnershipTransferred(this.applications);
     }
 
     async handle(log: Log, block: BlockData, ctx: DataHandlerContext<Store>) {
         await this.applicationCreated.handle(log, block, ctx);
         await this.inputAdded.handle(log, block, ctx);
+        await this.ownershipTransferred.handle(log, block, ctx);
         return true;
     }
 
