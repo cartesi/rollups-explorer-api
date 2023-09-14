@@ -17,8 +17,8 @@
     "sqd:graphql": "sqd serve",
     "sqd:auth": "sqd auth -k $SQD_API_KEY",
     "sqd:deploy": "sqd deploy -o cartesi -m",
-    "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {1} .\" -- \"squid-mainnet.yaml\"",
-    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {1} .\" -- \"squid-sepolia.yaml\"",
+    "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {@} .\" -- \"squid-mainnet.yaml\"",
+    "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {@} .\" -- \"squid-sepolia.yaml\"",
     "tsc": "tsc"
   },
   "dependencies": {
