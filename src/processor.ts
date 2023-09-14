@@ -6,6 +6,7 @@ import {
     Log as _Log,
     Transaction as _Transaction,
 } from '@subsquid/evm-processor';
+import { events as CartesiDApp } from './abi/CartesiDApp';
 import { events as CartesiDAppFactory } from './abi/CartesiDAppFactory';
 import { events as InputBox } from './abi/InputBox';
 import {
@@ -42,6 +43,10 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
         .addLog({
             address: [InputBoxAddress],
             topic0: [InputBox.InputAdded.topic],
+            transaction: true,
+        })
+        .addLog({
+            topic0: [CartesiDApp.OwnershipTransferred.topic],
             transaction: true,
         });
     return processor;
