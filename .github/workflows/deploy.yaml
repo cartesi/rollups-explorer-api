@@ -26,6 +26,9 @@ jobs:
             - name: Build
               run: npm run build
 
+            - name: Run tests
+              run: npm run ci:test
+
             - name: Aquarium Login
               run: npm run sqd:auth
               env:

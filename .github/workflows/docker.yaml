@@ -29,6 +29,9 @@ jobs:
             - name: Build
               run: npm run build
 
+            - name: Run tests
+              run: npm run ci:test
+
             - name: Docker meta
               id: docker_meta
               uses: docker/metadata-action@v4
