@@ -29,6 +29,12 @@ jobs:
             - name: Run tests
               run: npm run ci:test
 
+            - name: Publish coveralls report
+              uses: coverallsapp/github-action@master
+              with:
+                path-to-lcov: 'coverage/lcov.info'
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Aquarium Login
               run: npm run sqd:auth
               env:
