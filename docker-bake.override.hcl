@@ -1,3 +1,3 @@
 target "default" {
-    tags = ["cartesi/rollups-subsquid:devel"]
+  tags = ["cartesi/rollups-explorer-api:devel"]
 }
