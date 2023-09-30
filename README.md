@@ -1,4 +1,5 @@
 ## Rollups Explorer Backend
+[![Coverage Status](https://coveralls.io/repos/github/cartesi/rollups-explorer-api/badge.svg?branch=main)](https://coveralls.io/github/cartesi/rollups-explorer-api?branch=main)
 
 Experimentation with subsquid as a new indexing protocol.
 
