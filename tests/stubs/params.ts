@@ -2,7 +2,10 @@ import { Chain } from '@subsquid/evm-processor/lib/interfaces/chain';
 import { Logger } from '@subsquid/logger';
 import { Store } from '@subsquid/typeorm-store';
 import { vi } from 'vitest';
-import { ERC20PortalAddress } from '../../src/config';
+import {
+    CartesiDAppFactoryAddress,
+    ERC20PortalAddress,
+} from '../../src/config';
 vi.mock('@subsquid/logger', async (importOriginal) => {
     const actualMods = await importOriginal;
     const Logger = vi.fn();
@@ -82,38 +85,38 @@ export const logs = [
         },
     },
     {
-        id: '0004360162-000045-48ec5',
-        logIndex: 45,
-        transactionIndex: 47,
-        address: '0xd0a1a5ca123249affbb1c1278c966ad2073ee30f',
+        id: '0004411650-000023-520a3',
+        logIndex: 23,
+        transactionIndex: 13,
+        address: CartesiDAppFactoryAddress,
         topics: [
-            '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
-            '0x0000000000000000000000000000000000000000000000000000000000000000',
-            '0x0000000000000000000000005f1d00a0e5758077631b6a05e1b92ad10d05bbb4',
+            '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            '0x00000000000000000000000089b7b5d0e61b760f63e3d55d2a57baf974f108cd',
         ],
-        data: '0x',
+        data: '0x00000000000000000000000074d093f6911ac080897c3145441103dabb869307aa0a3217fbeee55d5bae9905c77d3204fb2e8716ec0a9d1205c9b602388ae67d0000000000000000000000000be010fa7e70d74fa8b6729fe1ae268787298f54',
         block: {
-            id: '0004360162-48ec5',
-            height: 4360162,
-            hash: '0x48ec59e44a7476f79b17756bf309592f5bfc07b8c892104c096e1f105b124e11',
+            id: '0004411650-520a3',
+            height: 4411650,
+            hash: '0x520a3652498c69888556abb744fa734751104cd4f9ab1a920377d6eec8647db9',
             parentHash:
-                '0x7432135998d062fd7509c2a6aebcd793c7035bad777c45cd304d32cf4ec3da1d',
-            timestamp: 1695633264000,
+                '0xc4df8cd32701923b2c5e228db6a918d41f0b9b125c128714beed9dd16c9f0d21',
+            timestamp: 1696281168000,
         },
         transaction: {
-            id: '0004360162-000047-48ec5',
-            transactionIndex: 47,
-            from: '0x5f1d00a0e5758077631b6a05e1b92ad10d05bbb4',
-            hash: '0x12eb5747eb00ec5430f2787bd628bc22b1bb7c7e34c56a37c24b7ca95c2f293d',
+            id: '0004411650-000013-520a3',
+            transactionIndex: 13,
+            from: '0x74d093f6911ac080897c3145441103dabb869307',
+            to: '0x7122cd1221c20892234186facfe8615e6743ab02',
+            hash: '0x1675b03dcc2e953e1c244f7a416a0644afff560d1e10b86d52c630e5a4d7d0aa',
             chainId: 11155111,
             value: '0',
             block: {
-                id: '0004360162-48ec5',
-                height: 4360162,
-                hash: '0x48ec59e44a7476f79b17756bf309592f5bfc07b8c892104c096e1f105b124e11',
+                id: '0004411650-520a3',
+                height: 4411650,
+                hash: '0x520a3652498c69888556abb744fa734751104cd4f9ab1a920377d6eec8647db9',
                 parentHash:
-                    '0x7432135998d062fd7509c2a6aebcd793c7035bad777c45cd304d32cf4ec3da1d',
-                timestamp: 1695633264000,
+                    '0xc4df8cd32701923b2c5e228db6a918d41f0b9b125c128714beed9dd16c9f0d21',
+                timestamp: 1696281168000,
             },
         },
     },
