@@ -71,6 +71,7 @@ export const logs = [
             id: '0004411683-000001-cae3a',
             transactionIndex: 1,
             from: '0x74d093f6911ac080897c3145441103dabb869307',
+            to: '0x95ff8d3ce9dcb7455beb7845143bea84fe5c4f6f',
             hash: '0x1b165c2cd18cc58823fbe598e954458774a48f69249efed9ba5cf243b17d0d89',
             chainId: 11155111,
             value: '0',
@@ -117,6 +118,43 @@ export const logs = [
                 parentHash:
                     '0xc4df8cd32701923b2c5e228db6a918d41f0b9b125c128714beed9dd16c9f0d21',
                 timestamp: 1696281168000,
+            },
+        },
+    },
+    {
+        id: '0004412547-000071-ef8d2',
+        logIndex: 71,
+        transactionIndex: 38,
+        address: '0x5a1651482b751c1ecc36acb2fff5f31df24e7683',
+        topics: [
+            '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x00000000000000000000000096ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
+        ],
+        data: '0x',
+        block: {
+            id: '0004412547-ef8d2',
+            height: 4412547,
+            hash: '0xef8d2ed24f024c5299be89a8cd518f69944c949f281f675f90aa360d108a2003',
+            parentHash:
+                '0xb73623fba8d50070a0f42eb884a8f28fc56a2af336d9721d3e25615d565b3f85',
+            timestamp: 1696292376000,
+        },
+        transaction: {
+            id: '0004412547-000038-ef8d2',
+            transactionIndex: 38,
+            from: '0x96ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
+            to: '0x7122cd1221c20892234186facfe8615e6743ab02',
+            hash: '0xc4df497a15a4afc64dcdb511be8d282283ddd99fc6b4760c74dbaf0570019aa0',
+            chainId: 11155111,
+            value: '0',
+            block: {
+                id: '0004412547-ef8d2',
+                height: 4412547,
+                hash: '0xef8d2ed24f024c5299be89a8cd518f69944c949f281f675f90aa360d108a2003',
+                parentHash:
+                    '0xb73623fba8d50070a0f42eb884a8f28fc56a2af336d9721d3e25615d565b3f85',
+                timestamp: 1696292376000,
             },
         },
     },
