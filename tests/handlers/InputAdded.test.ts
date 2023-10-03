@@ -2,18 +2,9 @@ import { dataSlice, getUint } from 'ethers';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Contract } from '../../src/abi/ERC20';
 import InputAdded from '../../src/handlers/InputAdded';
-import { Application, Erc20Deposit, Token } from '../../src/model/';
-import { block, ctx, input } from '../stubs/params';
-vi.mock('@subsquid/logger', async (importOriginal) => {
-    const actualMods = await importOriginal;
-    const Logger = vi.fn();
-    Logger.prototype.info = vi.fn();
-    Logger.prototype.warn = vi.fn();
-    return {
-        ...actualMods!,
-        Logger,
-    };
-});
+import { Erc20Deposit, Token } from '../../src/model';
+import { block, ctx, input, logs } from '../stubs/params';
+
 vi.mock('../../src/abi/ERC20', async (importOriginal) => {
     const actualMods = await importOriginal;
     const Contract = vi.fn();
@@ -25,6 +16,20 @@ vi.mock('../../src/abi/ERC20', async (importOriginal) => {
         Contract,
     };
 });
+vi.mock('../../src/model/', async (importOriginal) => {
+    const actualMods = await importOriginal;
+    const Token = vi.fn();
+    const Erc20Deposit = vi.fn();
+    const Application = vi.fn();
+    const Input = vi.fn();
+    return {
+        ...actualMods!,
+        Application,
+        Token,
+        Erc20Deposit,
+        Input,
+    };
+});
 const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
 const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
 const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
@@ -34,7 +39,7 @@ describe('InputAdded', () => {
     const mockTokenStorage = new Map();
     const mockDepositStorage = new Map();
     const mockInputStorage = new Map();
-    const mockApplicationStorage = new Map<string, Application>();
+    const mockApplicationStorage = new Map();
     beforeEach(() => {
         inputAdded = new InputAdded(
             mockTokenStorage,
@@ -46,9 +51,10 @@ describe('InputAdded', () => {
         mockTokenStorage.clear();
         mockDepositStorage.clear();
         mockApplicationStorage.clear();
+        mockInputStorage.clear();
         vi.clearAllMocks();
     });
-    describe('handlePayload', async () => {
+    describe('handlePayload(log)', async () => {
         test('call with the correct params', async () => {
             vi.spyOn(inputAdded, 'handlePayload');
             inputAdded.handlePayload(input, block, ctx);
@@ -100,5 +106,22 @@ describe('InputAdded', () => {
             expect(handlePayload).toBe(undefined);
         });
     });
-    describe('handle', async () => {});
+    describe('handle', async () => {
+        test('call with the correct params', async () => {
+            vi.spyOn(inputAdded, 'handle');
+            inputAdded.handle(logs[0], block, ctx);
+            expect(inputAdded.handle).toBeCalledWith(logs[0], block, ctx);
+        });
+        test('wrong contract address', async () => {
+            await inputAdded.handle(logs[1], block, ctx);
+            expect(mockInputStorage.size).toBe(0);
+            expect(mockApplicationStorage.size).toBe(0);
+            expect(mockDepositStorage.size).toBe(0);
+        });
+        test('correct contract address', async () => {
+            await inputAdded.handle(logs[0], block, ctx);
+            expect(mockApplicationStorage.size).toBe(1);
+            expect(mockInputStorage.size).toBe(1);
+        });
+    });
 });
