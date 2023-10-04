@@ -6,10 +6,11 @@ build:
 deploy:
     addons:
         postgres:
+    secrets:
+        - RPC_URL_11155111
     processor:
         env:
             CHAIN_ID: 11155111
-            RPC_ENDPOINT: https://rpc.ankr.com/eth_sepolia
         cmd:
             - node
             - lib/main

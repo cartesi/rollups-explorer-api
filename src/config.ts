@@ -20,13 +20,13 @@ export type ProcessorConfig = {
 };
 
 export const getConfig = (chainId: number): ProcessorConfig => {
+    const RPC_URL = `RPC_URL_${chainId}`;
     switch (chainId) {
         case 1: // mainnet
             return {
                 dataSource: {
                     archive: lookupArchive('eth-mainnet'),
-                    chain:
-                        process.env.RPC_ENDPOINT ?? 'https://rpc.ankr.com/eth',
+                    chain: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
                 },
                 from: Math.min(
                     CartesiDAppFactoryMainnet.receipt.blockNumber,
@@ -38,7 +38,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                 dataSource: {
                     archive: lookupArchive('sepolia'),
                     chain:
-                        process.env.RPC_ENDPOINT ??
+                        process.env[RPC_URL] ??
                         'https://rpc.ankr.com/eth_sepolia',
                 },
                 from: Math.min(
@@ -49,7 +49,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 31337: // anvil
             return {
                 dataSource: {
-                    chain: process.env.RPC_ENDPOINT ?? 'http://127.0.0.1:8545',
+                    chain: process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
                 },
                 from: 0,
             };
