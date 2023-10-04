@@ -6,10 +6,11 @@ build:
 deploy:
     addons:
         postgres:
+    secrets:
+        - RPC_URL_1
     processor:
         env:
             CHAIN_ID: 1
-            RPC_ENDPOINT: https://rpc.ankr.com/eth
         cmd:
             - node
             - lib/main

@@ -1,3 +1,4 @@
+import { afterEach } from 'node:test';
 import { MockInstance, beforeEach, describe, expect, test, vi } from 'vitest';
 import { createProcessor } from '../src/processor';
 
@@ -26,6 +27,10 @@ const local = 31337;
 describe('Processor creation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
     });
 
     test('Throw error for unsupported chains', () => {
@@ -172,6 +177,41 @@ describe('Processor creation', () => {
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
             transaction: true,
+        });
+    });
+
+    test('Set correct chain for sepolia based on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-sepolia-node/v3/api';
+        vi.stubEnv('RPC_URL_11155111', myRPCNodeURL);
+
+        const processor = createProcessor(sepolia);
+
+        expect(processor.setDataSource).toHaveBeenCalledWith({
+            archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+            chain: 'https://my-custom-sepolia-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for mainnet based on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-mainnet-node/v3/api';
+        vi.stubEnv('RPC_URL_1', myRPCNodeURL);
+
+        const processor = createProcessor(mainnet);
+
+        expect(processor.setDataSource).toHaveBeenCalledWith({
+            archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+            chain: 'https://my-custom-mainnet-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for local/anvil based on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-local-node:9000';
+        vi.stubEnv('RPC_URL_31337', myRPCNodeURL);
+
+        const processor = createProcessor(local);
+
+        expect(processor.setDataSource).toHaveBeenCalledWith({
+            chain: 'https://my-custom-local-node:9000',
         });
     });
 });
