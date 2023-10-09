@@ -123,5 +123,34 @@ describe('InputAdded', () => {
             expect(mockApplicationStorage.size).toBe(1);
             expect(mockInputStorage.size).toBe(1);
         });
+        test('Erc20Deposit Stored', async () => {
+            const name = 'SimpleERC20';
+            const symbol = 'SIM20';
+            const decimals = 18;
+            const token = new Token({
+                id: tokenAddress,
+                name,
+                symbol,
+                decimals,
+            });
+            erc20.name.mockResolvedValueOnce('SimpleERC20');
+            erc20.symbol.mockResolvedValue('SIM20');
+            erc20.decimals.mockResolvedValue(18);
+            const deposit = new Erc20Deposit({
+                id: input.id,
+                amount,
+                from,
+                token,
+            });
+            vi.spyOn(inputAdded, 'handlePayload').mockImplementation(
+                (input, block, ctx) => {
+                    return new Promise((resolve) => {
+                        resolve(deposit);
+                    });
+                },
+            );
+            await inputAdded.handle(logs[0], block, ctx);
+            expect(mockDepositStorage.size).toBe(1);
+        });
     });
 });
