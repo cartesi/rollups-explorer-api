@@ -6,6 +6,7 @@ import {
     CartesiDAppFactoryAddress,
     ERC20PortalAddress,
 } from '../../src/config';
+import { Input } from '../../src/model';
 vi.mock('@subsquid/logger', async (importOriginal) => {
     const actualMods = await importOriginal;
     const Logger = vi.fn();
@@ -31,6 +32,7 @@ export const input = {
     id: '0x60a7048c3136293071605a4eaffef49923e981cc-0',
     application: {
         id: '0x60a7048c3136293071605a4eaffef49923e981cc',
+        timestamp: 1696281168n,
         owner: null,
         factory: null,
         inputs: [],
@@ -38,14 +40,14 @@ export const input = {
     index: 1,
     msgSender: ERC20PortalAddress,
     payload: payload,
-    timestamp: 1691384268 as unknown as bigint,
-    blockNumber: 4040941 as unknown as bigint,
+    timestamp: 1691384268n,
+    blockNumber: 4040941n,
     blockHash:
         '0xce6a0d404b4201b3bd4fb8309df0b6a64f6a5d7b71fa89bf2737d4574c58b32f',
     erc20Deposit: null,
     transactionHash:
         '0x6a3d76983453c0f74188bd89e01576c35f9d9b02daecdd49f7171aeb2bd3dc78',
-};
+} satisfies Input;
 
 export const logs = [
     {
