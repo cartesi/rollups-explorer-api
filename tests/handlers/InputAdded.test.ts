@@ -2,7 +2,7 @@ import { dataSlice, getUint } from 'ethers';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Contract } from '../../src/abi/ERC20';
 import InputAdded from '../../src/handlers/InputAdded';
-import { Erc20Deposit, Token } from '../../src/model';
+import { Application, Erc20Deposit, Token } from '../../src/model';
 import { block, ctx, input, logs } from '../stubs/params';
 
 vi.mock('../../src/abi/ERC20', async (importOriginal) => {
@@ -30,9 +30,13 @@ vi.mock('../../src/model/', async (importOriginal) => {
         Input,
     };
 });
+
+const ApplicationMock = vi.mocked(Application);
+
 const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
 const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
 const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
+
 describe('InputAdded', () => {
     let inputAdded: InputAdded;
     let erc20;
@@ -151,6 +155,24 @@ describe('InputAdded', () => {
             );
             await inputAdded.handle(logs[0], block, ctx);
             expect(mockDepositStorage.size).toBe(1);
+        });
+
+        test('when creating a non-existing app it should also set the timestamp in seconds', async () => {
+            const expectedParams = vi.fn();
+
+            ApplicationMock.mockImplementationOnce((args) => {
+                expectedParams(args);
+                return new Application(args);
+            });
+
+            await inputAdded.handle(logs[0], block, ctx);
+
+            const timestamp = BigInt(logs[0].block.timestamp) / 1000n;
+
+            expect(expectedParams).toHaveBeenCalledWith({
+                id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
+                timestamp,
+            });
         });
     });
 });
