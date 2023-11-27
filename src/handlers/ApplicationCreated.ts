@@ -33,7 +33,9 @@ export default class ApplicationCreated implements Handler {
                 id,
                 factory,
                 owner: dappOwner.toLowerCase(),
+                timestamp: timestamp / 1000n,
             });
+
             this.applicationStorage.set(id, app);
             ctx.log.info(`${id} (Application) stored`);
         }

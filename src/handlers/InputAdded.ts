@@ -55,13 +55,17 @@ export default class InputAdded implements Handler {
             const timestamp = BigInt(log.block.timestamp);
             const event = events.InputAdded.decode(log);
             const dappId = event.dapp.toLowerCase();
+            const timestampInSeconds = timestamp / 1000n;
 
             let application =
                 this.applicationStorage.get(dappId) ??
                 (await ctx.store.get(Application, dappId));
             if (!application) {
                 ctx.log.warn(`${dappId} (Application) not found`);
-                application = new Application({ id: dappId });
+                application = new Application({
+                    id: dappId,
+                    timestamp: timestampInSeconds,
+                });
                 this.applicationStorage.set(dappId, application);
                 ctx.log.info(`${dappId} (Application) stored`);
             }
@@ -73,7 +77,7 @@ export default class InputAdded implements Handler {
                 index: Number(event.inboxInputIndex),
                 msgSender: event.sender.toLowerCase(),
                 payload: event.input,
-                timestamp: timestamp / 1000n,
+                timestamp: timestampInSeconds,
                 blockNumber: BigInt(log.block.height),
                 blockHash: log.block.hash,
                 transactionHash: log.transaction?.hash,
