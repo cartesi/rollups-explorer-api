@@ -12,6 +12,8 @@ export const CartesiDAppFactoryAddress =
 export const ERC20PortalAddress =
     mainnet.contracts.ERC20Portal.address.toLowerCase();
 export const InputBoxAddress = mainnet.contracts.InputBox.address.toLowerCase();
+export const ERC721PortalAddress =
+    mainnet.contracts.ERC721Portal.address.toLowerCase();
 
 export type ProcessorConfig = {
     dataSource: DataSource;
