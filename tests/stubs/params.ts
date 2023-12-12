@@ -5,18 +5,22 @@ import { vi } from 'vitest';
 import {
     CartesiDAppFactoryAddress,
     ERC20PortalAddress,
+    InputBoxAddress,
 } from '../../src/config';
 import { Input } from '../../src/model';
+
 vi.mock('@subsquid/logger', async (importOriginal) => {
     const actualMods = await importOriginal;
     const Logger = vi.fn();
     Logger.prototype.warn = vi.fn();
     Logger.prototype.info = vi.fn();
+    Logger.prototype.error = vi.fn();
     return {
         ...actualMods!,
         Logger,
     };
 });
+
 vi.mock('@subsquid/typeorm-store', async (importOriginal) => {
     const actualMods = await importOriginal;
     const Store = vi.fn();
@@ -28,6 +32,7 @@ vi.mock('@subsquid/typeorm-store', async (importOriginal) => {
 });
 const payload =
     '0x494e5345525420494e544f20636572746966696572202056414c554553202827307866434432423566316346353562353643306632323464614439394331346234454530393237346433272c3130202c273078664344324235663163463535623536433066323234646144393943313462344545303932373464332729';
+
 export const input = {
     id: '0x60a7048c3136293071605a4eaffef49923e981cc-0',
     application: {
@@ -44,17 +49,55 @@ export const input = {
     blockNumber: 4040941n,
     blockHash:
         '0xce6a0d404b4201b3bd4fb8309df0b6a64f6a5d7b71fa89bf2737d4574c58b32f',
+    erc721Deposit: null,
     erc20Deposit: null,
     transactionHash:
         '0x6a3d76983453c0f74188bd89e01576c35f9d9b02daecdd49f7171aeb2bd3dc78',
 } satisfies Input;
+
+export const logErc721Transfer = {
+    id: '0004867730-000035-2c78f',
+    address: InputBoxAddress,
+    logIndex: 35,
+    transactionIndex: 24,
+    topics: [
+        '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+        '0x0000000000000000000000000be010fa7e70d74fa8b6729fe1ae268787298f54',
+        '0x0000000000000000000000000000000000000000000000000000000000000001',
+    ],
+    data: '0x000000000000000000000000237f8dd094c0e47f4236f12b4fa01d6dae89fb87000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c87a3cc9c0408887a030a0354330c36a9cd681aa7ea074683b5be015f053b5dceb064c41fc9d11b6e500000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    block: {
+        id: '0004867730-2c78f',
+        height: 4867730,
+        hash: '0x2c78fb73f84f2755f65533652983578bcf89a68ad173e756bc631b4d0d242b53',
+        parentHash:
+            '0x1bb7d54bde1c3dda41c6cc5ab40ad04b855d1ce5dec4175571dd158d3134ec3e',
+        timestamp: 1702321200000,
+    },
+    transaction: {
+        id: '0004867730-000024-2c78f',
+        transactionIndex: 24,
+        from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+        to: '0x237f8dd094c0e47f4236f12b4fa01d6dae89fb87',
+        hash: '0x47c53eeddc2f927ef2a7a3dd9a95bfd70ecfda2c4efdf10a16c48ca98c86b881',
+        value: 0,
+        block: {
+            id: '0004867730-2c78f',
+            height: 4867730,
+            hash: '0x2c78fb73f84f2755f65533652983578bcf89a68ad173e756bc631b4d0d242b53',
+            parentHash:
+                '0x1bb7d54bde1c3dda41c6cc5ab40ad04b855d1ce5dec4175571dd158d3134ec3e',
+            timestamp: 1702321200000,
+        },
+    },
+};
 
 export const logs = [
     {
         id: '0004411683-000001-cae3a',
         logIndex: 1,
         transactionIndex: 1,
-        address: '0x59b22d57d4f067708ab0c00552767405926dc768',
+        address: InputBoxAddress,
         topics: [
             '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
             '0x0000000000000000000000000be010fa7e70d74fa8b6729fe1ae268787298f54',
@@ -161,6 +204,7 @@ export const logs = [
         },
     },
 ];
+
 export const block = {
     header: {
         id: '1234567890',
@@ -174,15 +218,18 @@ export const block = {
     traces: [],
     stateDiffs: [],
 };
+
 export const token = {
     decimals: 18,
     id: '0x059c7507b973d1512768c06f32a813bc93d83eb2',
     name: 'SimpleERC20',
     symbol: 'SIM20',
 };
+
 const consoleSink = vi.fn();
 const em = vi.fn();
 const logger = new Logger(consoleSink, 'app');
+
 const store = new Store(em);
 export const ctx = {
     _chain: {} as unknown as Chain,
