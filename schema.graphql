@@ -18,7 +18,20 @@ type Token @entity @cardinality(value: 10) {
     decimals: Int!
 }
 
-type Erc20Deposit @entity {
+type NFT @entity @cardinality(value: 10) {
+    id: ID!
+    name: String
+    symbol: String
+}
+
+type Erc721Deposit @entity @cardinality(value: 100) {
+    id: ID!
+    from: String!
+    token: NFT!
+    tokenIndex: BigInt!
+}
+
+type Erc20Deposit @entity @cardinality(value: 100) {
     id: ID!
     token: Token!
     from: String!
@@ -36,4 +49,5 @@ type Input @entity @cardinality(value: 100) {
     blockHash: String!
     transactionHash: String!
     erc20Deposit: Erc20Deposit
+    erc721Deposit: Erc721Deposit
 }
