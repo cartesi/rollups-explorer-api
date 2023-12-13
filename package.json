@@ -16,12 +16,16 @@
     "sqd:down": "sqd down",
     "sqd:migration": "sqd migration",
     "sqd:process": "sqd process",
+    "sqd:process:prod": "sqd process:prod",
     "sqd:graphql": "sqd serve",
+    "sqd:graphql:prod": "sqd serve:prod",
     "sqd:auth": "sqd auth -k $SQD_API_KEY",
     "sqd:deploy": "sqd deploy -o cartesi -m",
     "sqd:deploy:mainnet": "run-s \"sqd:deploy -- {@} .\" -- \"squid-mainnet.yaml\"",
     "sqd:deploy:sepolia": "run-s \"sqd:deploy -- {@} .\" -- \"squid-sepolia.yaml\"",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "process:prod": "node deploy/run --npmScriptName=sqd:process:prod",
+    "serve:prod": "node deploy/run --npmScriptName=sqd:graphql:prod"
   },
   "dependencies": {
     "@cartesi/rollups": "1.0.0",
@@ -34,8 +38,10 @@
     "dotenv": "^16.1.4",
     "ethers": "^6.5.1",
     "pg": "^8.11.0",
+    "shelljs": "^0.8.5",
     "type-graphql": "^1.2.0-rc.1",
-    "typeorm": "^0.3.16"
+    "typeorm": "^0.3.16",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@subsquid/cli": "latest",
