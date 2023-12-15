@@ -1,2 +1,2 @@
-web: GQL_PORT=$PORT sqd serve:prod
-worker: sqd process:prod
+web: GQL_PORT=$PORT npm run serve:prod
+worker: npm run process:prod

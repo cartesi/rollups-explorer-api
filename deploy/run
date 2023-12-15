@@ -1,0 +1,65 @@
+#!/usr/bin/env node
+
+/**
+ * @file Manage to derive the DATABASE_URL env var
+ * into several ones, followed by starting the correct npm script.
+ * It will set the new vars prepending its declaration prior
+ * calling the npm-script defined by the caller.
+ * The main intent is to solve the problem when the cloud provider changes
+ * the DATABASE_URL due to maintenance that leads to manual derivation
+ * of such values.
+ *
+ * @author Bruno Menezes <brunodmenezes@gmail.com>
+ */
+
+/**
+ * @typedef {Object} Config
+ * @property {string} DB_HOST - Database host
+ * @property {string} DB_NAME - Database name
+ * @property {string} DB_USER - Database user
+ * @property {string} DB_PASS - Database password
+ * @property {string} DB_PORT - Database port
+ */
+
+const url = require('node:url');
+const shell = require('shelljs');
+const yargs = require('yargs');
+const { hideBin } = require('yargs/helpers');
+
+const argv = yargs(hideBin(process.argv)).argv;
+
+if (!argv.npmScriptName) {
+    console.error('Npm script name is required!\n');
+    process.exitCode = 1;
+}
+
+/**
+ * @type Config
+ */
+const config = {};
+
+const scriptName = argv.npmScriptName;
+const DATABASE_URL = process.env.DATABASE_URL;
+const db = url.parse(DATABASE_URL);
+const auth = db.auth.split(':');
+config.DB_HOST = db.hostname;
+config.DB_NAME = db.pathname.substring(1);
+config.DB_USER = auth[0];
+config.DB_PASS = auth[1];
+config.DB_PORT = db.port;
+
+/**
+ *
+ * @param {string} scriptName Existing npm-script name.
+ * @param {Config} config Database environment variables to be injected.
+ */
+function runScript(scriptName, config) {
+    const vars = [];
+    for (const key in config) {
+        vars.push(`${key}=${config[key]}`);
+    }
+
+    shell.exec(`${vars.join(' ')} npm run ${scriptName}`);
+}
+
+runScript(scriptName, config);
