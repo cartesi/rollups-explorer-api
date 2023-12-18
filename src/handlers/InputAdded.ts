@@ -33,40 +33,45 @@ export default class InputAdded implements Handler {
         private inputStorage: Map<String, Input>,
     ) {}
 
-    async handlePayload(
+    private async prepareErc20Deposit(
         input: Input,
         block: BlockData,
         ctx: DataHandlerContext<Store>,
+        opts: {
+            inputId: string;
+        },
     ) {
-        if (input.msgSender == ERC20PortalAddress) {
-            const success = getNumber(dataSlice(input.payload, 0, 1)) == 1; // 1 byte for boolean (not used?)
-            const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
-            const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
-            const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
+        if (input.msgSender !== ERC20PortalAddress) return undefined;
 
-            let token = this.tokenStorage.get(tokenAddress) as Token;
-            if (!token) {
-                const contract = new ERC20(ctx, block.header, tokenAddress);
-                const name = await contract.name();
-                const symbol = await contract.symbol();
-                const decimals = await contract.decimals();
-                token = new Token({ id: tokenAddress, name, symbol, decimals });
-                this.tokenStorage.set(tokenAddress, token);
-                ctx.log.info(`${tokenAddress} (Token) stored`);
-            }
-            const deposit = new Erc20Deposit({
-                id: input.id,
-                amount,
-                from,
-                token,
-            });
-            return deposit;
+        const success = getNumber(dataSlice(input.payload, 0, 1)) == 1; // 1 byte for boolean (not used?)
+        const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
+        const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
+        const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
+
+        let token = this.tokenStorage.get(tokenAddress) as Token;
+        if (!token) {
+            const contract = new ERC20(ctx, block.header, tokenAddress);
+            const name = await contract.name();
+            const symbol = await contract.symbol();
+            const decimals = await contract.decimals();
+            token = new Token({ id: tokenAddress, name, symbol, decimals });
+            this.tokenStorage.set(tokenAddress, token);
+            ctx.log.info(`${tokenAddress} (Token) stored`);
         }
+        const deposit = new Erc20Deposit({
+            id: input.id,
+            amount,
+            from,
+            token,
+        });
 
-        return undefined;
+        this.depositStorage.set(opts.inputId, deposit);
+        ctx.log.info(`${opts.inputId} (Erc20Deposit) stored`);
+
+        return deposit;
     }
 
-    async prepareErc721Deposit(
+    private async prepareErc721Deposit(
         input: Input,
         block: BlockData,
         ctx: DataHandlerContext<Store>,
@@ -143,12 +148,14 @@ export default class InputAdded implements Handler {
                 transactionHash: log.transaction?.hash,
             });
 
-            const erc20Deposit = await this.handlePayload(input, block, ctx);
-            if (erc20Deposit) {
-                this.depositStorage.set(inputId, erc20Deposit);
-                ctx.log.info(`${inputId} (Erc20Deposit) stored`);
-                input.erc20Deposit = erc20Deposit;
-            }
+            input.erc20Deposit = await this.prepareErc20Deposit(
+                input,
+                block,
+                ctx,
+                {
+                    inputId,
+                },
+            );
 
             input.erc721Deposit = await this.prepareErc721Deposit(
                 input,

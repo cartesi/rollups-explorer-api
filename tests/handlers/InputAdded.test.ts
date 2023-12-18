@@ -1,4 +1,4 @@
-import { dataSlice, getUint } from 'ethers';
+import { dataSlice } from 'ethers';
 import { afterEach } from 'node:test';
 import { MockedObject, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Contract } from '../../src/abi/ERC20';
@@ -12,7 +12,14 @@ import {
     NFT,
     Token,
 } from '../../src/model';
-import { block, ctx, input, logErc721Transfer, logs } from '../stubs/params';
+import {
+    block,
+    ctx,
+    input,
+    logErc20Transfer,
+    logErc721Transfer,
+    logs,
+} from '../stubs/params';
 
 vi.mock('../../src/abi/ERC20', async (importOriginal) => {
     const actualMods = await importOriginal;
@@ -58,14 +65,14 @@ const ApplicationMock = vi.mocked(Application);
 const InputMock = vi.mocked(Input);
 const NFTStub = vi.mocked(NFT);
 const ERC721DepositStub = vi.mocked(Erc721Deposit);
+const ERC20Mock = vi.mocked(Contract, true);
+const ERC20DepositStub = vi.mocked(Erc20Deposit);
+const TokenStub = vi.mocked(Token);
 
 const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
-const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
-const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
 
 describe('InputAdded', () => {
     let inputAdded: InputAdded;
-    let erc20;
     let erc721: MockedObject<ERC721>;
     const mockTokenStorage = new Map();
     const mockDepositStorage = new Map();
@@ -79,7 +86,6 @@ describe('InputAdded', () => {
             mockApplicationStorage,
             mockInputStorage,
         );
-        erc20 = new Contract(ctx, block.header, tokenAddress);
         erc721 = vi.mocked(new ERC721(ctx, block.header, tokenAddress));
         mockTokenStorage.clear();
         mockDepositStorage.clear();
@@ -87,66 +93,8 @@ describe('InputAdded', () => {
         mockInputStorage.clear();
         vi.clearAllMocks();
     });
-    describe('handlePayload(log)', async () => {
-        test('call with the correct params', async () => {
-            vi.spyOn(inputAdded, 'handlePayload');
-            inputAdded.handlePayload(input, block, ctx);
-            expect(inputAdded.handlePayload).toHaveBeenCalledWith(
-                input,
-                block,
-                ctx,
-            );
-        });
-        test('call the ERC20 module', async () => {
-            await inputAdded.handlePayload(input, block, ctx);
-            expect(erc20.name).toBeCalledTimes(1);
-            expect(erc20.symbol).toBeCalledTimes(1);
-            expect(erc20.decimals).toBeCalledTimes(1);
-        });
-        test('return the correct deposit value', async () => {
-            const name = 'SimpleERC20';
-            const symbol = 'SIM20';
-            const decimals = 18;
-            const token = new Token({
-                id: tokenAddress,
-                name,
-                symbol,
-                decimals,
-            });
-            const deposit = new Erc20Deposit({
-                id: input.id,
-                amount,
-                from,
-                token,
-            });
-            erc20.name.mockResolvedValueOnce('SimpleERC20');
-            erc20.symbol.mockResolvedValue('SIM20');
-            erc20.decimals.mockResolvedValue(18);
-            const handlePayload = await inputAdded.handlePayload(
-                input,
-                block,
-                ctx,
-            );
-            expect(handlePayload).toStrictEqual(deposit);
-        });
-        test('msgSender is not the correct ERC20PortalAddress', async () => {
-            input.msgSender = '0x42985af528673AF020811c339Bf62497160Fe087';
-            const handlePayload = await inputAdded.handlePayload(
-                input,
-                block,
-                ctx,
-            );
-            expect(handlePayload).toBe(undefined);
-        });
-    });
 
     describe('handle', async () => {
-        test('call with the correct params', async () => {
-            vi.spyOn(inputAdded, 'handle');
-            inputAdded.handle(logs[0], block, ctx);
-            expect(inputAdded.handle).toBeCalledWith(logs[0], block, ctx);
-        });
-
         test('wrong contract address', async () => {
             await inputAdded.handle(logs[1], block, ctx);
             expect(mockInputStorage.size).toBe(0);
@@ -158,36 +106,6 @@ describe('InputAdded', () => {
             await inputAdded.handle(logs[0], block, ctx);
             expect(mockApplicationStorage.size).toBe(1);
             expect(mockInputStorage.size).toBe(1);
-        });
-
-        test('Erc20Deposit Stored', async () => {
-            const name = 'SimpleERC20';
-            const symbol = 'SIM20';
-            const decimals = 18;
-            const token = new Token({
-                id: tokenAddress,
-                name,
-                symbol,
-                decimals,
-            });
-            erc20.name.mockResolvedValueOnce('SimpleERC20');
-            erc20.symbol.mockResolvedValue('SIM20');
-            erc20.decimals.mockResolvedValue(18);
-            const deposit = new Erc20Deposit({
-                id: input.id,
-                amount,
-                from,
-                token,
-            });
-            vi.spyOn(inputAdded, 'handlePayload').mockImplementation(
-                (input, block, ctx) => {
-                    return new Promise((resolve) => {
-                        resolve(deposit);
-                    });
-                },
-            );
-            await inputAdded.handle(logs[0], block, ctx);
-            expect(mockDepositStorage.size).toBe(1);
         });
 
         test('when creating a non-existing app it should also set the timestamp in seconds', async () => {
@@ -205,6 +123,81 @@ describe('InputAdded', () => {
             expect(expectedParams).toHaveBeenCalledWith({
                 id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
                 timestamp,
+            });
+        });
+
+        describe('ERC-20 deposit', () => {
+            const name = 'Wrapped Ether';
+            const symbol = 'WETH';
+            const decimals = 18;
+
+            beforeEach(() => {
+                InputMock.mockImplementationOnce((args) => {
+                    return { ...args } as Input;
+                });
+                TokenStub.mockImplementation((args) => ({ ...args } as Token));
+                ERC20DepositStub.mockImplementation(
+                    (args) => ({ ...args } as Erc20Deposit),
+                );
+
+                // some default returns for the ERC20 contract calls
+                ERC20Mock.prototype.name.mockResolvedValue(name);
+                ERC20Mock.prototype.symbol.mockResolvedValue(symbol);
+                ERC20Mock.prototype.decimals.mockResolvedValue(decimals);
+            });
+
+            afterEach(() => {
+                vi.clearAllMocks();
+            });
+
+            test('Should store the token information', async () => {
+                await inputAdded.handle(logErc20Transfer, block, ctx);
+                expect(mockTokenStorage.size).toBe(1);
+                const token = mockTokenStorage.values().next().value;
+
+                expect(token.name).toEqual(name);
+                expect(token.symbol).toEqual(symbol);
+                expect(token.decimals).toEqual(decimals);
+            });
+
+            test('should store the deposit information', async () => {
+                await inputAdded.handle(logErc20Transfer, block, ctx);
+
+                expect(mockDepositStorage.size).toBe(1);
+                const deposit = mockDepositStorage.values().next().value;
+
+                expect(deposit).toEqual({
+                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
+                    amount: 111000000000000000n,
+                    from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
+                    token: {
+                        id: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                        decimals: 18,
+                        name: 'Wrapped Ether',
+                        symbol: 'WETH',
+                    },
+                });
+            });
+
+            test('should assign the erc20 deposit information correctly into the input', async () => {
+                await inputAdded.handle(logErc20Transfer, block, ctx);
+
+                expect(mockInputStorage.size).toEqual(1);
+                const input = mockInputStorage.values().next().value as Input;
+
+                expect(input.erc20Deposit).toEqual({
+                    amount: 111000000000000000n,
+                    from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
+                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
+                    token: {
+                        decimals: 18,
+                        id: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                        name: 'Wrapped Ether',
+                        symbol: 'WETH',
+                    },
+                });
+
+                expect(input.erc721Deposit).toBeUndefined;
             });
         });
 
