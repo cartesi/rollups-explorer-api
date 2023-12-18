@@ -148,23 +148,11 @@ export default class InputAdded implements Handler {
                 transactionHash: log.transaction?.hash,
             });
 
-            input.erc20Deposit = await this.prepareErc20Deposit(
-                input,
-                block,
-                ctx,
-                {
-                    inputId,
-                },
-            );
+            const params = [input, block, ctx, { inputId }] as const;
 
-            input.erc721Deposit = await this.prepareErc721Deposit(
-                input,
-                block,
-                ctx,
-                {
-                    inputId,
-                },
-            );
+            input.erc20Deposit = await this.prepareErc20Deposit(...params);
+
+            input.erc721Deposit = await this.prepareErc721Deposit(...params);
 
             this.inputStorage.set(inputId, input);
             ctx.log.info(`${inputId} (Input) stored`);
