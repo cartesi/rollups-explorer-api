@@ -1,7 +1,6 @@
-import { dataSlice } from 'ethers';
 import { afterEach } from 'node:test';
-import { MockedObject, beforeEach, describe, expect, test, vi } from 'vitest';
-import { Contract } from '../../src/abi/ERC20';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { Contract as ERC20 } from '../../src/abi/ERC20';
 import { Contract as ERC721 } from '../../src/abi/ERC721';
 import InputAdded from '../../src/handlers/InputAdded';
 import {
@@ -15,34 +14,14 @@ import {
 import {
     block,
     ctx,
-    input,
     logErc20Transfer,
     logErc721Transfer,
     logs,
 } from '../stubs/params';
 
-vi.mock('../../src/abi/ERC20', async (importOriginal) => {
-    const actualMods = await importOriginal;
-    const Contract = vi.fn();
-    Contract.prototype.name = vi.fn();
-    Contract.prototype.symbol = vi.fn();
-    Contract.prototype.decimals = vi.fn();
-    return {
-        ...actualMods!,
-        Contract,
-    };
-});
+vi.mock('../../src/abi/ERC20');
 
-vi.mock('../../src/abi/ERC721', async (importOriginal) => {
-    const Contract = vi.fn();
-
-    Contract.prototype.name = vi.fn();
-    Contract.prototype.symbol = vi.fn();
-
-    return {
-        Contract,
-    };
-});
+vi.mock('../../src/abi/ERC721');
 
 vi.mock('../../src/model/', async () => {
     const Token = vi.fn();
@@ -64,16 +43,14 @@ vi.mock('../../src/model/', async () => {
 const ApplicationMock = vi.mocked(Application);
 const InputMock = vi.mocked(Input);
 const NFTStub = vi.mocked(NFT);
+const ERC721Mock = vi.mocked(ERC721, true);
 const ERC721DepositStub = vi.mocked(Erc721Deposit);
-const ERC20Mock = vi.mocked(Contract, true);
+const ERC20Mock = vi.mocked(ERC20, true);
 const ERC20DepositStub = vi.mocked(Erc20Deposit);
 const TokenStub = vi.mocked(Token);
 
-const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
-
 describe('InputAdded', () => {
     let inputAdded: InputAdded;
-    let erc721: MockedObject<ERC721>;
     const mockTokenStorage = new Map();
     const mockDepositStorage = new Map();
     const mockInputStorage = new Map();
@@ -86,11 +63,13 @@ describe('InputAdded', () => {
             mockApplicationStorage,
             mockInputStorage,
         );
-        erc721 = vi.mocked(new ERC721(ctx, block.header, tokenAddress));
         mockTokenStorage.clear();
         mockDepositStorage.clear();
         mockApplicationStorage.clear();
         mockInputStorage.clear();
+    });
+
+    afterEach(() => {
         vi.clearAllMocks();
     });
 
@@ -206,8 +185,8 @@ describe('InputAdded', () => {
             const symbol = 'BRUH';
 
             beforeEach(() => {
-                erc721.name.mockResolvedValue(name);
-                erc721.symbol.mockResolvedValue(symbol);
+                ERC721Mock.prototype.name.mockResolvedValue(name);
+                ERC721Mock.prototype.symbol.mockResolvedValue(symbol);
 
                 // Returning simple object as the Class type for assertion
                 InputMock.mockImplementationOnce((args) => {
@@ -273,10 +252,10 @@ describe('InputAdded', () => {
             });
 
             test('should handle the absence of name and symbol methods in the ERC-721 contract', async () => {
-                erc721.name.mockRejectedValue(
+                ERC721Mock.prototype.name.mockRejectedValue(
                     new Error('No name method implemented on contract'),
                 );
-                erc721.symbol.mockRejectedValue(
+                ERC721Mock.prototype.symbol.mockRejectedValue(
                     new Error('No symbol method implemented on contract'),
                 );
 
