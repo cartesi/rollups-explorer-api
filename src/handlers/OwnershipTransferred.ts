@@ -9,11 +9,10 @@ export default class OwnershipTransferred implements Handler {
 
     async handle(log: Log, _block: BlockData, ctx: DataHandlerContext<Store>) {
         if (log.topics[0] === events.OwnershipTransferred.topic) {
-            const appId = log.transaction?.to?.toLowerCase();
-            const application = appId
-                ? this.applicationStorage.get(appId) ??
-                  (await ctx.store.get(Application, appId))
-                : undefined;
+            const appId = log.transaction?.to?.toLowerCase() ?? '';
+            const application =
+                this.applicationStorage.get(appId) ??
+                (await ctx.store.get(Application, appId));
 
             if (application) {
                 // decode event
