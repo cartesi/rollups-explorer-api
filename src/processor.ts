@@ -14,6 +14,7 @@ import {
     InputBoxAddress,
     getConfig,
 } from './config';
+import { loadApplications } from './utils';
 
 export type NetworkConfig = {
     archive: string;
@@ -21,8 +22,9 @@ export type NetworkConfig = {
 };
 
 export const createProcessor = (chainId: number): EvmBatchProcessor => {
+    const applicationMetadata = loadApplications(chainId);
     const config = getConfig(chainId);
-    const processor = new EvmBatchProcessor()
+    let processor = new EvmBatchProcessor()
         .setDataSource(config.dataSource)
         .setFinalityConfirmation(config.finalityConfirmation ?? 10)
         .setFields({
@@ -44,11 +46,29 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
             address: [InputBoxAddress],
             topic0: [InputBox.InputAdded.topic],
             transaction: true,
-        })
-        .addLog({
+        });
+
+    if (applicationMetadata !== null) {
+        processor = processor
+            .addLog({
+                address:
+                    applicationMetadata.addresses[CartesiDAppFactoryAddress],
+                topic0: [CartesiDApp.OwnershipTransferred.topic],
+                range: { from: config.from, to: applicationMetadata.height },
+                transaction: true,
+            })
+            .addLog({
+                topic0: [CartesiDApp.OwnershipTransferred.topic],
+                range: { from: applicationMetadata.height + 1 },
+                transaction: true,
+            });
+    } else {
+        processor = processor.addLog({
             topic0: [CartesiDApp.OwnershipTransferred.topic],
             transaction: true,
         });
+    }
+
     return processor;
 };
 

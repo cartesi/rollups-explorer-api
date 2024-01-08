@@ -27,10 +27,12 @@ const logErrorAndReturnNull =
 
 export default class InputAdded implements Handler {
     constructor(
-        private tokenStorage: Map<String, Token | NFT>,
-        private depositStorage: Map<String, Erc20Deposit | Erc721Deposit>,
+        private tokenStorage: Map<String, Token>,
+        private depositStorage: Map<String, Erc20Deposit>,
         private applicationStorage: Map<String, Application>,
         private inputStorage: Map<String, Input>,
+        private nftStorage: Map<String, NFT>,
+        private erc721DepositStorage: Map<String, Erc721Deposit>,
     ) {}
 
     private async prepareErc20Deposit(
@@ -85,7 +87,7 @@ export default class InputAdded implements Handler {
         const from = dataSlice(input.payload, 20, 40).toLowerCase(); // 20 bytes for address
         const tokenIndex = getUint(dataSlice(input.payload, 40, 72)); // 32 bytes for uint256
 
-        let nft = this.tokenStorage.get(tokenAddress) as NFT;
+        let nft = this.nftStorage.get(tokenAddress);
         if (!nft) {
             const contract = new ERC721(ctx, block.header, tokenAddress);
             const name = await contract
@@ -95,7 +97,7 @@ export default class InputAdded implements Handler {
                 .symbol()
                 .catch(logErrorAndReturnNull(ctx));
             nft = new NFT({ id: tokenAddress, name, symbol });
-            this.tokenStorage.set(tokenAddress, nft);
+            this.nftStorage.set(tokenAddress, nft);
             ctx.log.info(`${tokenAddress} (NFT) stored`);
         }
 
@@ -106,7 +108,7 @@ export default class InputAdded implements Handler {
             tokenIndex,
         });
 
-        this.depositStorage.set(opts.inputId, deposit);
+        this.erc721DepositStorage.set(opts.inputId, deposit);
         ctx.log.info(`${opts.inputId} (Erc721Deposit) stored`);
 
         return deposit;

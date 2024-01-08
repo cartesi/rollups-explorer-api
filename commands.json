@@ -117,6 +117,10 @@
         "open": {
             "description": "Open a local browser window",
             "cmd": ["npx", "--yes", "opener"]
+        },
+        "preload:apps": {
+            "description": "Preload the address of applications created by CartesiDAppFactory",
+            "cmd": ["npx", "--yes", "ts-node", "./preloaders/applicationLoader"]
         }
     }
 }
