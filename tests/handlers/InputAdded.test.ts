@@ -55,6 +55,8 @@ describe('InputAdded', () => {
     const mockDepositStorage = new Map();
     const mockInputStorage = new Map();
     const mockApplicationStorage = new Map();
+    const mockNftStorage = new Map();
+    const mockErc721DepositStorage = new Map();
 
     beforeEach(() => {
         inputAdded = new InputAdded(
@@ -62,11 +64,16 @@ describe('InputAdded', () => {
             mockDepositStorage,
             mockApplicationStorage,
             mockInputStorage,
+            mockNftStorage,
+            mockErc721DepositStorage,
         );
+
         mockTokenStorage.clear();
         mockDepositStorage.clear();
         mockApplicationStorage.clear();
         mockInputStorage.clear();
+        mockNftStorage.clear();
+        mockErc721DepositStorage.clear();
     });
 
     afterEach(() => {
@@ -209,8 +216,8 @@ describe('InputAdded', () => {
             test('should store the token information', async () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
-                expect(mockTokenStorage.size).toBe(1);
-                const token = mockTokenStorage.values().next().value;
+                expect(mockNftStorage.size).toBe(1);
+                const token = mockNftStorage.values().next().value;
                 expect(token.name).toEqual(name);
                 expect(token.symbol).toEqual(symbol);
             });
@@ -218,8 +225,8 @@ describe('InputAdded', () => {
             test('should store the deposit information', async () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
-                expect(mockDepositStorage.size).toBe(1);
-                const deposit = mockDepositStorage.values().next().value;
+                expect(mockErc721DepositStorage.size).toBe(1);
+                const deposit = mockErc721DepositStorage.values().next().value;
                 expect(deposit.id).toEqual(
                     '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
                 );
