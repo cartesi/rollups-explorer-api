@@ -1,6 +1,6 @@
 import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
-import { dataSlice, getNumber, getUint } from 'ethers';
+import { dataSlice, getUint } from 'ethers';
 import { Contract as ERC20 } from '../abi/ERC20';
 import { Contract as ERC721 } from '../abi/ERC721';
 import { events } from '../abi/InputBox';
@@ -45,7 +45,7 @@ export default class InputAdded implements Handler {
     ) {
         if (input.msgSender !== ERC20PortalAddress) return undefined;
 
-        const success = getNumber(dataSlice(input.payload, 0, 1)) == 1; // 1 byte for boolean (not used?)
+        // first byte is a boolean and it is not used here at the moment
         const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
         const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
         const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
