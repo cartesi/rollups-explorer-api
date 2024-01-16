@@ -1,6 +1,8 @@
 import { afterEach } from 'node:test';
 import { MockInstance, beforeEach, describe, expect, test, vi } from 'vitest';
+import { CartesiDAppFactoryAddress } from '../src/config';
 import { createProcessor } from '../src/processor';
+import { loadApplications } from '../src/utils';
 
 vi.mock('@subsquid/evm-processor', async () => {
     const actualMods = await vi.importActual('@subsquid/evm-processor');
@@ -45,6 +47,7 @@ describe('Processor creation', () => {
 
     test('Required configs for sepolia', () => {
         const processor = createProcessor(sepolia);
+        const applicationMetadata = loadApplications(sepolia);
 
         expect(processor.setDataSource).toHaveBeenCalledWith({
             archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
@@ -66,7 +69,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(4);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -82,9 +85,22 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
+            range: {
+                from: expect.any(Number),
+                to: applicationMetadata?.height,
+            },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: { from: applicationMetadata?.height! + 1 },
             transaction: true,
         });
     });
@@ -136,6 +152,7 @@ describe('Processor creation', () => {
 
     test('Required configs for mainnet', () => {
         const processor = createProcessor(mainnet);
+        const applicationMetadata = loadApplications(mainnet);
 
         expect(processor.setDataSource).toHaveBeenCalledWith({
             archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
@@ -157,7 +174,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(4);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -173,9 +190,24 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
+            range: {
+                from: expect.any(Number),
+                to: applicationMetadata?.height,
+            },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: {
+                from: applicationMetadata?.height! + 1,
+            },
             transaction: true,
         });
     });

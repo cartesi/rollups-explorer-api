@@ -27,15 +27,24 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         }
     }
 
-    const { tokens, applications, factories, deposits, inputs } =
-        eventHandler.getValues();
+    const {
+        tokens,
+        applications,
+        factories,
+        deposits,
+        inputs,
+        nfts,
+        erc721Deposits,
+    } = eventHandler.getValues();
 
     const total =
         tokens.size +
         applications.size +
         factories.size +
         deposits.size +
-        inputs.size;
+        inputs.size +
+        nfts.size +
+        erc721Deposits.size;
 
     if (total > 0) {
         const summary = Object.entries({
@@ -44,6 +53,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
             factories: factories.size,
             deposits: deposits.size,
             inputs: inputs.size,
+            nfts: nfts.size,
+            erc721Deposits: erc721Deposits.size,
         })
             .map(([entity, count]) => `${entity}: ${count}`)
             .join(', ');
@@ -51,8 +62,10 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     }
 
     await ctx.store.upsert([...tokens.values()]);
+    await ctx.store.upsert([...nfts.values()]);
     await ctx.store.upsert([...factories.values()]);
     await ctx.store.upsert([...applications.values()]);
     await ctx.store.upsert([...deposits.values()]);
+    await ctx.store.upsert([...erc721Deposits.values()]);
     await ctx.store.upsert([...inputs.values()]);
 });

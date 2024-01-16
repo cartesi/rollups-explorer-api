@@ -1,6 +1,0 @@
-generates:
-    ./graphql/squid/schema.graphql:
-        schema:
-            - http://localhost:4350/graphql
-        plugins:
-            - schema-ast

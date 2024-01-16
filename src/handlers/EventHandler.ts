@@ -4,7 +4,9 @@ import {
     Application,
     ApplicationFactory,
     Erc20Deposit,
+    Erc721Deposit,
     Input,
+    NFT,
     Token,
 } from '../model';
 import ApplicationCreated from './ApplicationCreated';
@@ -18,6 +20,8 @@ export default class EventHandler {
     private readonly inputs: Map<string, Input>;
     private readonly applications: Map<string, Application>;
     private readonly factories: Map<string, ApplicationFactory>;
+    private readonly nfts: Map<string, NFT>;
+    private readonly erc721Deposits: Map<string, Erc721Deposit>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
     private readonly ownershipTransferred: Handler;
@@ -28,6 +32,8 @@ export default class EventHandler {
         this.inputs = new Map();
         this.applications = new Map();
         this.factories = new Map();
+        this.nfts = new Map();
+        this.erc721Deposits = new Map();
         this.applicationCreated = new ApplicationCreated(
             this.factories,
             this.applications,
@@ -38,6 +44,8 @@ export default class EventHandler {
             this.deposits,
             this.applications,
             this.inputs,
+            this.nfts,
+            this.erc721Deposits,
         );
 
         this.ownershipTransferred = new OwnershipTransferred(this.applications);
@@ -57,6 +65,8 @@ export default class EventHandler {
             factories: this.factories,
             deposits: this.deposits,
             inputs: this.inputs,
+            nfts: this.nfts,
+            erc721Deposits: this.erc721Deposits,
         };
     }
 }
