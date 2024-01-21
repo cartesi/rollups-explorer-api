@@ -1,3 +1,25 @@
+type Authority @entity @cardinality(value: 5) {
+    id: ID!
+}
+
+type ValidatorNodeProvider @entity @cardinality(value: 100) {
+    id: ID!
+    authority: Authority!
+    token: Token!
+    payee: String!
+    price: BigInt!
+    paused: Boolean!
+    nodes: [ValidatorNode!] @derivedFrom(field: "provider")
+}
+
+type ValidatorNode @entity @cardinality(value: 100) {
+    id: ID!
+    application: Application!
+    provider: ValidatorNodeProvider!
+    runway: BigInt
+    location: String
+}
+
 type ApplicationFactory @entity @cardinality(value: 5) {
     id: ID!
     applications: [Application!] @derivedFrom(field: "factory")
