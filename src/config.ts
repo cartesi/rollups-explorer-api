@@ -4,7 +4,7 @@ import CartesiDAppFactorySepolia from '@cartesi/rollups/deployments/sepolia/Cart
 import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json';
 import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
 import { lookupArchive } from '@subsquid/archive-registry';
-import { DataSource } from '@subsquid/evm-processor';
+import { GatewaySettings, RpcEndpointSettings } from '@subsquid/evm-processor';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -16,7 +16,10 @@ export const ERC721PortalAddress =
     mainnet.contracts.ERC721Portal.address.toLowerCase();
 
 export type ProcessorConfig = {
-    dataSource: DataSource;
+    settings: {
+        gateway?: GatewaySettings;
+        rpcEndpoint: RpcEndpointSettings;
+    };
     from: number;
     finalityConfirmation?: number;
 };
@@ -26,9 +29,13 @@ export const getConfig = (chainId: number): ProcessorConfig => {
     switch (chainId) {
         case 1: // mainnet
             return {
-                dataSource: {
-                    archive: lookupArchive('eth-mainnet'),
-                    chain: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
+                settings: {
+                    gateway: {
+                        url: lookupArchive('eth-mainnet'),
+                    },
+                    rpcEndpoint: {
+                        url: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryMainnet.receipt.blockNumber,
@@ -37,11 +44,15 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case 11155111: // sepolia
             return {
-                dataSource: {
-                    archive: lookupArchive('sepolia'),
-                    chain:
-                        process.env[RPC_URL] ??
-                        'https://rpc.ankr.com/eth_sepolia',
+                settings: {
+                    gateway: {
+                        url: lookupArchive('sepolia'),
+                    },
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            'https://rpc.ankr.com/eth_sepolia',
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactorySepolia.receipt.blockNumber,
@@ -50,8 +61,10 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case 31337: // anvil
             return {
-                dataSource: {
-                    chain: process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
+                settings: {
+                    rpcEndpoint: {
+                        url: process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
+                    },
                 },
                 from: 0,
             };

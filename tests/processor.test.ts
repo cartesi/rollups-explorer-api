@@ -8,7 +8,8 @@ vi.mock('@subsquid/evm-processor', async () => {
     const actualMods = await vi.importActual('@subsquid/evm-processor');
     const EvmBatchProcessor = vi.fn();
 
-    EvmBatchProcessor.prototype.setDataSource = vi.fn().mockReturnThis();
+    EvmBatchProcessor.prototype.setRpcEndpoint = vi.fn().mockReturnThis();
+    EvmBatchProcessor.prototype.setGateway = vi.fn().mockReturnThis();
     EvmBatchProcessor.prototype.setFinalityConfirmation = vi
         .fn()
         .mockReturnThis();
@@ -49,9 +50,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(sepolia);
         const applicationMetadata = loadApplications(sepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
-            chain: 'https://rpc.ankr.com/eth_sepolia',
+        expect(processor.setGateway).toHaveBeenCalledWith({
+            url: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+        });
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth_sepolia',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -108,8 +112,9 @@ describe('Processor creation', () => {
     test('Required configs for local/anvil', () => {
         const processor = createProcessor(local);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            chain: 'http://127.0.0.1:8545',
+        expect(processor.setGateway).not.toHaveBeenCalled();
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'http://127.0.0.1:8545',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -154,9 +159,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(mainnet);
         const applicationMetadata = loadApplications(mainnet);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-            chain: 'https://rpc.ankr.com/eth',
+        expect(processor.setGateway).toHaveBeenCalledWith({
+            url: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+        });
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -212,38 +220,36 @@ describe('Processor creation', () => {
         });
     });
 
-    test('Set correct chain for sepolia based on environment var', () => {
+    test('Set correct rpc-endpoint for sepolia based on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-sepolia-node/v3/api';
         vi.stubEnv('RPC_URL_11155111', myRPCNodeURL);
 
         const processor = createProcessor(sepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
-            chain: 'https://my-custom-sepolia-node/v3/api',
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-sepolia-node/v3/api',
         });
     });
 
-    test('Set correct chain for mainnet based on environment var', () => {
+    test('Set correct rpc-endpoint for mainnet based on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-mainnet-node/v3/api';
         vi.stubEnv('RPC_URL_1', myRPCNodeURL);
 
         const processor = createProcessor(mainnet);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-            chain: 'https://my-custom-mainnet-node/v3/api',
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-mainnet-node/v3/api',
         });
     });
 
-    test('Set correct chain for local/anvil based on environment var', () => {
+    test('Set correct rpc-endpoint for local/anvil based on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-local-node:9000';
         vi.stubEnv('RPC_URL_31337', myRPCNodeURL);
 
         const processor = createProcessor(local);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            chain: 'https://my-custom-local-node:9000',
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-local-node:9000',
         });
     });
 });
