@@ -35,32 +35,20 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         inputs,
         nfts,
         erc721Deposits,
+        authorities,
+        validatorNodeProviders,
+        validatorNodes,
     } = eventHandler.getValues();
 
-    const total =
-        tokens.size +
-        applications.size +
-        factories.size +
-        deposits.size +
-        inputs.size +
-        nfts.size +
-        erc721Deposits.size;
+    const total = eventHandler.getTotalHandled();
 
     if (total > 0) {
-        const summary = Object.entries({
-            tokens: tokens.size,
-            applications: applications.size,
-            factories: factories.size,
-            deposits: deposits.size,
-            inputs: inputs.size,
-            nfts: nfts.size,
-            erc721Deposits: erc721Deposits.size,
-        })
-            .map(([entity, count]) => `${entity}: ${count}`)
-            .join(', ');
-        ctx.log.info(`Flushing ${total} entities: ${summary}`);
+        ctx.log.info(
+            `Flushing ${total} entities: ${eventHandler.getSummary()}`,
+        );
     }
 
+    await ctx.store.upsert([...authorities.values()]);
     await ctx.store.upsert([...tokens.values()]);
     await ctx.store.upsert([...nfts.values()]);
     await ctx.store.upsert([...factories.values()]);
@@ -68,4 +56,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.upsert([...deposits.values()]);
     await ctx.store.upsert([...erc721Deposits.values()]);
     await ctx.store.upsert([...inputs.values()]);
+    await ctx.store.upsert([...validatorNodeProviders.values()]);
+    await ctx.store.upsert([...validatorNodes.values()]);
 });

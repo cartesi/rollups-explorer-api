@@ -123,4 +123,19 @@ export default class EventHandler {
             validatorNodes: this.validatorNodes,
         };
     }
+
+    getTotalHandled() {
+        return Object.values(this.getValues()).reduce(
+            (acc, entityMap) => acc + entityMap.size,
+            0,
+        );
+    }
+
+    getSummary() {
+        return Object.entries(this.getValues())
+            .map(
+                ([entityName, entityMap]) => `${entityName}: ${entityMap.size}`,
+            )
+            .join(', ');
+    }
 }
