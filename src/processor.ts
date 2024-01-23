@@ -6,12 +6,17 @@ import {
     Log as _Log,
     Transaction as _Transaction,
 } from '@subsquid/evm-processor';
+import { events as AuthorityFactoryEvents } from './abi/AuthorityFactory';
 import { events as CartesiDApp } from './abi/CartesiDApp';
 import { events as CartesiDAppFactory } from './abi/CartesiDAppFactory';
 import { events as InputBox } from './abi/InputBox';
+import { events as MarketplaceEvents } from './abi/Marketplace';
+import { events as ValidatorNodeProviderEvents } from './abi/ValidatorNodeProvider';
 import {
+    AuthorityFactoryAddress,
     CartesiDAppFactoryAddress,
     InputBoxAddress,
+    MarketplaceAddress,
     getConfig,
 } from './config';
 import { loadApplications } from './utils';
@@ -45,6 +50,30 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
         .addLog({
             address: [InputBoxAddress],
             topic0: [InputBox.InputAdded.topic],
+            transaction: true,
+        })
+        .addLog({
+            address: [AuthorityFactoryAddress],
+            topic0: [AuthorityFactoryEvents.AuthorityCreated.topic],
+        })
+        .addLog({
+            address: [MarketplaceAddress],
+            topic0: [MarketplaceEvents.ValidatorNodeProviderCreated.topic],
+        })
+        .addLog({
+            topic0: [ValidatorNodeProviderEvents.MachineLocation.topic],
+            transaction: true,
+        })
+        .addLog({
+            topic0: [ValidatorNodeProviderEvents.FinancialRunway.topic],
+            transaction: true,
+        })
+        .addLog({
+            topic0: [ValidatorNodeProviderEvents.Paused.topic],
+            transaction: true,
+        })
+        .addLog({
+            topic0: [ValidatorNodeProviderEvents.Unpaused.topic],
             transaction: true,
         });
 

@@ -14,6 +14,10 @@ export const ERC20PortalAddress =
 export const InputBoxAddress = mainnet.contracts.InputBox.address.toLowerCase();
 export const ERC721PortalAddress =
     mainnet.contracts.ERC721Portal.address.toLowerCase();
+export const AuthorityFactoryAddress =
+    '0x519421Bd7843e0D1E2F280490962850e31c86087'.toLowerCase();
+export const MarketplaceAddress =
+    '0xB6dd5307629186A5d16611AAC1A14CdE9EA49f57'.toLowerCase();
 
 export type ProcessorConfig = {
     settings: {
