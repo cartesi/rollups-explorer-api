@@ -56,7 +56,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
-            url: 'https://rpc.ankr.com/eth_sepolia',
+            url: 'https://rpc.sepolia.org',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -145,7 +145,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
-            url: 'https://rpc.ankr.com/eth',
+            url: 'https://cloudflare-eth.com',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
