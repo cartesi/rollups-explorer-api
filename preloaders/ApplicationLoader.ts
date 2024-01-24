@@ -28,8 +28,8 @@ const config = getConfig(chainId);
 logger.info(`Processing chain_id: ${chainId}`);
 
 const processor = new EvmBatchProcessor()
-    .setDataSource(config.dataSource)
-    .useArchiveOnly(true)
+    .setGateway(config.settings.gateway!)
+    .setRpcDataIngestionSettings({ disabled: true }) // it sets to use only the archive node for data ingestion
     .setFinalityConfirmation(config.finalityConfirmation ?? 10)
     .setFields({
         log: {
