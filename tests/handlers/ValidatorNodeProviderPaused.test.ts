@@ -26,9 +26,10 @@ describe('ValidatorNodeProviderPaused', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        providerStorage.clear();
     });
 
-    it('should from storage cache update the node property paused to true', () => {
+    it('should from storage cache update the node property paused to true', async () => {
         providerStorage.set(
             validatorNodeProvider.id,
             structuredClone(validatorNodeProvider),
@@ -36,9 +37,21 @@ describe('ValidatorNodeProviderPaused', () => {
 
         expect(validatorNodeProvider.paused).toBeFalsy();
 
-        handler.handle(Logs.paused, blockData, ctx);
+        await handler.handle(Logs.paused, blockData, ctx);
 
         const provider = providerStorage.get(validatorNodeProvider.id);
+
+        expect(provider?.paused).toEqual(true);
+    });
+
+    it('should find the provider in the database and update the paused property to true', async () => {
+        const copy = structuredClone(validatorNodeProvider);
+        vi.spyOn(ctx.store, 'get').mockResolvedValueOnce(copy);
+
+        await handler.handle(Logs.paused, blockData, ctx);
+
+        expect(providerStorage.size).toBe(1);
+        const provider = providerStorage.get(Logs.paused.address.toLowerCase());
 
         expect(provider?.paused).toEqual(true);
     });
