@@ -52,6 +52,7 @@ export default class ValidatorNodeProviderCreated implements Handler {
                 new ValidatorNodeProvider({
                     id: providerId,
                     token: tokenInstance,
+                    paused: false,
                     authority,
                     payee: payee.toLowerCase(),
                     price,

@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { events as MarketplaceEvents } from '../../src/abi/Marketplace';
 import { events as ValidatorNodeProviderEvents } from '../../src/abi/ValidatorNodeProvider';
 import { MarketplaceAddress } from '../../src/config';
-import { ValidatorNodeProvider } from '../../src/model';
+import { Authority, Token, ValidatorNodeProvider } from '../../src/model';
 
 export const TokenAddress =
     '0xE15E2ADD14c26b9ae1E735bF5B444CCB11B0bd15'.toLowerCase();
@@ -16,16 +16,19 @@ export const AuthorityAddress =
 export const ValidatorNodeProviderAddress =
     '0x4d22c1F970574ae7B8724457D268D41E6459E288'.toLowerCase();
 
+export const authority = { id: AuthorityAddress } satisfies Authority;
+export const token = {
+    id: TokenAddress,
+    decimals: 18,
+    name: 'SunodoToken',
+    symbol: 'SUN',
+} satisfies Token;
+
 export const validatorNodeProvider = {
     id: ValidatorNodeProviderAddress,
-    authority: { id: AuthorityAddress },
+    authority,
     payee: PayeeAddress,
-    token: {
-        id: TokenAddress,
-        decimals: 18,
-        name: 'SunodoToken',
-        symbol: 'SUN',
-    },
+    token,
     price: 400000000000000n,
     paused: false,
     nodes: [],
