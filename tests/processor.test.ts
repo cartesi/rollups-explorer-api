@@ -1,5 +1,6 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor';
 import { afterEach } from 'node:test';
+import { arbitrum, arbitrumGoerli } from 'viem/chains';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { CartesiDAppFactoryAddress } from '../src/config';
 import { createProcessor } from '../src/processor';
@@ -159,6 +160,114 @@ describe('Processor creation', () => {
         });
         expect(processor.setBlockRange).toHaveBeenCalledWith({
             from: 17784733,
+        });
+
+        expect(processor.addLog).toHaveBeenCalledTimes(10);
+
+        addLogExpectation(processor);
+
+        const addLog = vi.mocked(processor.addLog);
+
+        expect(addLog.mock.calls[8][0]).toEqual({
+            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: {
+                from: expect.any(Number),
+                to: applicationMetadata?.height,
+            },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[9][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: {
+                from: applicationMetadata?.height! + 1,
+            },
+            transaction: true,
+        });
+    });
+
+    test('Required configs for arbitrum', () => {
+        const applicationMetadata = loadApplications(arbitrum.id);
+        const processor = createProcessor(arbitrum.id);
+
+        expect(processor.setGateway).toHaveBeenCalledWith({
+            url: 'https://v2.archive.subsquid.io/network/arbitrum-one',
+        });
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://arb1.arbitrum.io/rpc',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 115470622,
+        });
+
+        expect(processor.addLog).toHaveBeenCalledTimes(10);
+
+        addLogExpectation(processor);
+
+        const addLog = vi.mocked(processor.addLog);
+
+        expect(addLog.mock.calls[8][0]).toEqual({
+            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: {
+                from: expect.any(Number),
+                to: applicationMetadata?.height,
+            },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[9][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            range: {
+                from: applicationMetadata?.height! + 1,
+            },
+            transaction: true,
+        });
+    });
+
+    test('Required configs for arbitrum-goerli', () => {
+        const applicationMetadata = loadApplications(arbitrumGoerli.id);
+        const processor = createProcessor(arbitrumGoerli.id);
+
+        expect(processor.setGateway).toHaveBeenCalledWith({
+            url: 'https://v2.archive.subsquid.io/network/arbitrum-goerli',
+        });
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://goerli-rollup.arbitrum.io/rpc',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 31715663,
         });
 
         expect(processor.addLog).toHaveBeenCalledTimes(10);
