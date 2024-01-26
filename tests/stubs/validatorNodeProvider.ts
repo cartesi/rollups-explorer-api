@@ -17,7 +17,8 @@ import {
     ValidatorNodeProvider,
 } from '../../src/model';
 
-const UntilTimestamp = 1702321200000n;
+export const CID = 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR';
+export const UntilTimestamp = 1702321200000n;
 export const DappAddress = '0x028367fE226CD9E5699f4288d512fE3a4a4a0012';
 export const TokenAddress =
     '0xE15E2ADD14c26b9ae1E735bF5B444CCB11B0bd15'.toLowerCase();
@@ -184,6 +185,46 @@ export const Logs = {
             encodeAbiParameters([{ type: 'address' }], [DappAddress]),
         ],
         data: encodeAbiParameters([{ type: 'uint' }], [UntilTimestamp]),
+        getTransaction() {
+            return this.transaction;
+        },
+        block: {
+            id: '0004867730-2c78f',
+            height: 4867730,
+            hash: '0x8f998edf202fe3449e61849c2207432833721d9e6a5ffda1c5388187826ac9a7',
+            parentHash:
+                '0x91f4d079445be915f9a9226a05a6c33a9112dda3cd10cffa4fe28406975220c6',
+            timestamp: 1702321200000,
+        },
+        transaction: {
+            id: '0004867730-000024-2c78f',
+            transactionIndex: 24,
+            from: '0xd8464d1b3592b6c3786b32931e2a2adac501aaad',
+            to: ValidatorNodeProviderAddress,
+            hash: '0xa4fd02a167a6a4a876283aa682febe6502278be2a2882d99a2d31e52bd3e5a52',
+            block: {
+                id: '0004867730-2c78f',
+                height: 4867730,
+                hash: '0x8f998edf202fe3449e61849c2207432833721d9e6a5ffda1c5388187826ac9a7',
+                parentHash:
+                    '0x91f4d079445be915f9a9226a05a6c33a9112dda3cd10cffa4fe28406975220c6',
+                timestamp: 1702321200000,
+            },
+            logs: [],
+            traces: [],
+            stateDiffs: [],
+        },
+    },
+    machineLocation: {
+        id: '0004867730-000035-2c78f',
+        address: ValidatorNodeProviderAddress,
+        logIndex: 129,
+        transactionIndex: 24,
+        topics: [
+            ValidatorNodeProviderEvents.MachineLocation.topic,
+            encodeAbiParameters([{ type: 'address' }], [DappAddress]),
+        ],
+        data: encodeAbiParameters([{ type: 'string' }], [CID]),
         getTransaction() {
             return this.transaction;
         },
