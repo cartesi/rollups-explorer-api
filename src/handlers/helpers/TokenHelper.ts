@@ -16,9 +16,15 @@ export default class TokenHelper {
             token.decimals(),
         ]).then(
             (results) =>
-                results.map((r) =>
-                    r.status === 'fulfilled' ? r.value : undefined,
-                ) as [string?, string?, number?],
+                results.map((r) => {
+                    if (r.status === 'fulfilled') {
+                        ctx.log.info(`(TokenHelper): ${r.status}: ${r.value}`);
+                        return r.value;
+                    } else {
+                        ctx.log.info(`(TokenHelper): ${r.status}: ${r.reason}`);
+                        return undefined;
+                    }
+                }) as [string?, string?, number?],
         );
 
         return new Token({
