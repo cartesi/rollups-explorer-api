@@ -19,15 +19,82 @@ import {
     MarketplaceAddress,
     getConfig,
 } from './config';
-import { loadApplications } from './utils';
+import { loadApplications, loadProviders } from './utils';
 
 export type NetworkConfig = {
     archive: string;
     rpcUrl: string;
 };
 
-export const createProcessor = (chainId: number): EvmBatchProcessor => {
+function setLogsForProviders<R extends EvmBatchProcessor>(
+    processor: R,
+    chainId: number,
+): R {
+    const providersMetadata = loadProviders(chainId);
+    const config = getConfig(chainId);
+    const addressesCount =
+        providersMetadata?.addresses[MarketplaceAddress].length ?? 0;
+
+    const topic0 = [
+        ValidatorNodeProviderEvents.MachineLocation.topic,
+        ValidatorNodeProviderEvents.FinancialRunway.topic,
+        ValidatorNodeProviderEvents.Paused.topic,
+        ValidatorNodeProviderEvents.Unpaused.topic,
+    ];
+
+    if (providersMetadata !== null && addressesCount > 0) {
+        return processor
+            .addLog({
+                address: providersMetadata.addresses[MarketplaceAddress],
+                topic0,
+                range: { from: config.from, to: providersMetadata.height },
+                transaction: true,
+            })
+            .addLog({
+                topic0,
+                range: { from: providersMetadata.height + 1 },
+                transaction: true,
+            });
+    } else {
+        return processor.addLog({
+            topic0,
+            transaction: true,
+        });
+    }
+}
+
+function setLogsForApplications<R extends EvmBatchProcessor>(
+    processor: R,
+    chainId: number,
+): R {
     const applicationMetadata = loadApplications(chainId);
+    const config = getConfig(chainId);
+    const addressesCount =
+        applicationMetadata?.addresses[CartesiDAppFactoryAddress].length ?? 0;
+
+    if (applicationMetadata !== null && addressesCount > 0) {
+        return processor
+            .addLog({
+                address:
+                    applicationMetadata.addresses[CartesiDAppFactoryAddress],
+                topic0: [CartesiDApp.OwnershipTransferred.topic],
+                range: { from: config.from, to: applicationMetadata.height },
+                transaction: true,
+            })
+            .addLog({
+                topic0: [CartesiDApp.OwnershipTransferred.topic],
+                range: { from: applicationMetadata.height + 1 },
+                transaction: true,
+            });
+    } else {
+        return processor.addLog({
+            topic0: [CartesiDApp.OwnershipTransferred.topic],
+            transaction: true,
+        });
+    }
+}
+
+export const createProcessor = (chainId: number): EvmBatchProcessor => {
     const config = getConfig(chainId);
     let processor = new EvmBatchProcessor()
         .setRpcEndpoint(config.settings.rpcEndpoint)
@@ -59,48 +126,15 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
         .addLog({
             address: [MarketplaceAddress],
             topic0: [MarketplaceEvents.ValidatorNodeProviderCreated.topic],
-        })
-        .addLog({
-            topic0: [ValidatorNodeProviderEvents.MachineLocation.topic],
-            transaction: true,
-        })
-        .addLog({
-            topic0: [ValidatorNodeProviderEvents.FinancialRunway.topic],
-            transaction: true,
-        })
-        .addLog({
-            topic0: [ValidatorNodeProviderEvents.Paused.topic],
-            transaction: true,
-        })
-        .addLog({
-            topic0: [ValidatorNodeProviderEvents.Unpaused.topic],
-            transaction: true,
         });
+
+    processor = setLogsForProviders(processor, chainId);
 
     processor = config.settings.gateway
         ? processor.setGateway(config.settings.gateway)
         : processor;
 
-    if (applicationMetadata !== null) {
-        processor = processor
-            .addLog({
-                address:
-                    applicationMetadata.addresses[CartesiDAppFactoryAddress],
-                topic0: [CartesiDApp.OwnershipTransferred.topic],
-                range: { from: config.from, to: applicationMetadata.height },
-                transaction: true,
-            })
-            .addLog({
-                topic0: [CartesiDApp.OwnershipTransferred.topic],
-                range: { from: applicationMetadata.height + 1 },
-                transaction: true,
-            });
-    } else {
-        processor = processor.addLog({
-            topic0: [CartesiDApp.OwnershipTransferred.topic],
-            transaction: true,
-        });
-    }
+    processor = setLogsForApplications(processor, chainId);
 
     return processor;
 };
