@@ -2,9 +2,10 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor';
 import { afterEach } from 'node:test';
 import { arbitrum, arbitrumGoerli } from 'viem/chains';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { CartesiDAppFactoryAddress } from '../src/config';
+import { events as ValidatorNodeProviderEvents } from '../src/abi/ValidatorNodeProvider';
+import { CartesiDAppFactoryAddress, MarketplaceAddress } from '../src/config';
 import { createProcessor } from '../src/processor';
-import { loadApplications } from '../src/utils';
+import { loadApplications, loadProviders } from '../src/utils';
 
 vi.mock('@subsquid/evm-processor', async () => {
     const actualMods = await vi.importActual('@subsquid/evm-processor');
@@ -25,6 +26,12 @@ vi.mock('@subsquid/evm-processor', async () => {
     };
 });
 
+const validatorNodeProviderTopics = [
+    ValidatorNodeProviderEvents.MachineLocation.topic,
+    ValidatorNodeProviderEvents.FinancialRunway.topic,
+    ValidatorNodeProviderEvents.Paused.topic,
+    ValidatorNodeProviderEvents.Unpaused.topic,
+];
 const sepolia = 11155111;
 const mainnet = 1;
 const local = 31337;
@@ -51,6 +58,7 @@ describe('Processor creation', () => {
     test('Required configs for sepolia', () => {
         const processor = createProcessor(sepolia);
         const applicationMetadata = loadApplications(sepolia);
+        const providersMetadata = loadProviders(sepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith({
             url: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
@@ -73,13 +81,41 @@ describe('Processor creation', () => {
             from: 3963384,
         });
 
-        expect(processor.addLog).toHaveBeenCalledTimes(10);
+        expect(processor.addLog).toHaveBeenCalledTimes(8);
 
         addLogExpectation(processor);
 
         const addLog = vi.mocked(processor.addLog);
 
-        expect(addLog.mock.calls[8][0]).toEqual({
+        expect(addLog.mock.calls[4][0]).toEqual({
+            address: providersMetadata?.addresses[MarketplaceAddress],
+            range: {
+                from: 3963384,
+                to: providersMetadata?.height,
+            },
+            topic0: [
+                '0x22f244e839c97faca31341c9c2bb7a09f94a81fb309a36a85c8465bafeb69ffc',
+                '0x206c488a3e590d91a82467a0072d112dfe901a99ae561b30c89ff2509fadde35',
+                '0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258',
+                '0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[5][0]).toEqual({
+            range: {
+                from: providersMetadata?.height! + 1,
+            },
+            topic0: [
+                '0x22f244e839c97faca31341c9c2bb7a09f94a81fb309a36a85c8465bafeb69ffc',
+                '0x206c488a3e590d91a82467a0072d112dfe901a99ae561b30c89ff2509fadde35',
+                '0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258',
+                '0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[6][0]).toEqual({
             address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
@@ -91,7 +127,7 @@ describe('Processor creation', () => {
             transaction: true,
         });
 
-        expect(addLog.mock.calls[9][0]).toEqual({
+        expect(addLog.mock.calls[7][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -123,13 +159,23 @@ describe('Processor creation', () => {
             from: 0,
         });
 
-        expect(processor.addLog).toHaveBeenCalledTimes(9);
+        expect(processor.addLog).toHaveBeenCalledTimes(6);
 
         addLogExpectation(processor);
 
         const addLog = vi.mocked(processor.addLog);
 
-        expect(addLog.mock.calls[8][0]).toEqual({
+        expect(addLog.mock.calls[4][0]).toEqual({
+            topic0: [
+                '0x22f244e839c97faca31341c9c2bb7a09f94a81fb309a36a85c8465bafeb69ffc',
+                '0x206c488a3e590d91a82467a0072d112dfe901a99ae561b30c89ff2509fadde35',
+                '0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258',
+                '0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[5][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -139,6 +185,7 @@ describe('Processor creation', () => {
 
     test('Required configs for mainnet', () => {
         const applicationMetadata = loadApplications(mainnet);
+        const providerMetadata = loadProviders(mainnet);
         const processor = createProcessor(mainnet);
 
         expect(processor.setGateway).toHaveBeenCalledWith({
@@ -162,13 +209,18 @@ describe('Processor creation', () => {
             from: 17784733,
         });
 
-        expect(processor.addLog).toHaveBeenCalledTimes(10);
+        expect(processor.addLog).toHaveBeenCalledTimes(7);
 
         addLogExpectation(processor);
 
         const addLog = vi.mocked(processor.addLog);
 
-        expect(addLog.mock.calls[8][0]).toEqual({
+        expect(addLog.mock.calls[4][0]).toEqual({
+            topic0: validatorNodeProviderTopics,
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[5][0]).toEqual({
             address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
@@ -180,7 +232,7 @@ describe('Processor creation', () => {
             transaction: true,
         });
 
-        expect(addLog.mock.calls[9][0]).toEqual({
+        expect(addLog.mock.calls[6][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -216,31 +268,21 @@ describe('Processor creation', () => {
             from: 115470622,
         });
 
-        expect(processor.addLog).toHaveBeenCalledTimes(10);
+        expect(processor.addLog).toHaveBeenCalledTimes(6);
 
         addLogExpectation(processor);
 
         const addLog = vi.mocked(processor.addLog);
 
-        expect(addLog.mock.calls[8][0]).toEqual({
-            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
-            topic0: [
-                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
-            ],
-            range: {
-                from: expect.any(Number),
-                to: applicationMetadata?.height,
-            },
+        expect(addLog.mock.calls[4][0]).toEqual({
+            topic0: validatorNodeProviderTopics,
             transaction: true,
         });
 
-        expect(addLog.mock.calls[9][0]).toEqual({
+        expect(addLog.mock.calls[5][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
-            range: {
-                from: applicationMetadata?.height! + 1,
-            },
             transaction: true,
         });
     });
@@ -270,13 +312,18 @@ describe('Processor creation', () => {
             from: 31715663,
         });
 
-        expect(processor.addLog).toHaveBeenCalledTimes(10);
+        expect(processor.addLog).toHaveBeenCalledTimes(7);
 
         addLogExpectation(processor);
 
         const addLog = vi.mocked(processor.addLog);
 
-        expect(addLog.mock.calls[8][0]).toEqual({
+        expect(addLog.mock.calls[4][0]).toEqual({
+            topic0: validatorNodeProviderTopics,
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[5][0]).toEqual({
             address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
@@ -288,7 +335,7 @@ describe('Processor creation', () => {
             transaction: true,
         });
 
-        expect(addLog.mock.calls[9][0]).toEqual({
+        expect(addLog.mock.calls[6][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -365,34 +412,6 @@ describe('Processor creation', () => {
             topic0: [
                 '0x0e2b88107197b560f03a59714a3b7fcced2035fc2f645c44f71491f96c003541',
             ],
-        });
-
-        expect(addLog.mock.calls[4][0]).toEqual({
-            topic0: [
-                '0x22f244e839c97faca31341c9c2bb7a09f94a81fb309a36a85c8465bafeb69ffc',
-            ],
-            transaction: true,
-        });
-
-        expect(addLog.mock.calls[5][0]).toEqual({
-            topic0: [
-                '0x206c488a3e590d91a82467a0072d112dfe901a99ae561b30c89ff2509fadde35',
-            ],
-            transaction: true,
-        });
-
-        expect(addLog.mock.calls[6][0]).toEqual({
-            topic0: [
-                '0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258',
-            ],
-            transaction: true,
-        });
-
-        expect(addLog.mock.calls[7][0]).toEqual({
-            topic0: [
-                '0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa',
-            ],
-            transaction: true,
         });
     }
 });
