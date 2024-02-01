@@ -64,7 +64,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
-                            sepolia.rpcUrls.default.http[0],
+                            'https://rpc.ankr.com/eth_sepolia',
                     },
                 },
                 from: Math.min(
