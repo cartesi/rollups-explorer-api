@@ -401,7 +401,7 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
-            address: ['0x519421bd7843e0d1e2f280490962850e31c86087'],
+            address: ['0xf26a5b278c25d8d41a136d22ad719eaced9c3e63'],
             topic0: [
                 '0xdca1fad70bee4ba7a4e17a1c6e99e657d2251af7a279124758bc01588abe2d2f',
             ],
