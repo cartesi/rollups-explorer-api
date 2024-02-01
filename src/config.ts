@@ -9,7 +9,8 @@ import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json'
 import rollupsMainnet from '@cartesi/rollups/export/abi/mainnet.json';
 import { lookupArchive } from '@subsquid/archive-registry';
 import { GatewaySettings, RpcEndpointSettings } from '@subsquid/evm-processor';
-import { arbitrum, arbitrumGoerli, mainnet, sepolia } from 'viem/chains';
+import sunodoSepolia from '@sunodo/contracts/export/abi/sepolia.json';
+import { arbitrum, arbitrumGoerli, mainnet } from 'viem/chains';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -21,9 +22,9 @@ export const InputBoxAddress =
 export const ERC721PortalAddress =
     rollupsMainnet.contracts.ERC721Portal.address.toLowerCase();
 export const AuthorityFactoryAddress =
-    '0x519421Bd7843e0D1E2F280490962850e31c86087'.toLowerCase();
+    rollupsMainnet.contracts.AuthorityFactory.address.toLowerCase();
 export const MarketplaceAddress =
-    '0xB6dd5307629186A5d16611AAC1A14CdE9EA49f57'.toLowerCase();
+    sunodoSepolia.contracts.Marketplace.address.toLowerCase();
 
 export type ProcessorConfig = {
     settings: {
