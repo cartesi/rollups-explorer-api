@@ -2,14 +2,14 @@ import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { events as MarketplaceEvents } from '../abi/Marketplace';
 import { MarketplaceAddress } from '../config';
-import { Authority, Token, ValidatorNodeProvider } from '../model';
+import { Authority, FunctionType, NodeProvider, Token } from '../model';
 import Handler from './Handler';
 import TokenHelper from './helpers/TokenHelper';
 
 export default class ValidatorNodeProviderCreated implements Handler {
     constructor(
         private authorities: Map<string, Authority>,
-        private providers: Map<string, ValidatorNodeProvider>,
+        private providers: Map<string, NodeProvider>,
         private tokens: Map<string, Token>,
     ) {}
 
@@ -49,7 +49,8 @@ export default class ValidatorNodeProviderCreated implements Handler {
             ctx.log.info(`${providerId} (ValidatorNodeProvider) stored`);
             this.providers.set(
                 providerId,
-                new ValidatorNodeProvider({
+                new NodeProvider({
+                    type: FunctionType.VALIDATOR,
                     id: providerId,
                     token: tokenInstance,
                     paused: false,

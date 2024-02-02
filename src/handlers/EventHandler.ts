@@ -8,9 +8,9 @@ import {
     Erc721Deposit,
     Input,
     NFT,
+    Node,
+    NodeProvider,
     Token,
-    ValidatorNode,
-    ValidatorNodeProvider,
 } from '../model';
 import ApplicationCreated from './ApplicationCreated';
 import AuthorityCreated from './AuthorityCreated';
@@ -32,8 +32,8 @@ export default class EventHandler {
     private readonly nfts: Map<string, NFT>;
     private readonly erc721Deposits: Map<string, Erc721Deposit>;
     private readonly authorities: Map<string, Authority>;
-    private readonly validatorNodeProviders: Map<string, ValidatorNodeProvider>;
-    private readonly validatorNodes: Map<string, ValidatorNode>;
+    private readonly nodeProviders: Map<string, NodeProvider>;
+    private readonly nodes: Map<string, Node>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
     private readonly ownershipTransferred: Handler;
@@ -53,8 +53,8 @@ export default class EventHandler {
         this.nfts = new Map();
         this.erc721Deposits = new Map();
         this.authorities = new Map();
-        this.validatorNodeProviders = new Map();
-        this.validatorNodes = new Map();
+        this.nodeProviders = new Map();
+        this.nodes = new Map();
 
         this.applicationCreated = new ApplicationCreated(
             this.factories,
@@ -74,25 +74,25 @@ export default class EventHandler {
         this.authorityCreated = new AuthorityCreated(this.authorities);
         this.validatorNodeProviderCreated = new ValidatorNodeProviderCreated(
             this.authorities,
-            this.validatorNodeProviders,
+            this.nodeProviders,
             this.tokens,
         );
 
         this.validatorNodeProviderPaused = new ValidatorNodeProviderPaused(
-            this.validatorNodeProviders,
+            this.nodeProviders,
         );
         this.validatorNodeProviderUnpaused = new validatorNodeProviderUnpaused(
-            this.validatorNodeProviders,
+            this.nodeProviders,
         );
         this.validatorNodeFinancialRunway = new ValidatorNodeFinancialRunway(
             this.applications,
-            this.validatorNodes,
-            this.validatorNodeProviders,
+            this.nodes,
+            this.nodeProviders,
         );
         this.validatorNodeMachineLocation = new ValidatorNodeMachineLocation(
             this.applications,
-            this.validatorNodes,
-            this.validatorNodeProviders,
+            this.nodes,
+            this.nodeProviders,
         );
     }
 
@@ -119,8 +119,8 @@ export default class EventHandler {
             nfts: this.nfts,
             erc721Deposits: this.erc721Deposits,
             authorities: this.authorities,
-            validatorNodeProviders: this.validatorNodeProviders,
-            validatorNodes: this.validatorNodes,
+            nodeProviders: this.nodeProviders,
+            nodes: this.nodes,
         };
     }
 

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ValidatorNodeProviderUnpaused from '../../src/handlers/ValidatorNodeProviderUnpaused';
-import { ValidatorNodeProvider } from '../../src/model';
+import { NodeProvider } from '../../src/model';
 import {
     Logs,
     blockData,
@@ -9,16 +9,18 @@ import {
 } from '../stubs/validatorNodeProvider';
 
 vi.mock('../../src/model/', async () => {
-    const ValidatorNodeProvider = vi.fn();
+    const NodeProvider = vi.fn();
+    const FunctionType = { READER: 'READER', VALIDATOR: 'VALIDATOR' };
 
     return {
-        ValidatorNodeProvider,
+        NodeProvider,
+        FunctionType,
     };
 });
 
 describe('ValidatorNodeProviderUnpaused', () => {
     let handler: ValidatorNodeProviderUnpaused;
-    const providerStorage = new Map<string, ValidatorNodeProvider>();
+    const providerStorage = new Map<string, NodeProvider>();
 
     beforeEach(() => {
         handler = new ValidatorNodeProviderUnpaused(providerStorage);

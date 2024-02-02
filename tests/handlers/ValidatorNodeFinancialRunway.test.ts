@@ -1,11 +1,7 @@
 import { EntityClass, FindOneOptions } from '@subsquid/typeorm-store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ValidatorNodeFinancialRunway from '../../src/handlers/ValidatorNodeFinancialRunway';
-import {
-    Application,
-    ValidatorNode,
-    ValidatorNodeProvider,
-} from '../../src/model';
+import { Application, Node, NodeProvider } from '../../src/model';
 import {
     Logs,
     application,
@@ -15,29 +11,29 @@ import {
 } from '../stubs/validatorNodeProvider';
 
 vi.mock('../../src/model/', async () => {
-    const ValidatorNodeProvider = vi.fn();
-    const ValidatorNode = vi.fn();
+    const NodeProvider = vi.fn();
+    const Node = vi.fn();
     const Application = vi.fn();
+    const FunctionType = { READER: 'READER', VALIDATOR: 'VALIDATOR' };
 
     return {
-        ValidatorNodeProvider,
-        ValidatorNode,
+        NodeProvider,
+        Node,
         Application,
+        FunctionType,
     };
 });
 
-const ValidatorNodeMock = vi.mocked(ValidatorNode);
+const NodeMock = vi.mocked(Node);
 
 describe('ValidatorNodeFinancialRunway', () => {
     let handler: ValidatorNodeFinancialRunway;
-    const providersStorage = new Map<string, ValidatorNodeProvider>();
-    const nodesStorage = new Map<string, ValidatorNode>();
+    const providersStorage = new Map<string, NodeProvider>();
+    const nodesStorage = new Map<string, Node>();
     const applicationStorage = new Map<string, Application>();
 
     beforeEach(() => {
-        ValidatorNodeMock.mockImplementation(
-            (args) => ({ ...args } as ValidatorNode),
-        );
+        NodeMock.mockImplementation((args) => ({ ...args } as Node));
 
         handler = new ValidatorNodeFinancialRunway(
             applicationStorage,
@@ -79,6 +75,7 @@ describe('ValidatorNodeFinancialRunway', () => {
 
         expect(node.id).toEqual(`${node.provider.id}-${node.application.id}`);
         expect(node.application).toBeDefined();
+        expect(node.type).toEqual('VALIDATOR');
         expect(node.provider).toBeDefined();
         expect(node.runway).toEqual(1702321200000n);
         expect(node.location).not.toBeDefined();
@@ -91,8 +88,7 @@ describe('ValidatorNodeFinancialRunway', () => {
                 id: FindOneOptions<any> | string,
             ): Promise<any | undefined> => {
                 if (entityClass === Application) return application;
-                if (entityClass === ValidatorNodeProvider)
-                    return validatorNodeProvider;
+                if (entityClass === NodeProvider) return validatorNodeProvider;
 
                 return undefined;
             },

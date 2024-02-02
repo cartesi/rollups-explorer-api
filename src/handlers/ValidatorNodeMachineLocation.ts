@@ -1,14 +1,14 @@
 import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { events as ValidatorNodeProviderEvents } from '../abi/ValidatorNodeProvider';
-import { Application, ValidatorNode, ValidatorNodeProvider } from '../model';
+import { Application, FunctionType, Node, NodeProvider } from '../model';
 import Handler from './Handler';
 
 export default class ValidatorNodeMachineLocation implements Handler {
     constructor(
         private apps: Map<string, Application>,
-        private nodes: Map<string, ValidatorNode>,
-        private providers: Map<string, ValidatorNodeProvider>,
+        private nodes: Map<string, Node>,
+        private providers: Map<string, NodeProvider>,
     ) {}
 
     async handle(log: Log, block: BlockData, ctx: DataHandlerContext<Store>) {
@@ -18,7 +18,7 @@ export default class ValidatorNodeMachineLocation implements Handler {
             const providerAddress = log.address.toLowerCase();
             const provider =
                 this.providers.get(providerAddress) ??
-                (await ctx.store.get(ValidatorNodeProvider, providerAddress));
+                (await ctx.store.get(NodeProvider, providerAddress));
 
             if (provider) {
                 const { dapp, location } =
@@ -27,13 +27,14 @@ export default class ValidatorNodeMachineLocation implements Handler {
                 const nodeId = `${providerAddress}-${appId}`;
                 let node =
                     this.nodes.get(nodeId) ??
-                    (await ctx.store.get(ValidatorNode, nodeId));
+                    (await ctx.store.get(Node, nodeId));
 
                 if (!node) {
                     const application =
                         this.apps.get(appId) ??
                         (await ctx.store.get(Application, appId));
-                    node = new ValidatorNode({
+                    node = new Node({
+                        type: FunctionType.VALIDATOR,
                         id: nodeId,
                         provider,
                         application,

@@ -1,11 +1,7 @@
 import { EntityClass, FindOneOptions } from '@subsquid/typeorm-store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ValidatorNodeMachineLocation from '../../src/handlers/ValidatorNodeMachineLocation';
-import {
-    Application,
-    ValidatorNode,
-    ValidatorNodeProvider,
-} from '../../src/model';
+import { Application, Node, NodeProvider } from '../../src/model';
 import {
     Logs,
     application,
@@ -15,29 +11,29 @@ import {
 } from '../stubs/validatorNodeProvider';
 
 vi.mock('../../src/model/', async () => {
-    const ValidatorNodeProvider = vi.fn();
-    const ValidatorNode = vi.fn();
+    const NodeProvider = vi.fn();
+    const Node = vi.fn();
     const Application = vi.fn();
+    const FunctionType = { READER: 'READER', VALIDATOR: 'VALIDATOR' };
 
     return {
-        ValidatorNodeProvider,
-        ValidatorNode,
+        NodeProvider,
+        Node,
         Application,
+        FunctionType,
     };
 });
 
-const ValidatorNodeMock = vi.mocked(ValidatorNode);
+const NodeMock = vi.mocked(Node);
 
 describe('ValidatorNodeMachineLocation', () => {
     let handler: ValidatorNodeMachineLocation;
-    const providersStorage = new Map<string, ValidatorNodeProvider>();
-    const nodesStorage = new Map<string, ValidatorNode>();
+    const providersStorage = new Map<string, NodeProvider>();
+    const nodesStorage = new Map<string, Node>();
     const applicationStorage = new Map<string, Application>();
 
     beforeEach(() => {
-        ValidatorNodeMock.mockImplementation(
-            (args) => ({ ...args } as ValidatorNode),
-        );
+        NodeMock.mockImplementation((args) => ({ ...args } as Node));
         // defaults to find nothing in the "DB"
         vi.spyOn(ctx.store, 'get').mockResolvedValue(undefined);
 
@@ -80,6 +76,7 @@ describe('ValidatorNodeMachineLocation', () => {
         const [[id, node]] = nodesStorage.entries();
 
         expect(node.id).toEqual(`${node.provider.id}-${node.application.id}`);
+        expect(node.type).toEqual('VALIDATOR');
         expect(node.application).toBeDefined();
         expect(node.provider).toBeDefined();
         expect(node.location).toEqual(
@@ -94,8 +91,7 @@ describe('ValidatorNodeMachineLocation', () => {
                 id: FindOneOptions<any> | string,
             ): Promise<any | undefined> => {
                 if (entityClass === Application) return application;
-                if (entityClass === ValidatorNodeProvider)
-                    return validatorNodeProvider;
+                if (entityClass === NodeProvider) return validatorNodeProvider;
 
                 return undefined;
             },
