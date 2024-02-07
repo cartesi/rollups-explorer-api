@@ -121,6 +121,15 @@
         "preload:apps": {
             "description": "Preload the address of applications created by CartesiDAppFactory",
             "cmd": ["npx", "--yes", "ts-node", "./preloaders/applicationLoader"]
+        },
+        "preload:providers": {
+            "description": "Preload the address of validator-node-providers created by Marketplace ",
+            "cmd": [
+                "npx",
+                "--yes",
+                "ts-node",
+                "./preloaders/validatorNodeProviderLoader"
+            ]
         }
     }
 }

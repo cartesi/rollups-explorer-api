@@ -1,7 +1,6 @@
 import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { dataSlice, getUint } from 'ethers';
-import { Contract as ERC20 } from '../abi/ERC20';
 import { Contract as ERC721 } from '../abi/ERC721';
 import { events } from '../abi/InputBox';
 import {
@@ -18,6 +17,7 @@ import {
     Token,
 } from '../model';
 import Handler from './Handler';
+import TokenHelper from './helpers/TokenHelper';
 
 const logErrorAndReturnNull =
     (ctx: DataHandlerContext<Store>) => (reason: any) => {
@@ -52,11 +52,7 @@ export default class InputAdded implements Handler {
 
         let token = this.tokenStorage.get(tokenAddress) as Token;
         if (!token) {
-            const contract = new ERC20(ctx, block.header, tokenAddress);
-            const name = await contract.name();
-            const symbol = await contract.symbol();
-            const decimals = await contract.decimals();
-            token = new Token({ id: tokenAddress, name, symbol, decimals });
+            token = await TokenHelper.createToken(tokenAddress, ctx, block);
             this.tokenStorage.set(tokenAddress, token);
             ctx.log.info(`${tokenAddress} (Token) stored`);
         }
