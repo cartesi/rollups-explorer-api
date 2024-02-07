@@ -36,8 +36,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         nfts,
         erc721Deposits,
         authorities,
-        validatorNodeProviders,
-        validatorNodes,
+        nodeProviders,
+        nodes,
     } = eventHandler.getValues();
 
     const total = eventHandler.getTotalHandled();
@@ -56,6 +56,6 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
     await ctx.store.upsert([...deposits.values()]);
     await ctx.store.upsert([...erc721Deposits.values()]);
     await ctx.store.upsert([...inputs.values()]);
-    await ctx.store.upsert([...validatorNodeProviders.values()]);
-    await ctx.store.upsert([...validatorNodes.values()]);
+    await ctx.store.upsert([...nodeProviders.values()]);
+    await ctx.store.upsert([...nodes.values()]);
 });

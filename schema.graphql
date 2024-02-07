@@ -1,23 +1,30 @@
+enum FunctionType {
+    READER
+    VALIDATOR
+}
+
 type Authority @entity @cardinality(value: 5) {
     id: ID!
 }
 
-type ValidatorNodeProvider @entity @cardinality(value: 100) {
+type NodeProvider @entity @cardinality(value: 100) {
     id: ID!
-    authority: Authority!
+    authority: Authority
     token: Token!
     payee: String!
     price: BigInt!
     paused: Boolean!
-    nodes: [ValidatorNode!] @derivedFrom(field: "provider")
+    nodes: [Node!] @derivedFrom(field: "provider")
+    type: FunctionType!
 }
 
-type ValidatorNode @entity @cardinality(value: 100) {
+type Node @entity @cardinality(value: 100) {
     id: ID!
     application: Application!
-    provider: ValidatorNodeProvider!
+    provider: NodeProvider!
     runway: BigInt
     location: String
+    type: FunctionType!
 }
 
 type ApplicationFactory @entity @cardinality(value: 5) {
@@ -31,6 +38,7 @@ type Application @entity @cardinality(value: 100) {
     timestamp: BigInt!
     factory: ApplicationFactory
     inputs: [Input!] @derivedFrom(field: "application")
+    nodes: [Node!] @derivedFrom(field: "application")
 }
 
 type Token @entity @cardinality(value: 10) {

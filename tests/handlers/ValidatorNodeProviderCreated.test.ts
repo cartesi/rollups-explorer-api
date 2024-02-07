@@ -2,7 +2,7 @@ import { EntityClass, FindOneOptions } from '@subsquid/typeorm-store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ValidatorNodeProviderCreated from '../../src/handlers/ValidatorNodeProviderCreated';
 import TokenHelper from '../../src/handlers/helpers/TokenHelper';
-import { Authority, Token, ValidatorNodeProvider } from '../../src/model';
+import { Authority, NodeProvider, Token } from '../../src/model';
 import {
     Logs,
     TokenAddress,
@@ -15,26 +15,29 @@ import {
 } from '../stubs/validatorNodeProvider';
 
 vi.mock('../../src/model/', async () => {
-    const ValidatorNodeProvider = vi.fn();
+    const NodeProvider = vi.fn();
     const Authority = vi.fn();
     const Token = vi.fn();
+    const FunctionType = { READER: 'READER', VALIDATOR: 'VALIDATOR' };
 
     return {
-        ValidatorNodeProvider,
+        NodeProvider,
         Authority,
         Token,
+        FunctionType,
     };
 });
 
-const ValidatorNodeProviderMock = vi.mocked(ValidatorNodeProvider);
+const NodeProviderMock = vi.mocked(NodeProvider);
 const AuthorityMock = vi.mocked(Authority);
 
 describe('ValidatorNodeProviderCreated', () => {
     let handler: ValidatorNodeProviderCreated;
-    const providerStorage = new Map<string, ValidatorNodeProvider>();
+    const providerStorage = new Map<string, NodeProvider>();
     const tokenStorage = new Map<string, Token>();
     const authorityStorage = new Map<string, Authority>();
     const expectedProvider = {
+        type: 'VALIDATOR',
         authority: {
             id: '0x83e4283f7eab201b06f749f683f27cfda294ab81',
         },
@@ -51,8 +54,8 @@ describe('ValidatorNodeProviderCreated', () => {
     };
 
     beforeEach(() => {
-        ValidatorNodeProviderMock.mockImplementation(
-            (args) => ({ ...args } as ValidatorNodeProvider),
+        NodeProviderMock.mockImplementation(
+            (args) => ({ ...args } as NodeProvider),
         );
         AuthorityMock.mockImplementation((args) => ({ ...args } as Authority));
 

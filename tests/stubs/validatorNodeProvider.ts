@@ -12,9 +12,10 @@ import {
 import {
     Application,
     Authority,
+    FunctionType,
+    Node,
+    NodeProvider,
     Token,
-    ValidatorNode,
-    ValidatorNodeProvider,
 } from '../../src/model';
 
 export const CID = 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR';
@@ -41,6 +42,7 @@ export const application = {
     factory: { id: CartesiDAppFactoryAddress, applications: [] },
     id: DappAddress.toLowerCase(),
     inputs: [],
+    nodes: [],
     owner: '0x',
     timestamp: 1691779848n,
 } satisfies Application;
@@ -53,7 +55,8 @@ export const validatorNodeProvider = {
     price: 400000000000000n,
     paused: false,
     nodes: [],
-} satisfies ValidatorNodeProvider;
+    type: FunctionType.VALIDATOR,
+} satisfies NodeProvider;
 
 export const validatorNode = {
     application,
@@ -61,7 +64,8 @@ export const validatorNode = {
     id: `${validatorNodeProvider.id}-${application.id}`,
     location: null,
     runway: null,
-} satisfies ValidatorNode;
+    type: FunctionType.VALIDATOR,
+} satisfies Node;
 
 export const Logs = {
     paused: {
