@@ -5,15 +5,20 @@ import { Contract as ERC721 } from '../../src/abi/ERC721';
 import InputAdded from '../../src/handlers/InputAdded';
 import {
     Application,
+    Erc1155Deposit,
+    Erc1155Transfer,
     Erc20Deposit,
     Erc721Deposit,
     Input,
+    MultiToken,
     NFT,
     Token,
 } from '../../src/model';
 import {
     block,
     ctx,
+    logErc1155BatchTransfer,
+    logErc1155SingleTransfer,
     logErc20Transfer,
     logErc721Transfer,
     logs,
@@ -30,6 +35,10 @@ vi.mock('../../src/model/', async () => {
     const Input = vi.fn();
     const Erc721Deposit = vi.fn();
     const NFT = vi.fn();
+    const Erc1155Deposit = vi.fn();
+    const MultiToken = vi.fn();
+    const Erc1155Transfer = vi.fn();
+
     return {
         Application,
         Token,
@@ -37,6 +46,9 @@ vi.mock('../../src/model/', async () => {
         Erc721Deposit,
         Input,
         NFT,
+        MultiToken,
+        Erc1155Deposit,
+        Erc1155Transfer,
     };
 });
 
@@ -48,6 +60,9 @@ const ERC721DepositStub = vi.mocked(Erc721Deposit);
 const ERC20Mock = vi.mocked(ERC20, true);
 const ERC20DepositStub = vi.mocked(Erc20Deposit);
 const TokenStub = vi.mocked(Token);
+const MultiTokenStub = vi.mocked(MultiToken);
+const ERC1155DepositStub = vi.mocked(Erc1155Deposit);
+const ERC1155TransferStub = vi.mocked(Erc1155Transfer);
 
 describe('InputAdded', () => {
     let inputAdded: InputAdded;
@@ -57,6 +72,8 @@ describe('InputAdded', () => {
     const mockApplicationStorage = new Map();
     const mockNftStorage = new Map();
     const mockErc721DepositStorage = new Map();
+    const mockMultiTokenStorage = new Map<string, MultiToken>();
+    const mockErc1155DepositStorage = new Map<string, Erc1155Deposit>();
 
     beforeEach(() => {
         inputAdded = new InputAdded(
@@ -66,6 +83,8 @@ describe('InputAdded', () => {
             mockInputStorage,
             mockNftStorage,
             mockErc721DepositStorage,
+            mockMultiTokenStorage,
+            mockErc1155DepositStorage,
         );
 
         mockTokenStorage.clear();
@@ -74,6 +93,8 @@ describe('InputAdded', () => {
         mockInputStorage.clear();
         mockNftStorage.clear();
         mockErc721DepositStorage.clear();
+        mockMultiTokenStorage.clear();
+        mockErc1155DepositStorage.clear();
     });
 
     afterEach(() => {
@@ -279,6 +300,101 @@ describe('InputAdded', () => {
                         symbol: null,
                     },
                     tokenIndex: 1n,
+                });
+            });
+        });
+
+        describe('ERC-1155 deposits', () => {
+            const tokenAddress = '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e';
+
+            beforeEach(() => {
+                // Returning simple object as the Class type for assertion
+                InputMock.mockImplementationOnce((args) => {
+                    return { ...args } as Input;
+                });
+
+                MultiTokenStub.mockImplementationOnce((args) => {
+                    return { ...args } as MultiToken;
+                });
+
+                ERC1155TransferStub.mockImplementation((args) => {
+                    return { ...args } as Erc1155Transfer;
+                });
+
+                ERC1155DepositStub.mockImplementationOnce((args) => {
+                    return { ...args } as Erc1155Deposit;
+                });
+            });
+
+            afterEach(() => {
+                vi.clearAllMocks();
+            });
+
+            test('should store the token information', async () => {
+                expect(mockMultiTokenStorage.size).toBe(0);
+
+                await inputAdded.handle(logErc1155SingleTransfer, block, ctx);
+
+                expect(mockMultiTokenStorage.size).toBe(1);
+                const token = mockMultiTokenStorage.get(tokenAddress);
+                expect(token?.id).toEqual(tokenAddress);
+            });
+
+            test('should store the deposit information for single transfer', async () => {
+                const inputId =
+                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8-783';
+                expect(mockErc1155DepositStorage.size).toBe(0);
+                await inputAdded.handle(logErc1155SingleTransfer, block, ctx);
+
+                expect(mockErc1155DepositStorage.size).toBe(1);
+
+                const deposit = mockErc1155DepositStorage.get(inputId);
+
+                expect(deposit).toEqual({
+                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+                    id: inputId,
+                    token: {
+                        id: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                    },
+                    transfers: [
+                        {
+                            amount: 10000000n,
+                            tokenIndex: 2n,
+                        },
+                    ],
+                });
+            });
+
+            test('should store the deposit information for batch transfer', async () => {
+                const inputId =
+                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8-784';
+                expect(mockErc1155DepositStorage.size).toBe(0);
+                await inputAdded.handle(logErc1155BatchTransfer, block, ctx);
+
+                expect(mockErc1155DepositStorage.size).toBe(1);
+
+                const deposit = mockErc1155DepositStorage.get(inputId);
+
+                expect(deposit).toEqual({
+                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+                    id: inputId,
+                    token: {
+                        id: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                    },
+                    transfers: [
+                        {
+                            amount: 100n,
+                            tokenIndex: 0n,
+                        },
+                        {
+                            amount: 1000n,
+                            tokenIndex: 1n,
+                        },
+                        {
+                            amount: 10000n,
+                            tokenIndex: 2n,
+                        },
+                    ],
                 });
             });
         });
