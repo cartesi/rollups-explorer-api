@@ -45,6 +45,7 @@
     "shelljs": "^0.8.5",
     "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.16",
+    "viem": "^2.5.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

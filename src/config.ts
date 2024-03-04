@@ -14,6 +14,10 @@ export const ERC20PortalAddress =
 export const InputBoxAddress = mainnet.contracts.InputBox.address.toLowerCase();
 export const ERC721PortalAddress =
     mainnet.contracts.ERC721Portal.address.toLowerCase();
+export const ERC1155SinglePortalAddress =
+    mainnet.contracts.ERC1155SinglePortal.address.toLowerCase();
+export const ERC1155BatchPortalAddress =
+    mainnet.contracts.ERC1155BatchPortal.address.toLowerCase();
 
 export type ProcessorConfig = {
     dataSource: DataSource;

@@ -1,19 +1,24 @@
 import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
-import { dataSlice, getUint } from 'ethers';
+import { AbiCoder, dataSlice, getUint } from 'ethers';
 import { Contract as ERC20 } from '../abi/ERC20';
 import { Contract as ERC721 } from '../abi/ERC721';
 import { events } from '../abi/InputBox';
 import {
+    ERC1155BatchPortalAddress,
+    ERC1155SinglePortalAddress,
     ERC20PortalAddress,
     ERC721PortalAddress,
     InputBoxAddress,
 } from '../config';
 import {
     Application,
+    Erc1155Deposit,
+    Erc1155Transfer,
     Erc20Deposit,
     Erc721Deposit,
     Input,
+    MultiToken,
     NFT,
     Token,
 } from '../model';
@@ -24,7 +29,6 @@ const logErrorAndReturnNull =
         ctx.log.error(reason);
         return null;
     };
-
 export default class InputAdded implements Handler {
     constructor(
         private tokenStorage: Map<String, Token>,
@@ -33,6 +37,8 @@ export default class InputAdded implements Handler {
         private inputStorage: Map<String, Input>,
         private nftStorage: Map<String, NFT>,
         private erc721DepositStorage: Map<String, Erc721Deposit>,
+        private multiTokenStorage: Map<String, MultiToken>,
+        private erc1155DepositStorage: Map<String, Erc1155Deposit>,
     ) {}
 
     private async prepareErc20Deposit(
@@ -114,6 +120,63 @@ export default class InputAdded implements Handler {
         return deposit;
     }
 
+    private async prepareErc1155Deposit(
+        input: Input,
+        block: BlockData,
+        ctx: DataHandlerContext<Store>,
+        opts: {
+            inputId: String;
+        },
+    ) {
+        if (
+            input.msgSender !== ERC1155BatchPortalAddress &&
+            input.msgSender !== ERC1155SinglePortalAddress
+        )
+            return undefined;
+
+        const tokenAddress = dataSlice(input.payload, 0, 20).toLowerCase(); // 20 bytes for token address
+        const from = dataSlice(input.payload, 20, 40).toLowerCase(); // 20 bytes for from address
+        let transfers: Erc1155Transfer[] = [];
+
+        if (input.msgSender === ERC1155BatchPortalAddress) {
+            ctx.log.info(`${input.id} (ERC-1155) batch deposit`);
+            const data = dataSlice(input.payload, 40); // Data arbitrary size
+            const [tokenIds, amounts] = new AbiCoder().decode(
+                ['uint256[]', 'uint256[]'],
+                data,
+            );
+            transfers = tokenIds.map(
+                (tokenIndex: bigint, idx: number) =>
+                    new Erc1155Transfer({ tokenIndex, amount: amounts[idx] }),
+            );
+        } else if (input.msgSender === ERC1155SinglePortalAddress) {
+            ctx.log.info(`${input.id} (ERC-1155) single deposit`);
+            const tokenIndex = getUint(dataSlice(input.payload, 40, 72)); // 32 bytes for tokenId
+            const amount = getUint(dataSlice(input.payload, 72, 104)); // 32 bytes for value a.k.a amount
+            transfers = [new Erc1155Transfer({ tokenIndex, amount })];
+        }
+
+        let token = this.multiTokenStorage.get(tokenAddress);
+
+        if (!token) {
+            token = new MultiToken({ id: tokenAddress });
+            this.multiTokenStorage.set(tokenAddress, token);
+            ctx.log.info(`${tokenAddress} (ERC-1155) contract stored.`);
+        }
+
+        const deposit = new Erc1155Deposit({
+            id: input.id,
+            from,
+            token,
+            transfers,
+        });
+
+        this.erc1155DepositStorage.set(input.id, deposit);
+        ctx.log.info(`${input.id} (Erc1155Deposit) stored`);
+
+        return deposit;
+    }
+
     async handle(log: Log, block: BlockData, ctx: DataHandlerContext<Store>) {
         if (
             log.address === InputBoxAddress &&
@@ -155,6 +218,8 @@ export default class InputAdded implements Handler {
             input.erc20Deposit = await this.prepareErc20Deposit(...params);
 
             input.erc721Deposit = await this.prepareErc721Deposit(...params);
+
+            input.erc1155Deposit = await this.prepareErc1155Deposit(...params);
 
             this.inputStorage.set(inputId, input);
             ctx.log.info(`${inputId} (Input) stored`);

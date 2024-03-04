@@ -24,6 +24,24 @@ type NFT @entity @cardinality(value: 10) {
     symbol: String
 }
 
+# ERC-1155 contract representation
+type MultiToken @entity @cardinality(value: 10) {
+    id: ID!
+}
+
+# scalar for erc-1155 tokens data to be used for single and batch deposits
+type Erc1155Transfer {
+    tokenIndex: BigInt!
+    amount: BigInt!
+}
+
+type Erc1155Deposit @entity @cardinality(value: 100) {
+    id: ID!
+    from: String!
+    token: MultiToken!
+    transfers: [Erc1155Transfer!]
+}
+
 type Erc721Deposit @entity @cardinality(value: 100) {
     id: ID!
     from: String!
@@ -50,4 +68,5 @@ type Input @entity @cardinality(value: 100) {
     transactionHash: String!
     erc20Deposit: Erc20Deposit
     erc721Deposit: Erc721Deposit
+    erc1155Deposit: Erc1155Deposit
 }
