@@ -42,7 +42,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 11155111: // sepolia
             return {
                 dataSource: {
-                    archive: lookupArchive('sepolia'),
+                    archive: lookupArchive('eth-sepolia'),
                     chain:
                         process.env[RPC_URL] ??
                         'https://rpc.ankr.com/eth_sepolia',
