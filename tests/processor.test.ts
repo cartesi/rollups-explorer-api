@@ -112,7 +112,7 @@ describe('Processor creation', () => {
             chain: 'http://127.0.0.1:8545',
         });
 
-        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(1);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -122,7 +122,7 @@ describe('Processor creation', () => {
             },
         });
         expect(processor.setBlockRange).toHaveBeenCalledWith({
-            from: 0,
+            from: 22,
         });
 
         const addLog = processor.addLog as unknown as MockInstance;
