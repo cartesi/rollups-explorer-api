@@ -25,8 +25,13 @@ export type ProcessorConfig = {
     finalityConfirmation?: number;
 };
 
+const FINALITY_CONFIRMATION = 10 as const;
+const LOCAL_GENESIS_BLOCK = 22 as const;
+
 export const getConfig = (chainId: number): ProcessorConfig => {
     const RPC_URL = `RPC_URL_${chainId}`;
+    const GENESIS_BLOCK = `GENESIS_BLOCK_${chainId}`;
+    const BLOCK_CONFIRMATIONS = `BLOCK_CONFIRMATIONS_${chainId}`;
     switch (chainId) {
         case 1: // mainnet
             return {
@@ -38,6 +43,10 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     CartesiDAppFactoryMainnet.receipt.blockNumber,
                     InputBoxMainnet.receipt.blockNumber,
                 ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
             };
         case 11155111: // sepolia
             return {
@@ -51,15 +60,36 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     CartesiDAppFactorySepolia.receipt.blockNumber,
                     InputBoxSepolia.receipt.blockNumber,
                 ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
             };
         case 31337: // anvil
             return {
                 dataSource: {
                     chain: process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
                 },
-                from: 0,
+                from: parseIntOr({
+                    defaultVal: LOCAL_GENESIS_BLOCK,
+                    value: process.env[GENESIS_BLOCK],
+                }),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: 1,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
             };
         default:
             throw new Error(`Unsupported chainId: ${chainId}`);
     }
 };
+
+interface ParseIntOr {
+    value?: string;
+    defaultVal: number;
+}
+
+function parseIntOr({ value, defaultVal }: ParseIntOr) {
+    const number = parseInt(value ?? '');
+    return Number.isNaN(number) ? defaultVal : number;
+}
