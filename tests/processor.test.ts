@@ -25,6 +25,8 @@ vi.mock('@subsquid/evm-processor', async () => {
 const sepolia = 11155111;
 const mainnet = 1;
 const local = 31337;
+const optimism = 10;
+const optimismSepolia = 11155420;
 
 describe('Processor creation', () => {
     beforeEach(() => {
@@ -123,6 +125,98 @@ describe('Processor creation', () => {
         });
         expect(processor.setBlockRange).toHaveBeenCalledWith({
             from: 22,
+        });
+
+        const addLog = processor.addLog as unknown as MockInstance;
+
+        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog.mock.calls[0][0]).toEqual({
+            address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
+            topic0: [
+                '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            ],
+        });
+        expect(addLog.mock.calls[1][0]).toEqual({
+            address: ['0x59b22d57d4f067708ab0c00552767405926dc768'],
+            topic0: [
+                '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[2][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            transaction: true,
+        });
+    });
+
+    test('Required configs for optimism', () => {
+        const processor = createProcessor(optimism);
+
+        expect(processor.setDataSource).toHaveBeenCalledWith({
+            archive: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
+            chain: 'https://mainnet.optimism.io',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 107432991,
+        });
+
+        const addLog = processor.addLog as unknown as MockInstance;
+
+        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog.mock.calls[0][0]).toEqual({
+            address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
+            topic0: [
+                '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            ],
+        });
+        expect(addLog.mock.calls[1][0]).toEqual({
+            address: ['0x59b22d57d4f067708ab0c00552767405926dc768'],
+            topic0: [
+                '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[2][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            transaction: true,
+        });
+    });
+
+    test('Required configs for optimism-sepolia', () => {
+        const processor = createProcessor(optimismSepolia);
+
+        expect(processor.setDataSource).toHaveBeenCalledWith({
+            archive: 'https://v2.archive.subsquid.io/network/optimism-sepolia',
+            chain: 'https://sepolia.optimism.io',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 5393079,
         });
 
         const addLog = processor.addLog as unknown as MockInstance;
