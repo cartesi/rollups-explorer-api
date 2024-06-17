@@ -1,3 +1,7 @@
+import CartesiDAppFactoryBase from '@cartesi/rollups/deployments/base/CartesiDAppFactory.json';
+import inputBoxBase from '@cartesi/rollups/deployments/base/InputBox.json';
+import CartesiDAppFactoryBaseSepolia from '@cartesi/rollups/deployments/base_sepolia/CartesiDAppFactory.json';
+import InputBoxBaseSepolia from '@cartesi/rollups/deployments/base_sepolia/InputBox.json';
 import CartesiDAppFactoryMainnet from '@cartesi/rollups/deployments/mainnet/CartesiDAppFactory.json';
 import InputBoxMainnet from '@cartesi/rollups/deployments/mainnet/InputBox.json';
 import CartesiDAppFactoryOptimism from '@cartesi/rollups/deployments/optimism/CartesiDAppFactory.json';
@@ -7,9 +11,8 @@ import InputBoxOptimismSepolia from '@cartesi/rollups/deployments/optimism_sepol
 import CartesiDAppFactorySepolia from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
 import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json';
 import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
-import { lookupArchive } from '@subsquid/archive-registry';
 import { DataSource } from '@subsquid/evm-processor';
-import { optimism, optimismSepolia } from 'viem/chains';
+import { base, baseSepolia, optimism, optimismSepolia } from 'viem/chains';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -30,6 +33,22 @@ export type ProcessorConfig = {
     finalityConfirmation?: number;
 };
 
+/**
+ * Archive nodes raw gateway URLs more info {@link https://docs.subsquid.io/glossary/#archive-registry}
+ *
+ * To find a new URL run the following command
+ * @example
+ *  npm run sqd gateways ls
+ */
+const archiveNodes = {
+    base: 'https://v2.archive.subsquid.io/network/base-mainnet',
+    baseSepolia: 'https://v2.archive.subsquid.io/network/base-sepolia',
+    optimism: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
+    optimismSepolia: 'https://v2.archive.subsquid.io/network/optimism-sepolia',
+    mainnet: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+    sepolia: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+} as const;
+
 const FINALITY_CONFIRMATION = 10 as const;
 const LOCAL_GENESIS_BLOCK = 22 as const;
 
@@ -41,7 +60,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 1: // mainnet
             return {
                 dataSource: {
-                    archive: lookupArchive('eth-mainnet'),
+                    archive: archiveNodes.mainnet,
                     chain: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
                 },
                 from: Math.min(
@@ -56,7 +75,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 11155111: // sepolia
             return {
                 dataSource: {
-                    archive: lookupArchive('eth-sepolia'),
+                    archive: archiveNodes.sepolia,
                     chain:
                         process.env[RPC_URL] ??
                         'https://rpc.ankr.com/eth_sepolia',
@@ -73,7 +92,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 10: //Optimism-Mainnet
             return {
                 dataSource: {
-                    archive: lookupArchive('optimism-mainnet'),
+                    archive: archiveNodes.optimism,
                     chain:
                         process.env[RPC_URL] ??
                         optimism.rpcUrls.default.http[0],
@@ -90,7 +109,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 11155420: //Optimism-Sepolia
             return {
                 dataSource: {
-                    archive: lookupArchive('optimism-sepolia'),
+                    archive: archiveNodes.optimismSepolia,
                     chain:
                         process.env[RPC_URL] ??
                         optimismSepolia.rpcUrls.default.http[0],
@@ -98,6 +117,38 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                 from: Math.min(
                     CartesiDAppFactoryOptimismSepolia.receipt.blockNumber,
                     InputBoxOptimismSepolia.receipt.blockNumber,
+                ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
+            };
+        case 8453: //Base-Mainnet
+            return {
+                dataSource: {
+                    archive: archiveNodes.base,
+                    chain: process.env[RPC_URL] ?? base.rpcUrls.default.http[0],
+                },
+                from: Math.min(
+                    CartesiDAppFactoryBase.receipt.blockNumber,
+                    inputBoxBase.receipt.blockNumber,
+                ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
+            };
+        case 84532: //Base-Sepolia
+            return {
+                dataSource: {
+                    archive: archiveNodes.baseSepolia,
+                    chain:
+                        process.env[RPC_URL] ??
+                        baseSepolia.rpcUrls.default.http[0],
+                },
+                from: Math.min(
+                    CartesiDAppFactoryBaseSepolia.receipt.blockNumber,
+                    InputBoxBaseSepolia.receipt.blockNumber,
                 ),
                 finalityConfirmation: parseIntOr({
                     defaultVal: FINALITY_CONFIRMATION,
