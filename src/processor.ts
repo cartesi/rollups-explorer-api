@@ -25,7 +25,6 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
     const applicationMetadata = loadApplications(chainId);
     const config = getConfig(chainId);
     let processor = new EvmBatchProcessor()
-        .setDataSource(config.dataSource)
         .setFinalityConfirmation(config.finalityConfirmation ?? 10)
         .setFields({
             transaction: {
@@ -47,6 +46,14 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
             topic0: [InputBox.InputAdded.topic],
             transaction: true,
         });
+
+    processor = config.dataSource.archive
+        ? processor.setGateway(config.dataSource.archive)
+        : processor;
+
+    processor = config.dataSource.rpcEndpoint
+        ? processor.setRpcEndpoint(config.dataSource.rpcEndpoint)
+        : processor;
 
     if (applicationMetadata !== null) {
         processor = processor

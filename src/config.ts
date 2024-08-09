@@ -11,8 +11,9 @@ import InputBoxOptimismSepolia from '@cartesi/rollups/deployments/optimism_sepol
 import CartesiDAppFactorySepolia from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
 import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json';
 import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
-import { DataSource } from '@subsquid/evm-processor';
+import { GatewaySettings, RpcEndpointSettings } from '@subsquid/evm-processor';
 import { base, baseSepolia, optimism, optimismSepolia } from 'viem/chains';
+import { archiveNodes } from './gateways';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -26,28 +27,22 @@ export const ERC1155SinglePortalAddress =
     mainnet.contracts.ERC1155SinglePortal.address.toLowerCase();
 export const ERC1155BatchPortalAddress =
     mainnet.contracts.ERC1155BatchPortal.address.toLowerCase();
+interface ArchiveDataSource {
+    archive: string | GatewaySettings;
+    rpcEndpoint?: string | RpcEndpointSettings;
+}
+interface RpcDataSource {
+    archive?: undefined;
+    rpcEndpoint: string | RpcEndpointSettings;
+}
+
+type DataSources = ArchiveDataSource | RpcDataSource;
 
 export type ProcessorConfig = {
-    dataSource: DataSource;
+    dataSource: DataSources;
     from: number;
     finalityConfirmation?: number;
 };
-
-/**
- * Archive nodes raw gateway URLs more info {@link https://docs.subsquid.io/glossary/#archive-registry}
- *
- * To find a new URL run the following command
- * @example
- *  npm run sqd gateways ls
- */
-const archiveNodes = {
-    base: 'https://v2.archive.subsquid.io/network/base-mainnet',
-    baseSepolia: 'https://v2.archive.subsquid.io/network/base-sepolia',
-    optimism: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
-    optimismSepolia: 'https://v2.archive.subsquid.io/network/optimism-sepolia',
-    mainnet: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-    sepolia: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
-} as const;
 
 const FINALITY_CONFIRMATION = 10 as const;
 const LOCAL_GENESIS_BLOCK = 22 as const;
@@ -61,7 +56,8 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.mainnet,
-                    chain: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
+                    rpcEndpoint:
+                        process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
                 },
                 from: Math.min(
                     CartesiDAppFactoryMainnet.receipt.blockNumber,
@@ -76,7 +72,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.sepolia,
-                    chain:
+                    rpcEndpoint:
                         process.env[RPC_URL] ??
                         'https://rpc.ankr.com/eth_sepolia',
                 },
@@ -93,7 +89,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.optimism,
-                    chain:
+                    rpcEndpoint:
                         process.env[RPC_URL] ??
                         optimism.rpcUrls.default.http[0],
                 },
@@ -110,7 +106,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.optimismSepolia,
-                    chain:
+                    rpcEndpoint:
                         process.env[RPC_URL] ??
                         optimismSepolia.rpcUrls.default.http[0],
                 },
@@ -127,7 +123,8 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.base,
-                    chain: process.env[RPC_URL] ?? base.rpcUrls.default.http[0],
+                    rpcEndpoint:
+                        process.env[RPC_URL] ?? base.rpcUrls.default.http[0],
                 },
                 from: Math.min(
                     CartesiDAppFactoryBase.receipt.blockNumber,
@@ -142,7 +139,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.baseSepolia,
-                    chain:
+                    rpcEndpoint:
                         process.env[RPC_URL] ??
                         baseSepolia.rpcUrls.default.http[0],
                 },
@@ -158,7 +155,8 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case 31337: // anvil
             return {
                 dataSource: {
-                    chain: process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
+                    rpcEndpoint:
+                        process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
                 },
                 from: parseIntOr({
                     defaultVal: LOCAL_GENESIS_BLOCK,
