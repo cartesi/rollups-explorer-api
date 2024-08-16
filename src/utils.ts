@@ -69,3 +69,18 @@ export function parseIntOr({ value, defaultVal }: ParseIntOr) {
     const number = parseInt(value ?? '');
     return Number.isNaN(number) ? defaultVal : number;
 }
+
+/**
+ * Utility to generate standard format IDs based on array of values.
+ * That makes the id creation between entities less error prone.
+ * The separator used is "-"
+ * @example
+ *  applicationId = "5-0xcbceaf7c9085e33629bcb8f5b6a6d230cf9ece61"
+ *  inputId = "5-0xcbceaf7c9085e33629bcb8f5b6a6d230cf9ece61-209"
+ * @param values List of values for ID generation
+ * @returns
+ */
+export function generateIDFrom(values: unknown[] = []) {
+    const separator = '-';
+    return values.join(separator);
+}

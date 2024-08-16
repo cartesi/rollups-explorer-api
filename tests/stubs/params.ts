@@ -2,6 +2,7 @@ import { Chain } from '@subsquid/evm-processor/lib/interfaces/chain';
 import { Logger } from '@subsquid/logger';
 import { Store } from '@subsquid/typeorm-store';
 import { encodeAbiParameters } from 'viem';
+import { sepolia } from 'viem/chains';
 import { vi } from 'vitest';
 import {
     CartesiDAppFactoryAddress,
@@ -9,6 +10,8 @@ import {
     InputBoxAddress,
 } from '../../src/config';
 import { Input } from '../../src/model';
+import { BlockData, Log } from '../../src/processor';
+import { generateIDFrom } from '../../src/utils';
 
 vi.mock('@subsquid/logger', async (importOriginal) => {
     const actualMods = await importOriginal;
@@ -38,12 +41,18 @@ const payload =
 
 export const input = {
     id: '0x60a7048c3136293071605a4eaffef49923e981cc-0',
+    chain: {
+        id: sepolia.id.toString(),
+    },
     application: {
         id: '0x60a7048c3136293071605a4eaffef49923e981cc',
         timestamp: 1696281168n,
         owner: null,
         factory: null,
         inputs: [],
+        chain: {
+            id: sepolia.id.toString(),
+        },
     },
     index: 1,
     msgSender: ERC20PortalAddress,
@@ -79,6 +88,7 @@ export const logErc721Transfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
@@ -116,6 +126,7 @@ export const logErc1155SingleTransfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
@@ -153,6 +164,7 @@ export const logErc1155BatchTransfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
@@ -190,6 +202,7 @@ export const logErc20Transfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xF9e958241c1cA380cFcD50170Ec43974bDeD0BfF',
@@ -207,7 +220,7 @@ export const logErc20Transfer = {
     },
 };
 
-export const logs = [
+export const logs: Log[] = [
     {
         id: '0004411683-000001-cae3a',
         logIndex: 1,
@@ -219,6 +232,7 @@ export const logs = [
             '0x0000000000000000000000000000000000000000000000000000000000000001',
         ],
         data: '0x000000000000000000000000e85fba508e9641103985e9101e5853f79d065e09000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000651b2b3c00000000000000000000000000000000000000000000000000000288e40d88a000000000000000000000000000000000000000000000000000000000651b2b3000000000000000000000000000000000000000000000000000000026dc68ca2400000000000000000000000000000000000000000000000000000000651b2b54000000000000000000000000000000000000000000000000000000002cf06118',
+        // @ts-ignore
         block: {
             id: '0004411683-cae3a',
             height: 4411683,
@@ -233,8 +247,9 @@ export const logs = [
             from: '0x74d093f6911ac080897c3145441103dabb869307',
             to: '0x95ff8d3ce9dcb7455beb7845143bea84fe5c4f6f',
             hash: '0x1b165c2cd18cc58823fbe598e954458774a48f69249efed9ba5cf243b17d0d89',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            //@ts-ignore
             block: {
                 id: '0004411683-cae3a',
                 height: 4411683,
@@ -255,6 +270,7 @@ export const logs = [
             '0x00000000000000000000000089b7b5d0e61b760f63e3d55d2a57baf974f108cd',
         ],
         data: '0x00000000000000000000000074d093f6911ac080897c3145441103dabb869307aa0a3217fbeee55d5bae9905c77d3204fb2e8716ec0a9d1205c9b602388ae67d0000000000000000000000000be010fa7e70d74fa8b6729fe1ae268787298f54',
+        // @ts-ignore
         block: {
             id: '0004411650-520a3',
             height: 4411650,
@@ -269,8 +285,9 @@ export const logs = [
             from: '0x74d093f6911ac080897c3145441103dabb869307',
             to: '0x7122cd1221c20892234186facfe8615e6743ab02',
             hash: '0x1675b03dcc2e953e1c244f7a416a0644afff560d1e10b86d52c630e5a4d7d0aa',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            // @ts-ignore
             block: {
                 id: '0004411650-520a3',
                 height: 4411650,
@@ -292,6 +309,7 @@ export const logs = [
             '0x00000000000000000000000096ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
         ],
         data: '0x',
+        // @ts-ignore
         block: {
             id: '0004412547-ef8d2',
             height: 4412547,
@@ -306,8 +324,9 @@ export const logs = [
             from: '0x96ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
             to: '0x7122cd1221c20892234186facfe8615e6743ab02',
             hash: '0xc4df497a15a4afc64dcdb511be8d282283ddd99fc6b4760c74dbaf0570019aa0',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            // @ts-ignore
             block: {
                 id: '0004412547-ef8d2',
                 height: 4412547,
@@ -320,13 +339,14 @@ export const logs = [
     },
 ];
 
-export const block = {
+export const block: BlockData = {
+    // @ts-ignore Add more properties as necessary.
     header: {
         id: '1234567890',
         height: 12345,
         hash: '0x1234567890abcdef',
         parentHash: '0xabcdef1234567890', // EvmBlock field
-        timestamp: 1632297600, // EvmBlock field
+        timestamp: 1632297600, // EvmBlock field,
     },
     transactions: [],
     logs,
@@ -336,7 +356,10 @@ export const block = {
 
 export const token = {
     decimals: 18,
-    id: '0x059c7507b973d1512768c06f32a813bc93d83eb2',
+    id: generateIDFrom([
+        sepolia.id,
+        '0x059c7507b973d1512768c06f32a813bc93d83eb2',
+    ]),
     name: 'SimpleERC20',
     symbol: 'SIM20',
 };
