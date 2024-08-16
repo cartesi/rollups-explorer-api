@@ -59,9 +59,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/base-mainnet',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://mainnet.base.org',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://mainnet.base.org',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -109,9 +109,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/base-sepolia',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://sepolia.base.org',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://sepolia.base.org',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -159,9 +159,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/ethereum-sepolia',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://rpc.ankr.com/eth_sepolia',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth_sepolia',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -267,9 +267,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/optimism-mainnet',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://mainnet.optimism.io',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://mainnet.optimism.io',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -316,9 +316,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/optimism-sepolia',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://sepolia.optimism.io',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://sepolia.optimism.io',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -366,9 +366,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/ethereum-mainnet',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://rpc.ankr.com/eth',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth',
+        });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -433,9 +433,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/ethereum-sepolia',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://my-custom-sepolia-node/v3/api',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-sepolia-node/v3/api',
+        });
     });
 
     test('Set correct chain for mainnet based on environment var', () => {
@@ -448,9 +448,9 @@ describe('Processor creation', () => {
             'https://v2.archive.subsquid.io/network/ethereum-mainnet',
         );
 
-        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
-            'https://my-custom-mainnet-node/v3/api',
-        );
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-mainnet-node/v3/api',
+        });
     });
 
     test('Set correct chain for local/anvil based on environment var', () => {

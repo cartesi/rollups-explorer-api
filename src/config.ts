@@ -14,6 +14,7 @@ import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
 import { GatewaySettings, RpcEndpointSettings } from '@subsquid/evm-processor';
 import { base, baseSepolia, optimism, optimismSepolia } from 'viem/chains';
 import { archiveNodes } from './gateways';
+import { parseIntOr } from './utils';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
@@ -51,13 +52,21 @@ export const getConfig = (chainId: number): ProcessorConfig => {
     const RPC_URL = `RPC_URL_${chainId}`;
     const GENESIS_BLOCK = `GENESIS_BLOCK_${chainId}`;
     const BLOCK_CONFIRMATIONS = `BLOCK_CONFIRMATIONS_${chainId}`;
+    const parsedRateLimit = parseIntOr({
+        value: process.env[`RPC_RATE_LIMIT_${chainId}`],
+        defaultVal: 0,
+    });
+    const rateLimit = parsedRateLimit <= 0 ? undefined : parsedRateLimit;
+
     switch (chainId) {
         case 1: // mainnet
             return {
                 dataSource: {
                     archive: archiveNodes.mainnet,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
+                    rpcEndpoint: {
+                        url: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryMainnet.receipt.blockNumber,
@@ -72,9 +81,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.sepolia,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ??
-                        'https://rpc.ankr.com/eth_sepolia',
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            'https://rpc.ankr.com/eth_sepolia',
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactorySepolia.receipt.blockNumber,
@@ -89,9 +101,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.optimism,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ??
-                        optimism.rpcUrls.default.http[0],
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            optimism.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryOptimism.receipt.blockNumber,
@@ -106,9 +121,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.optimismSepolia,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ??
-                        optimismSepolia.rpcUrls.default.http[0],
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            optimismSepolia.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryOptimismSepolia.receipt.blockNumber,
@@ -123,8 +141,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.base,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ?? base.rpcUrls.default.http[0],
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            base.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryBase.receipt.blockNumber,
@@ -139,9 +161,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             return {
                 dataSource: {
                     archive: archiveNodes.baseSepolia,
-                    rpcEndpoint:
-                        process.env[RPC_URL] ??
-                        baseSepolia.rpcUrls.default.http[0],
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            baseSepolia.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
                 },
                 from: Math.min(
                     CartesiDAppFactoryBaseSepolia.receipt.blockNumber,
@@ -171,13 +196,3 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             throw new Error(`Unsupported chainId: ${chainId}`);
     }
 };
-
-interface ParseIntOr {
-    value?: string;
-    defaultVal: number;
-}
-
-function parseIntOr({ value, defaultVal }: ParseIntOr) {
-    const number = parseInt(value ?? '');
-    return Number.isNaN(number) ? defaultVal : number;
-}
