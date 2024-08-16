@@ -1,4 +1,5 @@
 import {
+    BlockData as BlockDataEvm,
     BlockHeader,
     DataHandlerContext,
     EvmBatchProcessor,
@@ -21,7 +22,7 @@ export type NetworkConfig = {
     rpcUrl: string;
 };
 
-export const createProcessor = (chainId: number): EvmBatchProcessor => {
+export const createProcessor = (chainId: number) => {
     const applicationMetadata = loadApplications(chainId);
     const config = getConfig(chainId);
     let processor = new EvmBatchProcessor()
@@ -79,8 +80,9 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
     return processor;
 };
 
-export type Fields = EvmBatchProcessorFields<typeof EvmBatchProcessor>;
+export type Fields = EvmBatchProcessorFields<typeof createProcessor>;
 export type Block = BlockHeader<Fields>;
+export type BlockData = BlockDataEvm<Fields>;
 export type Log = _Log<Fields>;
 export type Transaction = _Transaction<Fields>;
 export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>;

@@ -1,32 +1,55 @@
-type ApplicationFactory @entity @cardinality(value: 5) {
-    id: ID!
-    applications: [Application!] @derivedFrom(field: "factory")
+type Chain @entity @cardinality(value: 10) {
+    id: ID! # network chain id e.g. 111555111
 }
 
-type Application @entity @cardinality(value: 100) {
-    id: ID!
+type ApplicationFactory @entity @cardinality(value: 5) {
+    id: ID! # chainId+address
+    applications: [Application!] @derivedFrom(field: "factory")
+    address: String!
+    chain: Chain! @index
+}
+
+type Application
+    @entity
+    @cardinality(value: 100)
+    @index(fields: ["address", "chain"]) {
+    id: ID! # chainId+address
+    address: String!
     owner: String
     timestamp: BigInt!
     factory: ApplicationFactory
     inputs: [Input!] @derivedFrom(field: "application")
+    chain: Chain! @index
 }
 
-type Token @entity @cardinality(value: 10) {
-    id: ID!
+type Token
+    @entity
+    @cardinality(value: 10)
+    @index(fields: ["address", "chain"]) {
+    id: ID! # chainId+address
+    address: String!
     name: String!
     symbol: String!
     decimals: Int!
+    chain: Chain! @index
 }
 
-type NFT @entity @cardinality(value: 10) {
-    id: ID!
+type NFT @entity @cardinality(value: 10) @index(fields: ["address", "chain"]) {
+    id: ID! # chainId+address
+    address: String!
     name: String
     symbol: String
+    chain: Chain! @index
 }
 
 # ERC-1155 contract representation
-type MultiToken @entity @cardinality(value: 10) {
-    id: ID!
+type MultiToken
+    @entity
+    @cardinality(value: 10)
+    @index(fields: ["address", "chain"]) {
+    id: ID! # chainId+address
+    address: String!
+    chain: Chain! @index
 }
 
 # scalar for erc-1155 tokens data to be used for single and batch deposits
@@ -36,28 +59,31 @@ type Erc1155Transfer {
 }
 
 type Erc1155Deposit @entity @cardinality(value: 100) {
-    id: ID!
+    id: ID! # chainId+address
     from: String!
     token: MultiToken!
     transfers: [Erc1155Transfer!]
+    chain: Chain! @index
 }
 
 type Erc721Deposit @entity @cardinality(value: 100) {
-    id: ID!
+    id: ID! # chainId+address
     from: String!
     token: NFT!
     tokenIndex: BigInt!
+    chain: Chain! @index
 }
 
 type Erc20Deposit @entity @cardinality(value: 100) {
-    id: ID!
+    id: ID! # chainId+address
     token: Token!
     from: String!
     amount: BigInt!
+    chain: Chain! @index
 }
 
-type Input @entity @cardinality(value: 100) {
-    id: ID!
+type Input @entity @cardinality(value: 100) @index(fields: ["id", "chain"]) {
+    id: ID! # chainId+address+idx
     application: Application!
     index: Int!
     msgSender: String!
@@ -69,4 +95,5 @@ type Input @entity @cardinality(value: 100) {
     erc20Deposit: Erc20Deposit
     erc721Deposit: Erc721Deposit
     erc1155Deposit: Erc1155Deposit
+    chain: Chain! @index
 }
