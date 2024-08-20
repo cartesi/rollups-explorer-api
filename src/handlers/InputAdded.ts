@@ -1,4 +1,4 @@
-import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
+import { DataHandlerContext } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { AbiCoder, dataSlice, getUint } from 'ethers';
 import { Contract as ERC20 } from '../abi/ERC20';
@@ -13,6 +13,7 @@ import {
 } from '../config';
 import {
     Application,
+    Chain,
     Erc1155Deposit,
     Erc1155Transfer,
     Erc20Deposit,
@@ -22,6 +23,9 @@ import {
     NFT,
     Token,
 } from '../model';
+import { BlockData, Log } from '../processor';
+
+import { generateIDFrom } from '../utils';
 import Handler from './Handler';
 
 const logErrorAndReturnNull =
@@ -31,14 +35,15 @@ const logErrorAndReturnNull =
     };
 export default class InputAdded implements Handler {
     constructor(
-        private tokenStorage: Map<String, Token>,
-        private depositStorage: Map<String, Erc20Deposit>,
-        private applicationStorage: Map<String, Application>,
-        private inputStorage: Map<String, Input>,
-        private nftStorage: Map<String, NFT>,
-        private erc721DepositStorage: Map<String, Erc721Deposit>,
-        private multiTokenStorage: Map<String, MultiToken>,
-        private erc1155DepositStorage: Map<String, Erc1155Deposit>,
+        private tokenStorage: Map<string, Token>,
+        private depositStorage: Map<string, Erc20Deposit>,
+        private applicationStorage: Map<string, Application>,
+        private inputStorage: Map<string, Input>,
+        private nftStorage: Map<string, NFT>,
+        private erc721DepositStorage: Map<string, Erc721Deposit>,
+        private multiTokenStorage: Map<string, MultiToken>,
+        private erc1155DepositStorage: Map<string, Erc1155Deposit>,
+        private chainStorage: Map<string, Chain>,
     ) {}
 
     private async prepareErc20Deposit(
@@ -47,30 +52,42 @@ export default class InputAdded implements Handler {
         ctx: DataHandlerContext<Store>,
         opts: {
             inputId: string;
+            chain: Chain;
         },
     ) {
         if (input.msgSender !== ERC20PortalAddress) return undefined;
+
+        const chain = opts.chain;
 
         // first byte is a boolean and it is not used here at the moment
         const tokenAddress = dataSlice(input.payload, 1, 21).toLowerCase(); // 20 bytes for address
         const from = dataSlice(input.payload, 21, 41).toLowerCase(); // 20 bytes for address
         const amount = getUint(dataSlice(input.payload, 41, 73)); // 32 bytes for uint256
+        const tokenId = generateIDFrom([chain.id, tokenAddress]);
 
-        let token = this.tokenStorage.get(tokenAddress) as Token;
+        let token = this.tokenStorage.get(tokenId) as Token;
         if (!token) {
             const contract = new ERC20(ctx, block.header, tokenAddress);
             const name = await contract.name();
             const symbol = await contract.symbol();
             const decimals = await contract.decimals();
-            token = new Token({ id: tokenAddress, name, symbol, decimals });
-            this.tokenStorage.set(tokenAddress, token);
-            ctx.log.info(`${tokenAddress} (Token) stored`);
+            token = new Token({
+                id: tokenId,
+                name,
+                symbol,
+                decimals,
+                chain: chain,
+                address: tokenAddress,
+            });
+            this.tokenStorage.set(tokenId, token);
+            ctx.log.info(`${tokenId} (Token) stored`);
         }
         const deposit = new Erc20Deposit({
             id: input.id,
             amount,
             from,
             token,
+            chain: opts.chain,
         });
 
         this.depositStorage.set(opts.inputId, deposit);
@@ -84,16 +101,20 @@ export default class InputAdded implements Handler {
         block: BlockData,
         ctx: DataHandlerContext<Store>,
         opts: {
-            inputId: String;
+            inputId: string;
+            chain: Chain;
         },
     ) {
         if (input.msgSender !== ERC721PortalAddress) return undefined;
 
+        const chain = opts.chain;
+
         const tokenAddress = dataSlice(input.payload, 0, 20).toLowerCase(); // 20 bytes for address
         const from = dataSlice(input.payload, 20, 40).toLowerCase(); // 20 bytes for address
         const tokenIndex = getUint(dataSlice(input.payload, 40, 72)); // 32 bytes for uint256
+        const tokenId = generateIDFrom([chain.id, tokenAddress]);
 
-        let nft = this.nftStorage.get(tokenAddress);
+        let nft = this.nftStorage.get(tokenId);
         if (!nft) {
             const contract = new ERC721(ctx, block.header, tokenAddress);
             const name = await contract
@@ -102,9 +123,15 @@ export default class InputAdded implements Handler {
             const symbol = await contract
                 .symbol()
                 .catch(logErrorAndReturnNull(ctx));
-            nft = new NFT({ id: tokenAddress, name, symbol });
-            this.nftStorage.set(tokenAddress, nft);
-            ctx.log.info(`${tokenAddress} (NFT) stored`);
+            nft = new NFT({
+                id: tokenId,
+                name,
+                symbol,
+                chain,
+                address: tokenAddress,
+            });
+            this.nftStorage.set(tokenId, nft);
+            ctx.log.info(`${tokenId} (NFT) stored`);
         }
 
         const deposit = new Erc721Deposit({
@@ -112,6 +139,7 @@ export default class InputAdded implements Handler {
             from,
             token: nft,
             tokenIndex,
+            chain,
         });
 
         this.erc721DepositStorage.set(opts.inputId, deposit);
@@ -122,10 +150,11 @@ export default class InputAdded implements Handler {
 
     private async prepareErc1155Deposit(
         input: Input,
-        block: BlockData,
+        _block: BlockData,
         ctx: DataHandlerContext<Store>,
         opts: {
-            inputId: String;
+            inputId: string;
+            chain: Chain;
         },
     ) {
         if (
@@ -134,8 +163,11 @@ export default class InputAdded implements Handler {
         )
             return undefined;
 
+        const chain = opts.chain;
+
         const tokenAddress = dataSlice(input.payload, 0, 20).toLowerCase(); // 20 bytes for token address
         const from = dataSlice(input.payload, 20, 40).toLowerCase(); // 20 bytes for from address
+        const tokenId = generateIDFrom([chain.id, tokenAddress]);
         let transfers: Erc1155Transfer[] = [];
 
         if (input.msgSender === ERC1155BatchPortalAddress) {
@@ -156,12 +188,16 @@ export default class InputAdded implements Handler {
             transfers = [new Erc1155Transfer({ tokenIndex, amount })];
         }
 
-        let token = this.multiTokenStorage.get(tokenAddress);
+        let token = this.multiTokenStorage.get(tokenId);
 
         if (!token) {
-            token = new MultiToken({ id: tokenAddress });
-            this.multiTokenStorage.set(tokenAddress, token);
-            ctx.log.info(`${tokenAddress} (ERC-1155) contract stored.`);
+            token = new MultiToken({
+                id: tokenId,
+                chain,
+                address: tokenAddress,
+            });
+            this.multiTokenStorage.set(tokenId, token);
+            ctx.log.info(`${tokenId} (ERC-1155) contract stored.`);
         }
 
         const deposit = new Erc1155Deposit({
@@ -169,6 +205,7 @@ export default class InputAdded implements Handler {
             from,
             token,
             transfers,
+            chain,
         });
 
         this.erc1155DepositStorage.set(input.id, deposit);
@@ -182,9 +219,22 @@ export default class InputAdded implements Handler {
             log.address === InputBoxAddress &&
             log.topics[0] === events.InputAdded.topic
         ) {
+            if (!log.transaction?.chainId)
+                throw new Error(
+                    'Chain id is required to save InputAdded events and related data!',
+                );
+
+            const chain = new Chain({
+                id: log.transaction.chainId.toString(),
+            });
+
+            // Storing Chain
+            this.chainStorage.set(chain.id, chain);
+
             const timestamp = BigInt(log.block.timestamp);
             const event = events.InputAdded.decode(log);
-            const dappId = event.dapp.toLowerCase();
+            const dappAddress = event.dapp.toLowerCase();
+            const dappId = generateIDFrom([chain.id, dappAddress]);
             const timestampInSeconds = timestamp / 1000n;
 
             let application =
@@ -195,12 +245,15 @@ export default class InputAdded implements Handler {
                 application = new Application({
                     id: dappId,
                     timestamp: timestampInSeconds,
+                    chain: chain,
+                    address: dappAddress,
                 });
                 this.applicationStorage.set(dappId, application);
                 ctx.log.info(`${dappId} (Application) stored`);
             }
 
-            const inputId = `${dappId}-${event.inboxInputIndex}`;
+            const inputId = generateIDFrom([dappId, event.inboxInputIndex]);
+
             const input = new Input({
                 id: inputId,
                 application,
@@ -211,9 +264,10 @@ export default class InputAdded implements Handler {
                 blockNumber: BigInt(log.block.height),
                 blockHash: log.block.hash,
                 transactionHash: log.transaction?.hash,
+                chain: chain,
             });
 
-            const params = [input, block, ctx, { inputId }] as const;
+            const params = [input, block, ctx, { inputId, chain }] as const;
 
             input.erc20Deposit = await this.prepareErc20Deposit(...params);
 
