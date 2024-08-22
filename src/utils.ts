@@ -41,7 +41,13 @@ export const supportedChains = new Set<number>([
 
 /**
  * Read the environment variable CHAIN_IDS and filter by
- * supported chains, if none is found 31337 is returned as default.
+ * supported chains, if none the chain 31337 is returned as default.
+ * @example
+ *  // Return when multiple supported chains are defined.
+ *  {chains: [1, 10, 11155111], usingDefault: false}
+ * @example
+ *  // Return when no valid chains are defined.
+ * { chains: [31337], usingDefault: true}
  * @returns {number[]}
  */
 export function loadChainsToIndexFromEnvironment() {
