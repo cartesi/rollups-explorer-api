@@ -1,5 +1,9 @@
 import { createLogger } from '@subsquid/logger';
-import { Store, TypeormDatabase } from '@subsquid/typeorm-store';
+import {
+    Store,
+    TypeormDatabase,
+    TypeormDatabaseOptions,
+} from '@subsquid/typeorm-store';
 
 import EventHandler from './handlers/EventHandler';
 import { createProcessor, ProcessorContext } from './processor';
@@ -23,12 +27,25 @@ if (chainsToIndex.chains.length > 1) {
 }
 logger.info(message);
 
+/**
+ * changing the default isolationLevel to `READ COMMITED`
+ * We don't have cross-chain dependencies but it is a high volume of tx
+ * and we do reads while executing writes causing interdependencies and problems.
+ * For our case we only want to read what is in the database even as an snapshot and
+ * that is not a perceived problem for our case here. see {@link https://docs.sqd.dev/sdk/resources/basics/multichain/#handling-concurrency}
+ * and also {@link https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED}
+ */
+const dbOptions: TypeormDatabaseOptions = {
+    isolationLevel: 'READ COMMITTED',
+    supportHotBlocks: true,
+};
+
 // instantiate processor for chain
 chainsToIndex.chains.forEach((chainId: number) => {
     const processor = createProcessor(chainId);
     processor.run(
         new TypeormDatabase({
-            supportHotBlocks: true,
+            ...dbOptions,
             stateSchema: `processor-${chainId}`,
         }),
         async (ctx: ProcessorContext<Store>) => {
@@ -71,6 +88,9 @@ chainsToIndex.chains.forEach((chainId: number) => {
             await ctx.store.upsert([...erc721Deposits.values()]);
             await ctx.store.upsert([...erc1155Deposits.values()]);
             await ctx.store.upsert([...inputs.values()]);
+
+            // Help GC kick-in and release memory.
+            eventHandler.cleanValues();
         },
     );
 });

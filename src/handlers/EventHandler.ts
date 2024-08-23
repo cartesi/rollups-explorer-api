@@ -103,4 +103,8 @@ export default class EventHandler {
             )
             .join(', ');
     }
+
+    cleanValues() {
+        Object.values(this.getValues()).forEach((storage) => storage.clear());
+    }
 }
