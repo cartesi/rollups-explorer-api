@@ -9,6 +9,8 @@ vi.mock('@subsquid/evm-processor', async () => {
     const EvmBatchProcessor = vi.fn();
 
     EvmBatchProcessor.prototype.setDataSource = vi.fn().mockReturnThis();
+    EvmBatchProcessor.prototype.setGateway = vi.fn().mockReturnThis();
+    EvmBatchProcessor.prototype.setRpcEndpoint = vi.fn().mockReturnThis();
     EvmBatchProcessor.prototype.setFinalityConfirmation = vi
         .fn()
         .mockReturnThis();
@@ -53,9 +55,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(base);
         const applicationMetadata = loadApplications(base);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/base-mainnet',
-            chain: 'https://mainnet.base.org',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/base-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://mainnet.base.org',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -100,9 +105,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(baseSepolia);
         const applicationMetadata = loadApplications(baseSepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/base-sepolia',
-            chain: 'https://sepolia.base.org',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/base-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://sepolia.base.org',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -147,9 +155,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(sepolia);
         const applicationMetadata = loadApplications(sepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
-            chain: 'https://rpc.ankr.com/eth_sepolia',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth_sepolia',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -206,9 +217,10 @@ describe('Processor creation', () => {
     test('Required configs for local/anvil', () => {
         const processor = createProcessor(local);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            chain: 'http://127.0.0.1:8545',
-        });
+        expect(processor.setGateway).not.toHaveBeenCalled();
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
+            'http://127.0.0.1:8545',
+        );
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(1);
         expect(processor.setFields).toHaveBeenCalledWith({
@@ -251,9 +263,12 @@ describe('Processor creation', () => {
     test('Required configs for optimism', () => {
         const processor = createProcessor(optimism);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/optimism-mainnet',
-            chain: 'https://mainnet.optimism.io',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/optimism-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://mainnet.optimism.io',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -297,9 +312,12 @@ describe('Processor creation', () => {
     test('Required configs for optimism-sepolia', () => {
         const processor = createProcessor(optimismSepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/optimism-sepolia',
-            chain: 'https://sepolia.optimism.io',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/optimism-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://sepolia.optimism.io',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -344,9 +362,12 @@ describe('Processor creation', () => {
         const processor = createProcessor(mainnet);
         const applicationMetadata = loadApplications(mainnet);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-            chain: 'https://rpc.ankr.com/eth',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://rpc.ankr.com/eth',
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
@@ -408,9 +429,12 @@ describe('Processor creation', () => {
 
         const processor = createProcessor(sepolia);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
-            chain: 'https://my-custom-sepolia-node/v3/api',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-sepolia-node/v3/api',
         });
     });
 
@@ -420,9 +444,12 @@ describe('Processor creation', () => {
 
         const processor = createProcessor(mainnet);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            archive: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-            chain: 'https://my-custom-mainnet-node/v3/api',
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-mainnet-node/v3/api',
         });
     });
 
@@ -432,8 +459,8 @@ describe('Processor creation', () => {
 
         const processor = createProcessor(local);
 
-        expect(processor.setDataSource).toHaveBeenCalledWith({
-            chain: 'https://my-custom-local-node:9000',
-        });
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
+            'https://my-custom-local-node:9000',
+        );
     });
 });

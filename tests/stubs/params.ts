@@ -2,6 +2,7 @@ import { Chain } from '@subsquid/evm-processor/lib/interfaces/chain';
 import { Logger } from '@subsquid/logger';
 import { Store } from '@subsquid/typeorm-store';
 import { encodeAbiParameters } from 'viem';
+import { sepolia } from 'viem/chains';
 import { vi } from 'vitest';
 import {
     CartesiDAppFactoryAddress,
@@ -9,6 +10,8 @@ import {
     InputBoxAddress,
 } from '../../src/config';
 import { Input } from '../../src/model';
+import { BlockData, Log } from '../../src/processor';
+import { generateIDFrom } from '../../src/utils';
 
 vi.mock('@subsquid/logger', async (importOriginal) => {
     const actualMods = await importOriginal;
@@ -38,12 +41,18 @@ const payload =
 
 export const input = {
     id: '0x60a7048c3136293071605a4eaffef49923e981cc-0',
+    chain: {
+        id: sepolia.id.toString(),
+    },
     application: {
         id: '0x60a7048c3136293071605a4eaffef49923e981cc',
         timestamp: 1696281168n,
         owner: null,
         factory: null,
         inputs: [],
+        chain: {
+            id: sepolia.id.toString(),
+        },
     },
     index: 1,
     msgSender: ERC20PortalAddress,
@@ -59,7 +68,7 @@ export const input = {
         '0x6a3d76983453c0f74188bd89e01576c35f9d9b02daecdd49f7171aeb2bd3dc78',
 } satisfies Input;
 
-export const logErc721Transfer = {
+export const logErc721Transfer: Log = {
     id: '0004867730-000035-2c78f',
     address: InputBoxAddress,
     logIndex: 35,
@@ -70,6 +79,7 @@ export const logErc721Transfer = {
         '0x0000000000000000000000000000000000000000000000000000000000000001',
     ],
     data: '0x000000000000000000000000237f8dd094c0e47f4236f12b4fa01d6dae89fb87000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c87a3cc9c0408887a030a0354330c36a9cd681aa7ea074683b5be015f053b5dceb064c41fc9d11b6e500000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    // @ts-ignore
     block: {
         id: '0004867730-2c78f',
         height: 4867730,
@@ -79,12 +89,14 @@ export const logErc721Transfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
         to: '0x237f8dd094c0e47f4236f12b4fa01d6dae89fb87',
         hash: '0x47c53eeddc2f927ef2a7a3dd9a95bfd70ecfda2c4efdf10a16c48ca98c86b881',
-        value: 0,
+        value: 0n,
+        // @ts-ignore
         block: {
             id: '0004867730-2c78f',
             height: 4867730,
@@ -96,7 +108,7 @@ export const logErc721Transfer = {
     },
 };
 
-export const logErc1155SingleTransfer = {
+export const logErc1155SingleTransfer: Log = {
     id: '0004867730-000035-2c78f',
     address: InputBoxAddress,
     logIndex: 35,
@@ -107,6 +119,7 @@ export const logErc1155SingleTransfer = {
         encodeAbiParameters([{ type: 'uint256' }], [783n]),
     ],
     data: '0x0000000000000000000000007cfb0193ca87eb6e48056885e026552c3a941fc4000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000001282960f4db2b0993ae5b59bc4a0f5ec7a1767e905ea074683b5be015f053b5dceb064c41fc9d11b6e500000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000989680000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    // @ts-ignore
     block: {
         id: '0004867730-2c78f',
         height: 4867730,
@@ -116,12 +129,14 @@ export const logErc1155SingleTransfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
         to: '0x7CFB0193Ca87eB6e48056885E026552c3A941FC4',
         hash: '0x47c53eeddc2f927ef2a7a3dd9a95bfd70ecfda2c4efdf10a16c48ca98c86b881',
-        value: 0,
+        value: 0n,
+        // @ts-ignore
         block: {
             id: '0004867730-2c78f',
             height: 4867730,
@@ -133,7 +148,7 @@ export const logErc1155SingleTransfer = {
     },
 };
 
-export const logErc1155BatchTransfer = {
+export const logErc1155BatchTransfer: Log = {
     id: '0004867730-000035-2c78f',
     address: InputBoxAddress,
     logIndex: 35,
@@ -144,6 +159,7 @@ export const logErc1155BatchTransfer = {
         encodeAbiParameters([{ type: 'uint256' }], [784n]),
     ],
     data: '0x000000000000000000000000edb53860a6b52bbb7561ad596416ee9965b055aa000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002282960f4db2b0993ae5b59bc4a0f5ec7a1767e905ea074683b5be015f053b5dceb064c41fc9d11b6e500000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    // @ts-ignore
     block: {
         id: '0004867730-2c78f',
         height: 4867730,
@@ -153,12 +169,14 @@ export const logErc1155BatchTransfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
         to: '0xedB53860A6B52bbb7561Ad596416ee9965B055Aa',
         hash: '0x47c53eeddc2f927ef2a7a3dd9a95bfd70ecfda2c4efdf10a16c48ca98c86b881',
-        value: 0,
+        value: 0n,
+        // @ts-ignore
         block: {
             id: '0004867730-2c78f',
             height: 4867730,
@@ -170,7 +188,7 @@ export const logErc1155BatchTransfer = {
     },
 };
 
-export const logErc20Transfer = {
+export const logErc20Transfer: Log = {
     id: '0004867730-000035-2c78f',
     address: InputBoxAddress,
     logIndex: 31,
@@ -181,6 +199,7 @@ export const logErc20Transfer = {
         '0x0000000000000000000000000000000000000000000000000000000000000001',
     ],
     data: '0x0000000000000000000000009c21aeb2093c32ddbc53eef24b873bdcd1ada1db0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000004a01813ae0539daf858599a1b2a7083380542a7b1bb5f9e958241c1ca380cfcd50170ec43974bded0bff000000000000000000000000000000000000000000000000018a59e9721180000000000000000000000000000000000000000000000000',
+    // @ts-ignore
     block: {
         id: '0004867730-2c78f',
         height: 4867730,
@@ -190,12 +209,14 @@ export const logErc20Transfer = {
         timestamp: 1702321200000,
     },
     transaction: {
+        chainId: sepolia.id,
         id: '0004867730-000024-2c78f',
         transactionIndex: 24,
         from: '0xF9e958241c1cA380cFcD50170Ec43974bDeD0BfF',
         to: '0xA1C977656F68e1eE2733FF43B83529aF2a5aE7c9',
         hash: '0x47c53eeddc2f927ef2a7a3dd9a95bfd70ecfda2c4efdf10a16c48ca98c86b881',
-        value: 0,
+        value: 0n,
+        // @ts-ignore
         block: {
             id: '0004867730-2c78f',
             height: 4867730,
@@ -207,7 +228,7 @@ export const logErc20Transfer = {
     },
 };
 
-export const logs = [
+export const logs: Log[] = [
     {
         id: '0004411683-000001-cae3a',
         logIndex: 1,
@@ -219,6 +240,7 @@ export const logs = [
             '0x0000000000000000000000000000000000000000000000000000000000000001',
         ],
         data: '0x000000000000000000000000e85fba508e9641103985e9101e5853f79d065e09000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000651b2b3c00000000000000000000000000000000000000000000000000000288e40d88a000000000000000000000000000000000000000000000000000000000651b2b3000000000000000000000000000000000000000000000000000000026dc68ca2400000000000000000000000000000000000000000000000000000000651b2b54000000000000000000000000000000000000000000000000000000002cf06118',
+        // @ts-ignore
         block: {
             id: '0004411683-cae3a',
             height: 4411683,
@@ -233,8 +255,9 @@ export const logs = [
             from: '0x74d093f6911ac080897c3145441103dabb869307',
             to: '0x95ff8d3ce9dcb7455beb7845143bea84fe5c4f6f',
             hash: '0x1b165c2cd18cc58823fbe598e954458774a48f69249efed9ba5cf243b17d0d89',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            //@ts-ignore
             block: {
                 id: '0004411683-cae3a',
                 height: 4411683,
@@ -255,6 +278,7 @@ export const logs = [
             '0x00000000000000000000000089b7b5d0e61b760f63e3d55d2a57baf974f108cd',
         ],
         data: '0x00000000000000000000000074d093f6911ac080897c3145441103dabb869307aa0a3217fbeee55d5bae9905c77d3204fb2e8716ec0a9d1205c9b602388ae67d0000000000000000000000000be010fa7e70d74fa8b6729fe1ae268787298f54',
+        // @ts-ignore
         block: {
             id: '0004411650-520a3',
             height: 4411650,
@@ -269,8 +293,9 @@ export const logs = [
             from: '0x74d093f6911ac080897c3145441103dabb869307',
             to: '0x7122cd1221c20892234186facfe8615e6743ab02',
             hash: '0x1675b03dcc2e953e1c244f7a416a0644afff560d1e10b86d52c630e5a4d7d0aa',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            // @ts-ignore
             block: {
                 id: '0004411650-520a3',
                 height: 4411650,
@@ -292,6 +317,7 @@ export const logs = [
             '0x00000000000000000000000096ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
         ],
         data: '0x',
+        // @ts-ignore
         block: {
             id: '0004412547-ef8d2',
             height: 4412547,
@@ -306,8 +332,9 @@ export const logs = [
             from: '0x96ae2ecbfde74b1ec55e9cf626ee80e4f64c8a63',
             to: '0x7122cd1221c20892234186facfe8615e6743ab02',
             hash: '0xc4df497a15a4afc64dcdb511be8d282283ddd99fc6b4760c74dbaf0570019aa0',
-            chainId: 11155111,
-            value: '0',
+            chainId: sepolia.id,
+            value: 0n,
+            // @ts-ignore
             block: {
                 id: '0004412547-ef8d2',
                 height: 4412547,
@@ -320,13 +347,14 @@ export const logs = [
     },
 ];
 
-export const block = {
+export const block: BlockData = {
+    // @ts-ignore Add more properties as necessary.
     header: {
         id: '1234567890',
         height: 12345,
         hash: '0x1234567890abcdef',
         parentHash: '0xabcdef1234567890', // EvmBlock field
-        timestamp: 1632297600, // EvmBlock field
+        timestamp: 1632297600, // EvmBlock field,
     },
     transactions: [],
     logs,
@@ -336,7 +364,10 @@ export const block = {
 
 export const token = {
     decimals: 18,
-    id: '0x059c7507b973d1512768c06f32a813bc93d83eb2',
+    id: generateIDFrom([
+        sepolia.id,
+        '0x059c7507b973d1512768c06f32a813bc93d83eb2',
+    ]),
     name: 'SimpleERC20',
     symbol: 'SIM20',
 };

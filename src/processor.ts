@@ -1,4 +1,5 @@
 import {
+    BlockData as BlockDataEvm,
     BlockHeader,
     DataHandlerContext,
     EvmBatchProcessor,
@@ -21,11 +22,10 @@ export type NetworkConfig = {
     rpcUrl: string;
 };
 
-export const createProcessor = (chainId: number): EvmBatchProcessor => {
+export const createProcessor = (chainId: number) => {
     const applicationMetadata = loadApplications(chainId);
     const config = getConfig(chainId);
     let processor = new EvmBatchProcessor()
-        .setDataSource(config.dataSource)
         .setFinalityConfirmation(config.finalityConfirmation ?? 10)
         .setFields({
             transaction: {
@@ -47,6 +47,14 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
             topic0: [InputBox.InputAdded.topic],
             transaction: true,
         });
+
+    processor = config.dataSource.archive
+        ? processor.setGateway(config.dataSource.archive)
+        : processor;
+
+    processor = config.dataSource.rpcEndpoint
+        ? processor.setRpcEndpoint(config.dataSource.rpcEndpoint)
+        : processor;
 
     if (applicationMetadata !== null) {
         processor = processor
@@ -72,8 +80,9 @@ export const createProcessor = (chainId: number): EvmBatchProcessor => {
     return processor;
 };
 
-export type Fields = EvmBatchProcessorFields<typeof EvmBatchProcessor>;
+export type Fields = EvmBatchProcessorFields<typeof createProcessor>;
 export type Block = BlockHeader<Fields>;
+export type BlockData = BlockDataEvm<Fields>;
 export type Log = _Log<Fields>;
 export type Transaction = _Transaction<Fields>;
 export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>;

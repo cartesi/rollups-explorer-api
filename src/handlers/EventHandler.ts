@@ -1,8 +1,8 @@
-import { BlockData, DataHandlerContext, Log } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import {
     Application,
     ApplicationFactory,
+    Chain,
     Erc1155Deposit,
     Erc20Deposit,
     Erc721Deposit,
@@ -11,6 +11,7 @@ import {
     NFT,
     Token,
 } from '../model';
+import { BlockData, Log, ProcessorContext } from '../processor';
 import ApplicationCreated from './ApplicationCreated';
 import Handler from './Handler';
 import InputAdded from './InputAdded';
@@ -26,6 +27,7 @@ export default class EventHandler {
     private readonly erc721Deposits: Map<string, Erc721Deposit>;
     private readonly multiTokens: Map<string, MultiToken>;
     private readonly erc1155Deposits: Map<string, Erc1155Deposit>;
+    private readonly chains: Map<string, Chain>;
     private readonly applicationCreated: Handler;
     private readonly inputAdded: Handler;
     private readonly ownershipTransferred: Handler;
@@ -40,9 +42,11 @@ export default class EventHandler {
         this.erc721Deposits = new Map();
         this.multiTokens = new Map();
         this.erc1155Deposits = new Map();
+        this.chains = new Map();
         this.applicationCreated = new ApplicationCreated(
             this.factories,
             this.applications,
+            this.chains,
         );
 
         this.inputAdded = new InputAdded(
@@ -54,12 +58,16 @@ export default class EventHandler {
             this.erc721Deposits,
             this.multiTokens,
             this.erc1155Deposits,
+            this.chains,
         );
 
-        this.ownershipTransferred = new OwnershipTransferred(this.applications);
+        this.ownershipTransferred = new OwnershipTransferred(
+            this.applications,
+            this.chains,
+        );
     }
 
-    async handle(log: Log, block: BlockData, ctx: DataHandlerContext<Store>) {
+    async handle(log: Log, block: BlockData, ctx: ProcessorContext<Store>) {
         await this.applicationCreated.handle(log, block, ctx);
         await this.inputAdded.handle(log, block, ctx);
         await this.ownershipTransferred.handle(log, block, ctx);
@@ -77,6 +85,7 @@ export default class EventHandler {
             erc721Deposits: this.erc721Deposits,
             multiTokens: this.multiTokens,
             erc1155Deposits: this.erc1155Deposits,
+            chains: this.chains,
         };
     }
 
@@ -93,5 +102,9 @@ export default class EventHandler {
                 ([entityName, entityMap]) => `${entityName}: ${entityMap.size}`,
             )
             .join(', ');
+    }
+
+    cleanValues() {
+        Object.values(this.getValues()).forEach((storage) => storage.clear());
     }
 }

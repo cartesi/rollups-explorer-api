@@ -1,10 +1,12 @@
 import { afterEach } from 'node:test';
+import { sepolia } from 'viem/chains';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { Contract as ERC20 } from '../../src/abi/ERC20';
 import { Contract as ERC721 } from '../../src/abi/ERC721';
 import InputAdded from '../../src/handlers/InputAdded';
 import {
     Application,
+    Chain,
     Erc1155Deposit,
     Erc1155Transfer,
     Erc20Deposit,
@@ -23,6 +25,7 @@ import {
     logErc721Transfer,
     logs,
 } from '../stubs/params';
+import { mockModelImplementation } from '../stubs/utils';
 
 vi.mock('../../src/abi/ERC20');
 
@@ -38,6 +41,7 @@ vi.mock('../../src/model/', async () => {
     const Erc1155Deposit = vi.fn();
     const MultiToken = vi.fn();
     const Erc1155Transfer = vi.fn();
+    const Chain = vi.fn();
 
     return {
         Application,
@@ -49,20 +53,22 @@ vi.mock('../../src/model/', async () => {
         MultiToken,
         Erc1155Deposit,
         Erc1155Transfer,
+        Chain,
     };
 });
 
-const ApplicationMock = vi.mocked(Application);
-const InputMock = vi.mocked(Input);
-const NFTStub = vi.mocked(NFT);
+const ApplicationMock = mockModelImplementation(Application);
+const InputMock = mockModelImplementation(Input);
+const NFTStub = mockModelImplementation(NFT);
 const ERC721Mock = vi.mocked(ERC721, true);
-const ERC721DepositStub = vi.mocked(Erc721Deposit);
+const ERC721DepositStub = mockModelImplementation(Erc721Deposit);
 const ERC20Mock = vi.mocked(ERC20, true);
-const ERC20DepositStub = vi.mocked(Erc20Deposit);
-const TokenStub = vi.mocked(Token);
-const MultiTokenStub = vi.mocked(MultiToken);
-const ERC1155DepositStub = vi.mocked(Erc1155Deposit);
-const ERC1155TransferStub = vi.mocked(Erc1155Transfer);
+const ERC20DepositStub = mockModelImplementation(Erc20Deposit);
+const TokenStub = mockModelImplementation(Token);
+const MultiTokenStub = mockModelImplementation(MultiToken);
+const ERC1155DepositStub = mockModelImplementation(Erc1155Deposit);
+const ERC1155TransferStub = mockModelImplementation(Erc1155Transfer);
+const ChainStub = mockModelImplementation(Chain);
 
 describe('InputAdded', () => {
     let inputAdded: InputAdded;
@@ -74,6 +80,8 @@ describe('InputAdded', () => {
     const mockErc721DepositStorage = new Map();
     const mockMultiTokenStorage = new Map<string, MultiToken>();
     const mockErc1155DepositStorage = new Map<string, Erc1155Deposit>();
+    const mockChainStorage = new Map<string, Chain>();
+    const expectedChain = { id: sepolia.id.toString() };
 
     beforeEach(() => {
         inputAdded = new InputAdded(
@@ -85,6 +93,7 @@ describe('InputAdded', () => {
             mockErc721DepositStorage,
             mockMultiTokenStorage,
             mockErc1155DepositStorage,
+            mockChainStorage,
         );
 
         mockTokenStorage.clear();
@@ -102,35 +111,44 @@ describe('InputAdded', () => {
     });
 
     describe('handle', async () => {
-        test('wrong contract address', async () => {
+        test('should ignore events other than InputAdded', async () => {
             await inputAdded.handle(logs[1], block, ctx);
             expect(mockInputStorage.size).toBe(0);
             expect(mockApplicationStorage.size).toBe(0);
             expect(mockDepositStorage.size).toBe(0);
         });
 
-        test('correct contract address', async () => {
+        test('should handle event type InputAdded', async () => {
             await inputAdded.handle(logs[0], block, ctx);
             expect(mockApplicationStorage.size).toBe(1);
             expect(mockInputStorage.size).toBe(1);
         });
 
         test('when creating a non-existing app it should also set the timestamp in seconds', async () => {
-            const expectedParams = vi.fn();
-
-            ApplicationMock.mockImplementationOnce((args) => {
-                expectedParams(args);
-                return new Application(args);
-            });
-
             await inputAdded.handle(logs[0], block, ctx);
 
             const timestamp = BigInt(logs[0].block.timestamp) / 1000n;
 
-            expect(expectedParams).toHaveBeenCalledWith({
-                id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
+            const [application] = mockApplicationStorage.values();
+            expect(application).toEqual({
+                id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54`,
+                address: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
                 timestamp,
+                chain: expectedChain,
             });
+        });
+
+        test('should throw error when chain-id information is not available in the Log ', async () => {
+            try {
+                const clonedLog = structuredClone(logErc20Transfer);
+                delete clonedLog.transaction?.chainId;
+                await inputAdded.handle(clonedLog, block, ctx);
+                expect(true).toEqual('Should not reach that expectation.');
+            } catch (error) {
+                expect(error.message).toEqual(
+                    'Chain id is required to save InputAdded events and related data!',
+                );
+            }
         });
 
         describe('ERC-20 deposit', () => {
@@ -139,14 +157,6 @@ describe('InputAdded', () => {
             const decimals = 18;
 
             beforeEach(() => {
-                InputMock.mockImplementationOnce((args) => {
-                    return { ...args } as Input;
-                });
-                TokenStub.mockImplementation((args) => ({ ...args } as Token));
-                ERC20DepositStub.mockImplementation(
-                    (args) => ({ ...args } as Erc20Deposit),
-                );
-
                 // some default returns for the ERC20 contract calls
                 ERC20Mock.prototype.name.mockResolvedValue(name);
                 ERC20Mock.prototype.symbol.mockResolvedValue(symbol);
@@ -160,28 +170,36 @@ describe('InputAdded', () => {
             test('Should store the token information', async () => {
                 await inputAdded.handle(logErc20Transfer, block, ctx);
                 expect(mockTokenStorage.size).toBe(1);
-                const token = mockTokenStorage.values().next().value;
+                const [token] = mockTokenStorage.values();
 
-                expect(token.name).toEqual(name);
-                expect(token.symbol).toEqual(symbol);
-                expect(token.decimals).toEqual(decimals);
+                expect(token).toEqual({
+                    chain: expectedChain,
+                    decimals: decimals,
+                    id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
+                    address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                    name: name,
+                    symbol: symbol,
+                });
             });
 
             test('should store the deposit information', async () => {
                 await inputAdded.handle(logErc20Transfer, block, ctx);
 
                 expect(mockDepositStorage.size).toBe(1);
-                const deposit = mockDepositStorage.values().next().value;
+                const [deposit] = mockDepositStorage.values();
 
                 expect(deposit).toEqual({
-                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
+                    chain: expectedChain,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
                     amount: 111000000000000000n,
                     from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
                     token: {
-                        id: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                        id: `${sepolia.id.toString()}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
+                        address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
                         decimals: 18,
                         name: 'Wrapped Ether',
                         symbol: 'WETH',
+                        chain: expectedChain,
                     },
                 });
             });
@@ -190,17 +208,21 @@ describe('InputAdded', () => {
                 await inputAdded.handle(logErc20Transfer, block, ctx);
 
                 expect(mockInputStorage.size).toEqual(1);
-                const input = mockInputStorage.values().next().value as Input;
+                const [input] =
+                    mockInputStorage.values() as IterableIterator<Input>;
 
                 expect(input.erc20Deposit).toEqual({
+                    chain: expectedChain,
                     amount: 111000000000000000n,
                     from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
-                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
                     token: {
                         decimals: 18,
-                        id: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                        id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
+                        address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
                         name: 'Wrapped Ether',
                         symbol: 'WETH',
+                        chain: expectedChain,
                     },
                 });
 
@@ -215,19 +237,6 @@ describe('InputAdded', () => {
             beforeEach(() => {
                 ERC721Mock.prototype.name.mockResolvedValue(name);
                 ERC721Mock.prototype.symbol.mockResolvedValue(symbol);
-
-                // Returning simple object as the Class type for assertion
-                InputMock.mockImplementationOnce((args) => {
-                    return { ...args } as Input;
-                });
-
-                NFTStub.mockImplementationOnce((args) => {
-                    return { ...args } as NFT;
-                });
-
-                ERC721DepositStub.mockImplementationOnce((args) => {
-                    return { ...args } as Erc721Deposit;
-                });
             });
 
             afterEach(() => {
@@ -238,27 +247,37 @@ describe('InputAdded', () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
                 expect(mockNftStorage.size).toBe(1);
-                const token = mockNftStorage.values().next().value;
-                expect(token.name).toEqual(name);
-                expect(token.symbol).toEqual(symbol);
+                const [token] =
+                    mockNftStorage.values() as IterableIterator<NFT>;
+
+                expect(token).toEqual({
+                    chain: expectedChain,
+                    id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                    address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                    name,
+                    symbol,
+                });
             });
 
             test('should store the deposit information', async () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
                 expect(mockErc721DepositStorage.size).toBe(1);
-                const deposit = mockErc721DepositStorage.values().next().value;
-                expect(deposit.id).toEqual(
-                    '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
-                );
-                expect(deposit.from).toEqual(
-                    logErc721Transfer.transaction.from,
-                );
-                expect(deposit.tokenIndex).toEqual(1n);
-                expect(deposit.token).toEqual({
-                    id: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
-                    name,
-                    symbol,
+                const [deposit] =
+                    mockErc721DepositStorage.values() as IterableIterator<Erc721Deposit>;
+
+                expect(deposit).toEqual({
+                    chain: expectedChain,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
+                    from: logErc721Transfer.transaction?.from,
+                    token: {
+                        chain: expectedChain,
+                        id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                        address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                        name,
+                        symbol,
+                    },
+                    tokenIndex: 1n,
                 });
             });
 
@@ -266,12 +285,17 @@ describe('InputAdded', () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
                 expect(mockInputStorage.size).toBe(1);
-                const input = mockInputStorage.values().next().value;
+                const [input] =
+                    mockInputStorage.values() as IterableIterator<Input>;
+
                 expect(input.erc721Deposit).toEqual({
+                    chain: expectedChain,
                     from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
                     token: {
-                        id: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                        chain: expectedChain,
+                        id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                        address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
                         name,
                         symbol,
                     },
@@ -290,41 +314,20 @@ describe('InputAdded', () => {
                 await inputAdded.handle(logErc721Transfer, block, ctx);
 
                 expect(mockInputStorage.size).toBe(1);
-                const input = mockInputStorage.values().next().value;
-                expect(input.erc721Deposit).toEqual({
-                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1',
-                    token: {
-                        id: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
-                        name: null,
-                        symbol: null,
-                    },
-                    tokenIndex: 1n,
+                const [input] =
+                    mockInputStorage.values() as IterableIterator<Input>;
+                expect(input.erc721Deposit?.token).toEqual({
+                    id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                    address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                    name: null,
+                    symbol: null,
+                    chain: expectedChain,
                 });
             });
         });
 
         describe('ERC-1155 deposits', () => {
-            const tokenAddress = '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e';
-
-            beforeEach(() => {
-                // Returning simple object as the Class type for assertion
-                InputMock.mockImplementationOnce((args) => {
-                    return { ...args } as Input;
-                });
-
-                MultiTokenStub.mockImplementationOnce((args) => {
-                    return { ...args } as MultiToken;
-                });
-
-                ERC1155TransferStub.mockImplementation((args) => {
-                    return { ...args } as Erc1155Transfer;
-                });
-
-                ERC1155DepositStub.mockImplementationOnce((args) => {
-                    return { ...args } as Erc1155Deposit;
-                });
-            });
+            const tokenAddress = `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`;
 
             afterEach(() => {
                 vi.clearAllMocks();
@@ -338,11 +341,14 @@ describe('InputAdded', () => {
                 expect(mockMultiTokenStorage.size).toBe(1);
                 const token = mockMultiTokenStorage.get(tokenAddress);
                 expect(token?.id).toEqual(tokenAddress);
+                expect(token?.address).toEqual(
+                    '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                );
+                expect(token?.chain).toEqual({ id: '11155111' });
             });
 
             test('should store the deposit information for single transfer', async () => {
-                const inputId =
-                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8-783';
+                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-783`;
                 expect(mockErc1155DepositStorage.size).toBe(0);
                 await inputAdded.handle(logErc1155SingleTransfer, block, ctx);
 
@@ -353,8 +359,11 @@ describe('InputAdded', () => {
                 expect(deposit).toEqual({
                     from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
                     id: inputId,
+                    chain: expectedChain,
                     token: {
-                        id: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                        id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
+                        address: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                        chain: expectedChain,
                     },
                     transfers: [
                         {
@@ -366,8 +375,7 @@ describe('InputAdded', () => {
             });
 
             test('should store the deposit information for batch transfer', async () => {
-                const inputId =
-                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8-784';
+                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-784`;
                 expect(mockErc1155DepositStorage.size).toBe(0);
                 await inputAdded.handle(logErc1155BatchTransfer, block, ctx);
 
@@ -378,8 +386,11 @@ describe('InputAdded', () => {
                 expect(deposit).toEqual({
                     from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
                     id: inputId,
+                    chain: expectedChain,
                     token: {
-                        id: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                        id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
+                        address: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                        chain: expectedChain,
                     },
                     transfers: [
                         {
