@@ -31,6 +31,8 @@ const optimism = 10;
 const optimismSepolia = 11155420;
 const base = 8453;
 const baseSepolia = 84532;
+const arbitrum = 42161;
+const arbitrumSepolia = 421614;
 
 describe('Processor creation', () => {
     beforeEach(() => {
@@ -358,6 +360,104 @@ describe('Processor creation', () => {
         });
     });
 
+    test('Required configs for arbitrum', () => {
+        const processor = createProcessor(arbitrum);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/arbitrum-one',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://arb1.arbitrum.io/rpc',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 115470622,
+        });
+
+        const addLog = processor.addLog as unknown as MockInstance;
+
+        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog.mock.calls[0][0]).toEqual({
+            address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
+            topic0: [
+                '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            ],
+        });
+        expect(addLog.mock.calls[1][0]).toEqual({
+            address: ['0x59b22d57d4f067708ab0c00552767405926dc768'],
+            topic0: [
+                '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[2][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            transaction: true,
+        });
+    });
+
+    test('Required configs for arbitrum sepolia', () => {
+        const processor = createProcessor(arbitrumSepolia);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://sepolia-rollup.arbitrum.io/rpc',
+        });
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 2838409,
+        });
+
+        const addLog = processor.addLog as unknown as MockInstance;
+
+        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog.mock.calls[0][0]).toEqual({
+            address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
+            topic0: [
+                '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            ],
+        });
+        expect(addLog.mock.calls[1][0]).toEqual({
+            address: ['0x59b22d57d4f067708ab0c00552767405926dc768'],
+            topic0: [
+                '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[2][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            transaction: true,
+        });
+    });
+
     test('Required configs for mainnet', () => {
         const processor = createProcessor(mainnet);
         const applicationMetadata = loadApplications(mainnet);
@@ -423,7 +523,7 @@ describe('Processor creation', () => {
         });
     });
 
-    test('Set correct chain for sepolia based on environment var', () => {
+    test('Set correct chain for sepolia set on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-sepolia-node/v3/api';
         vi.stubEnv('RPC_URL_11155111', myRPCNodeURL);
 
@@ -438,7 +538,7 @@ describe('Processor creation', () => {
         });
     });
 
-    test('Set correct chain for mainnet based on environment var', () => {
+    test('Set correct chain for mainnet set on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-mainnet-node/v3/api';
         vi.stubEnv('RPC_URL_1', myRPCNodeURL);
 
@@ -453,7 +553,7 @@ describe('Processor creation', () => {
         });
     });
 
-    test('Set correct chain for local/anvil based on environment var', () => {
+    test('Set correct chain for local/anvil set on environment var', () => {
         const myRPCNodeURL = 'https://my-custom-local-node:9000';
         vi.stubEnv('RPC_URL_31337', myRPCNodeURL);
 
@@ -462,5 +562,95 @@ describe('Processor creation', () => {
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
             'https://my-custom-local-node:9000',
         );
+    });
+
+    test('Set correct chain for Base set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_8453', myRPCNodeURL);
+
+        const processor = createProcessor(base);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/base-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for Base Sepolia set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_84532', myRPCNodeURL);
+
+        const processor = createProcessor(baseSepolia);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/base-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for Optimism set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_10', myRPCNodeURL);
+
+        const processor = createProcessor(optimism);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/optimism-mainnet',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for Optimism Sepolia set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_11155420', myRPCNodeURL);
+
+        const processor = createProcessor(optimismSepolia);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/optimism-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for Arbitrum set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_42161', myRPCNodeURL);
+
+        const processor = createProcessor(arbitrum);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/arbitrum-one',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
+    });
+
+    test('Set correct chain for Arbitrum Sepolia set on environment var', () => {
+        const myRPCNodeURL = 'https://my-custom-node/v3/api';
+        vi.stubEnv('RPC_URL_421614', myRPCNodeURL);
+
+        const processor = createProcessor(arbitrumSepolia);
+
+        expect(processor.setGateway).toHaveBeenCalledWith(
+            'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
+        );
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
+            url: 'https://my-custom-node/v3/api',
+        });
     });
 });
