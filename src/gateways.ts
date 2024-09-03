@@ -12,4 +12,6 @@ export const archiveNodes = {
     optimismSepolia: 'https://v2.archive.subsquid.io/network/optimism-sepolia',
     mainnet: 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
     sepolia: 'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+    arbitrum: 'https://v2.archive.subsquid.io/network/arbitrum-one',
+    arbitrumSepolia: 'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
 } as const;
