@@ -1,3 +1,7 @@
+import CartesiDAppFactoryArbitrum from '@cartesi/rollups/deployments/arbitrum/CartesiDAppFactory.json';
+import InputBoxArbitrum from '@cartesi/rollups/deployments/arbitrum/InputBox.json';
+import CartesiDAppFactoryArbitrumSepolia from '@cartesi/rollups/deployments/arbitrum_sepolia/CartesiDAppFactory.json';
+import InputBoxArbitrumSepolia from '@cartesi/rollups/deployments/arbitrum_sepolia/InputBox.json';
 import CartesiDAppFactoryBase from '@cartesi/rollups/deployments/base/CartesiDAppFactory.json';
 import inputBoxBase from '@cartesi/rollups/deployments/base/InputBox.json';
 import CartesiDAppFactoryBaseSepolia from '@cartesi/rollups/deployments/base_sepolia/CartesiDAppFactory.json';
@@ -10,24 +14,35 @@ import CartesiDAppFactoryOptimismSepolia from '@cartesi/rollups/deployments/opti
 import InputBoxOptimismSepolia from '@cartesi/rollups/deployments/optimism_sepolia/InputBox.json';
 import CartesiDAppFactorySepolia from '@cartesi/rollups/deployments/sepolia/CartesiDAppFactory.json';
 import InputBoxSepolia from '@cartesi/rollups/deployments/sepolia/InputBox.json';
-import mainnet from '@cartesi/rollups/export/abi/mainnet.json';
+import rollupsMainnet from '@cartesi/rollups/export/abi/mainnet.json';
 import { GatewaySettings, RpcEndpointSettings } from '@subsquid/evm-processor';
-import { base, baseSepolia, optimism, optimismSepolia } from 'viem/chains';
+import {
+    arbitrum,
+    arbitrumSepolia,
+    base,
+    baseSepolia,
+    foundry,
+    mainnet,
+    optimism,
+    optimismSepolia,
+    sepolia,
+} from 'viem/chains';
 import { archiveNodes } from './gateways';
 import { parseIntOr } from './utils';
 
 // addresses are the same on all chains
 export const CartesiDAppFactoryAddress =
-    mainnet.contracts.CartesiDAppFactory.address.toLowerCase();
+    rollupsMainnet.contracts.CartesiDAppFactory.address.toLowerCase();
 export const ERC20PortalAddress =
-    mainnet.contracts.ERC20Portal.address.toLowerCase();
-export const InputBoxAddress = mainnet.contracts.InputBox.address.toLowerCase();
+    rollupsMainnet.contracts.ERC20Portal.address.toLowerCase();
+export const InputBoxAddress =
+    rollupsMainnet.contracts.InputBox.address.toLowerCase();
 export const ERC721PortalAddress =
-    mainnet.contracts.ERC721Portal.address.toLowerCase();
+    rollupsMainnet.contracts.ERC721Portal.address.toLowerCase();
 export const ERC1155SinglePortalAddress =
-    mainnet.contracts.ERC1155SinglePortal.address.toLowerCase();
+    rollupsMainnet.contracts.ERC1155SinglePortal.address.toLowerCase();
 export const ERC1155BatchPortalAddress =
-    mainnet.contracts.ERC1155BatchPortal.address.toLowerCase();
+    rollupsMainnet.contracts.ERC1155BatchPortal.address.toLowerCase();
 interface ArchiveDataSource {
     archive: string | GatewaySettings;
     rpcEndpoint?: string | RpcEndpointSettings;
@@ -59,7 +74,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
     const rateLimit = parsedRateLimit <= 0 ? undefined : parsedRateLimit;
 
     switch (chainId) {
-        case 1: // mainnet
+        case mainnet.id:
             return {
                 dataSource: {
                     archive: archiveNodes.mainnet,
@@ -77,7 +92,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 11155111: // sepolia
+        case sepolia.id:
             return {
                 dataSource: {
                     archive: archiveNodes.sepolia,
@@ -97,7 +112,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 10: //Optimism-Mainnet
+        case optimism.id:
             return {
                 dataSource: {
                     archive: archiveNodes.optimism,
@@ -117,7 +132,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 11155420: //Optimism-Sepolia
+        case optimismSepolia.id: //Optimism-Sepolia
             return {
                 dataSource: {
                     archive: archiveNodes.optimismSepolia,
@@ -137,7 +152,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 8453: //Base-Mainnet
+        case base.id:
             return {
                 dataSource: {
                     archive: archiveNodes.base,
@@ -157,7 +172,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 84532: //Base-Sepolia
+        case baseSepolia.id:
             return {
                 dataSource: {
                     archive: archiveNodes.baseSepolia,
@@ -177,7 +192,47 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
-        case 31337: // anvil
+        case arbitrum.id:
+            return {
+                dataSource: {
+                    archive: archiveNodes.arbitrum,
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            arbitrum.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
+                },
+                from: Math.min(
+                    CartesiDAppFactoryArbitrum.receipt.blockNumber,
+                    InputBoxArbitrum.receipt.blockNumber,
+                ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
+            };
+        case arbitrumSepolia.id:
+            return {
+                dataSource: {
+                    archive: archiveNodes.arbitrumSepolia,
+                    rpcEndpoint: {
+                        url:
+                            process.env[RPC_URL] ??
+                            arbitrumSepolia.rpcUrls.default.http[0],
+                        rateLimit: rateLimit,
+                    },
+                },
+                from: Math.min(
+                    CartesiDAppFactoryArbitrumSepolia.receipt.blockNumber,
+                    InputBoxArbitrumSepolia.receipt.blockNumber,
+                ),
+                finalityConfirmation: parseIntOr({
+                    defaultVal: FINALITY_CONFIRMATION,
+                    value: process.env[BLOCK_CONFIRMATIONS],
+                }),
+            };
+        case foundry.id:
             return {
                 dataSource: {
                     rpcEndpoint:

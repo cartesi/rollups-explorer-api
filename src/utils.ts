@@ -1,5 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import {
+    arbitrum,
+    arbitrumSepolia,
     base,
     baseSepolia,
     foundry,
@@ -37,6 +39,8 @@ export const supportedChains = new Set<number>([
     baseSepolia.id,
     optimism.id,
     optimismSepolia.id,
+    arbitrum.id,
+    arbitrumSepolia.id,
 ]);
 
 /**

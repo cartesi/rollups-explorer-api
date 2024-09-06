@@ -10,6 +10,8 @@ describe('Gateways (Squid Archive Nodes)', () => {
             'optimismSepolia',
             'mainnet',
             'sepolia',
+            'arbitrum',
+            'arbitrumSepolia',
         ]);
     });
 
@@ -32,6 +34,14 @@ describe('Gateways (Squid Archive Nodes)', () => {
         );
         expect(archiveNodes.sepolia).toStrictEqual(
             'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+        );
+
+        expect(archiveNodes.arbitrum).toStrictEqual(
+            'https://v2.archive.subsquid.io/network/arbitrum-one',
+        );
+
+        expect(archiveNodes.arbitrumSepolia).toStrictEqual(
+            'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
         );
     });
 });
