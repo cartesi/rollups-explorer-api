@@ -1,7 +1,12 @@
 import { sepolia } from 'viem/chains';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import ApplicationCreated from '../../src/handlers/ApplicationCreated';
-import { Application, ApplicationFactory, Chain } from '../../src/model';
+import {
+    Application,
+    ApplicationFactory,
+    Chain,
+    RollupVersion,
+} from '../../src/model';
 import { generateIDFrom } from '../../src/utils';
 import { block, ctx, logs } from '../stubs/params';
 import { mockModelImplementation } from '../stubs/utils';
@@ -11,12 +16,14 @@ vi.mock('../../src/model/', async (importOriginal) => {
     const Application = vi.fn();
     const ApplicationFactory = vi.fn();
     const Chain = vi.fn();
+    const RollupVersion = { v1: 'v1', v2: 'v2' };
 
     return {
         ...actualMods!,
         Application,
         ApplicationFactory,
         Chain,
+        RollupVersion,
     };
 });
 
@@ -78,6 +85,7 @@ describe('ApplicationCreated', () => {
             const applicationId = generateIDFrom([
                 sepolia.id,
                 '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
+                RollupVersion.v1,
             ]);
 
             expect(mockFactoryStorage.size).toBe(1);
@@ -100,6 +108,7 @@ describe('ApplicationCreated', () => {
                 owner: '0x74d093f6911ac080897c3145441103dabb869307',
                 timestamp: 1696281168n,
                 chain: { id: sepolia.id.toString() },
+                rollupVersion: 'v1',
             });
         });
 
@@ -108,6 +117,7 @@ describe('ApplicationCreated', () => {
             const applicationId = generateIDFrom([
                 sepolia.id,
                 '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
+                RollupVersion.v1,
             ]);
 
             const timestampInSeconds = BigInt(logs[1].block.timestamp) / 1000n;
@@ -125,6 +135,7 @@ describe('ApplicationCreated', () => {
                 timestamp: timestampInSeconds,
                 address: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
                 chain: { id: sepolia.id.toString() },
+                rollupVersion: 'v1',
             });
         });
     });

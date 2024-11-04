@@ -42,6 +42,7 @@ vi.mock('../../src/model/', async () => {
     const MultiToken = vi.fn();
     const Erc1155Transfer = vi.fn();
     const Chain = vi.fn();
+    const RollupVersion = { v1: 'v1', v2: 'v2' };
 
     return {
         Application,
@@ -54,6 +55,7 @@ vi.mock('../../src/model/', async () => {
         Erc1155Deposit,
         Erc1155Transfer,
         Chain,
+        RollupVersion,
     };
 });
 
@@ -131,10 +133,11 @@ describe('InputAdded', () => {
 
             const [application] = mockApplicationStorage.values();
             expect(application).toEqual({
-                id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54`,
+                id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1`,
                 address: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
                 timestamp,
                 chain: expectedChain,
+                rollupVersion: 'v1',
             });
         });
 
@@ -190,7 +193,7 @@ describe('InputAdded', () => {
 
                 expect(deposit).toEqual({
                     chain: expectedChain,
-                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1-1`,
                     amount: 111000000000000000n,
                     from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
                     token: {
@@ -215,7 +218,7 @@ describe('InputAdded', () => {
                     chain: expectedChain,
                     amount: 111000000000000000n,
                     from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
-                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1-1`,
                     token: {
                         decimals: 18,
                         id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
@@ -268,7 +271,7 @@ describe('InputAdded', () => {
 
                 expect(deposit).toEqual({
                     chain: expectedChain,
-                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1-1`,
                     from: logErc721Transfer.transaction?.from,
                     token: {
                         chain: expectedChain,
@@ -291,7 +294,7 @@ describe('InputAdded', () => {
                 expect(input.erc721Deposit).toEqual({
                     chain: expectedChain,
                     from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-1`,
+                    id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1-1`,
                     token: {
                         chain: expectedChain,
                         id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
@@ -348,7 +351,7 @@ describe('InputAdded', () => {
             });
 
             test('should store the deposit information for single transfer', async () => {
-                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-783`;
+                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v1-783`;
                 expect(mockErc1155DepositStorage.size).toBe(0);
                 await inputAdded.handle(logErc1155SingleTransfer, block, ctx);
 
@@ -375,7 +378,7 @@ describe('InputAdded', () => {
             });
 
             test('should store the deposit information for batch transfer', async () => {
-                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-784`;
+                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v1-784`;
                 expect(mockErc1155DepositStorage.size).toBe(0);
                 await inputAdded.handle(logErc1155BatchTransfer, block, ctx);
 
