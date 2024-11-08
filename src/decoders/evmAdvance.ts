@@ -1,6 +1,6 @@
 import { Address, decodeFunctionData, Hex, parseAbi } from 'viem';
 
-interface Data {
+export interface Data {
     chainId: bigint;
     appContract: Address;
     msgSender: Address;
@@ -11,7 +11,7 @@ interface Data {
     payload: Hex;
 }
 
-const evmAdvanceAbi = parseAbi([
+export const evmAdvanceAbi = parseAbi([
     `function EvmAdvance( uint256 chainId, address appContract,address msgSender, uint256 blockNumber, uint256 blockTimestamp, uint256 prevRandao, uint256 index, bytes calldata payload) external`,
 ]);
 
