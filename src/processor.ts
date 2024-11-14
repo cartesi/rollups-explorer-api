@@ -75,10 +75,18 @@ export const createProcessor = (chainId: number) => {
         : processor;
 
     if (applicationMetadata !== null) {
+        const dappFactoryAddresses =
+            applicationMetadata.addresses[CartesiDAppFactoryAddress];
+        const appFactoryAddresses =
+            (config.v2 &&
+                applicationMetadata.addresses[
+                    RollupsAddressBook.v2.ApplicationFactory
+                ]) ??
+            [];
+
         processor = processor
             .addLog({
-                address:
-                    applicationMetadata.addresses[CartesiDAppFactoryAddress],
+                address: [...dappFactoryAddresses, ...appFactoryAddresses],
                 topic0: [CartesiDApp.OwnershipTransferred.topic],
                 range: { from: config.from, to: applicationMetadata.height },
                 transaction: true,

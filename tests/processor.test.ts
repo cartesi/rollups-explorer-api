@@ -213,7 +213,12 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[4][0]).toEqual({
-            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
+            address: [
+                ...applicationMetadata?.addresses[CartesiDAppFactoryAddress]!,
+                ...applicationMetadata?.addresses[
+                    RollupsAddressBook.v2.ApplicationFactory
+                ]!,
+            ],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
