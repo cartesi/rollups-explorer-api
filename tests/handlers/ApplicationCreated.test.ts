@@ -8,8 +8,8 @@ import {
     RollupVersion,
 } from '../../src/model';
 import { generateIDFrom } from '../../src/utils';
+import { mockModelImplementation } from '../stubs/mocks';
 import { block, ctx, logs } from '../stubs/params';
-import { mockModelImplementation } from '../stubs/utils';
 
 vi.mock('../../src/model/', async (importOriginal) => {
     const actualMods = await importOriginal;

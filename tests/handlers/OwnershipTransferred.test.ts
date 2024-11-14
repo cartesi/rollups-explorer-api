@@ -4,8 +4,8 @@ import { sepolia } from 'viem/chains';
 import OwnerShipTransferred from '../../src/handlers/OwnershipTransferred';
 import { Application, Chain, RollupVersion } from '../../src/model';
 import { generateIDFrom } from '../../src/utils';
+import { mockModelImplementation } from '../stubs/mocks';
 import { block, ctx, logs } from '../stubs/params';
-import { mockModelImplementation } from '../stubs/utils';
 
 vi.mock('../../src/model/', async (importOriginal) => {
     const actualMods = await importOriginal;

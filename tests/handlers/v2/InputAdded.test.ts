@@ -16,6 +16,7 @@ import {
     NFT,
     Token,
 } from '../../../src/model';
+import { mockModelImplementation } from '../../stubs/mocks';
 import {
     block,
     ctx,
@@ -27,7 +28,6 @@ import {
     logInputAddedV2,
     logs,
 } from '../../stubs/params';
-import { mockModelImplementation } from '../../stubs/utils';
 
 vi.mock('../../../src/abi/ERC20');
 

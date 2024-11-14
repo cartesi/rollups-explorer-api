@@ -7,15 +7,7 @@ import {
     Hex,
     parseAbiParameters,
 } from 'viem';
-import { MockedObject, vi } from 'vitest';
 import { evmAdvanceAbi } from '../../src/decoders/evmAdvance';
-
-export const mockModelImplementation = <T>(object: T) => {
-    const Mock = vi.mocked(object) as MockedObject<typeof object>;
-    // @ts-ignore
-    Mock.mockImplementation((args) => ({ ...args } as object));
-    return Mock;
-};
 
 type ERC721PortalInput = {
     token: Address;
@@ -50,6 +42,12 @@ type ERC20PortalInput = {
     execLayerData: Hex;
 };
 
+type EtherPortalInput = {
+    sender: Address;
+    value: bigint;
+    execLayerData: Hex;
+};
+
 type EvmAdvanceInput = {
     chainId: bigint;
     appContract: Address;
@@ -64,6 +62,16 @@ type EvmAdvanceInput = {
 const baseExecLayerAbiParameters = parseAbiParameters(
     'bytes baseLayer, bytes execLayer',
 );
+
+export const encodeEtherPortalInput = ({
+    sender,
+    value,
+    execLayerData,
+}: EtherPortalInput) =>
+    encodePacked(
+        ['address', 'uint256', 'bytes'],
+        [sender, value, execLayerData],
+    );
 
 export const encodeErc20PortalInput = ({
     token,
