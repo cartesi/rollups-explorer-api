@@ -32,7 +32,9 @@
   },
   "dependencies": {
     "@cartesi/rollups": "1.4.0",
-    "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0-rc.10",    
+    "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0-rc.10",
+    "@subsquid/evm-abi": "^0.3.1",
+    "@subsquid/evm-codec": "^0.3.0",
     "@subsquid/evm-processor": "^1.4.0",
     "@subsquid/file-store": "^2.0.0",
     "@subsquid/graphql-server": "^4.2.0",
