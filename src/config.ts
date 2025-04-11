@@ -25,6 +25,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     foundry,
     mainnet,
     optimism,
@@ -266,6 +267,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
             };
+        case cannon.id:
         case foundry.id:
             return {
                 dataSource: {

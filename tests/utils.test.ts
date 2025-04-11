@@ -4,6 +4,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     mainnet,
     optimism,
     optimismSepolia,
@@ -21,6 +22,7 @@ describe('Utility functions', () => {
             mainnet.id,
             sepolia.id,
             anvil.id,
+            cannon.id,
             base.id,
             baseSepolia.id,
             optimism.id,
@@ -58,11 +60,14 @@ describe('Utility functions', () => {
         it('should returned all supported chains when set on environment variable', () => {
             vi.stubEnv(
                 'CHAIN_IDS',
-                '11155111, 1, 10, 8453, 84532, 11155420, 42161, 421614',
+                '11155111, 1, 10, 8453, 84532, 11155420, 42161, 421614, 13370',
             );
 
             expect(loadChainsToIndexFromEnvironment()).toStrictEqual({
-                chains: [11155111, 1, 10, 8453, 84532, 11155420, 42161, 421614],
+                chains: [
+                    11155111, 1, 10, 8453, 84532, 11155420, 42161, 421614,
+                    13370,
+                ],
                 usingDefault: false,
             });
         });
