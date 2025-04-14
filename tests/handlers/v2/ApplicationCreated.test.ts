@@ -144,7 +144,7 @@ describe('ApplicationCreated v2', () => {
 
             expect(application).toEqual({
                 factory: {
-                    id: '11155111-0x1d4cfbd2622d802a07ceb4c3401bbb455c9dbdc3',
+                    id: `11155111-${logApplicationCreatedV2.address}`,
                     address: logApplicationCreatedV2.address,
                     chain: { id: sepolia.id.toString() },
                 },

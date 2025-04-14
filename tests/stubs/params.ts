@@ -1,7 +1,7 @@
 import { Chain } from '@subsquid/evm-processor/lib/interfaces/chain';
 import { Logger } from '@subsquid/logger';
 import { Store } from '@subsquid/typeorm-store';
-import { encodeAbiParameters } from 'viem';
+import { encodeAbiParameters, toBytes, toHex } from 'viem';
 import { sepolia } from 'viem/chains';
 import { vi } from 'vitest';
 import {
@@ -14,6 +14,7 @@ import { Input, RollupVersion } from '../../src/model';
 import { BlockData, Log } from '../../src/processor';
 import { generateIDFrom } from '../../src/utils';
 import {
+    buildApplicationCreatedLogData,
     buildInputAddedLogData,
     encodeErc1155BatchInput,
     encodeErc1155SingleInput,
@@ -82,12 +83,17 @@ export const logApplicationCreatedV2: Log = {
     id: '0006859373-c8732-000014',
     logIndex: 14,
     transactionIndex: 10,
-    address: '0x1d4cfbd2622d802a07ceb4c3401bbb455c9dbdc3',
-    data: '0x000000000000000000000000590f92fea8df163fff2d7df266364de7ce8f9e169f24c52e0fcd1ac696d00405c3bd5adc558c48936919ac5ab3718fcb7d70f93f000000000000000000000000fb92024ec789bb2fbbc5cd1390386843c5fb7694',
+    address: '0x2210ad1d9b0bd2d470c2bfa4814ab6253bc421a0',
     topics: [
-        '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
-        '0x0000000000000000000000004821e772f7e84abd6cfd63cdb3ca098807d8ee0a',
+        '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+        encodeAbiParameters([{ type: 'address' }], [dappAddress]),
     ],
+    data: buildApplicationCreatedLogData({
+        appContract: '0xfb92024ec789bb2fbbc5cd1390386843c5fb7694',
+        appOwner: '0x590f92fea8df163fff2d7df266364de7ce8f9e16',
+        templateHash: toHex(toBytes('template-hash', { size: 32 })),
+        dataAvailability: toHex(toBytes('dataAvailability')),
+    }),
     // @ts-ignore
     block: {
         id: '0006859373-c8732',
@@ -113,7 +119,7 @@ export const logInputAddedV2: Log = {
     id: '0006859416-fd6ca-000028',
     logIndex: 28,
     transactionIndex: 15,
-    address: '0x593e5bcf894d6829dd26d0810da7f064406aebb6',
+    address: '0xb6b39fb3dd926a9e3fbc7a129540eebea3016a6c',
     data: '0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000144415bf3630000000000000000000000000000000000000000000000000000000000aa36a7000000000000000000000000fb92024ec789bb2fbbc5cd1390386843c5fb7694000000000000000000000000590f92fea8df163fff2d7df266364de7ce8f9e16000000000000000000000000000000000000000000000000000000000068aa98000000000000000000000000000000000000000000000000000000006709c980094a6affe3aa787280fbdf0a19cdb161b26afdd58fd2672c4615c07ced7f351d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000002bb1100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
     topics: [
         '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
@@ -135,7 +141,7 @@ export const logInputAddedV2: Log = {
         transactionIndex: 15,
         hash: '0x0449bc3dcc0f0cdcbd5674823d0102eefd54c1803f0ae6c1812e73bd26d2a4c9',
         from: '0x590f92fea8df163fff2d7df266364de7ce8f9e16',
-        to: '0x593e5bcf894d6829dd26d0810da7f064406aebb6',
+        to: '0xb6b39fb3dd926a9e3fbc7a129540eebea3016a6c',
         value: 0n,
         chainId: 11155111,
     },

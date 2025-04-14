@@ -1,4 +1,3 @@
-import { abi as InputBoxV2Abi } from '@cartesi/rollups-v2/export/artifacts/contracts/inputs/InputBox.sol/InputBox.json';
 import {
     Address,
     encodeAbiParameters,
@@ -8,6 +7,7 @@ import {
     parseAbiParameters,
 } from 'viem';
 import { evmAdvanceAbi } from '../../src/decoders/evmAdvance';
+import { abi as InputBoxV2Abi } from '../../src/deployments/13370/InputBox.json';
 
 type ERC721PortalInput = {
     token: Address;
@@ -183,6 +183,33 @@ interface BuildInputAddedDataParams {
     index: bigint;
     msgSender: Address;
 }
+
+/**
+ * Only non-indexed-args
+ */
+interface BuildApplicationCreatedDataParams {
+    appOwner: Address;
+    templateHash: Hex;
+    dataAvailability: Hex;
+    appContract: Address;
+}
+
+export const buildApplicationCreatedLogData = ({
+    appOwner,
+    templateHash,
+    dataAvailability,
+    appContract,
+}: BuildApplicationCreatedDataParams) => {
+    return encodeAbiParameters(
+        [
+            { type: 'address', name: 'appOwner' },
+            { type: 'bytes32', name: 'templateHash' },
+            { type: 'bytes', name: 'dataAvailability' },
+            { type: 'address', name: 'appContract' },
+        ],
+        [appOwner, templateHash, dataAvailability, appContract],
+    );
+};
 
 export const buildInputAddedLogData = ({
     appContract,

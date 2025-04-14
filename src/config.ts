@@ -1,6 +1,3 @@
-import CartesiApplicationFactorySepolia from '@cartesi/rollups-v2/deployments/sepolia/ApplicationFactory.json';
-import InputBoxV2Sepolia from '@cartesi/rollups-v2/deployments/sepolia/InputBox.json';
-import rollupsV2Sepolia from '@cartesi/rollups-v2/export/abi/sepolia.json';
 import CartesiDAppFactoryArbitrum from '@cartesi/rollups/deployments/arbitrum/CartesiDAppFactory.json';
 import InputBoxArbitrum from '@cartesi/rollups/deployments/arbitrum/InputBox.json';
 import CartesiDAppFactoryArbitrumSepolia from '@cartesi/rollups/deployments/arbitrum_sepolia/CartesiDAppFactory.json';
@@ -32,16 +29,19 @@ import {
     optimismSepolia,
     sepolia,
 } from 'viem/chains';
+import { contracts as SepoliaContracts } from './deployments/11155111/contracts.json';
+import { contracts as OptSepoliaContracts } from './deployments/11155420/contracts.json';
+import { contracts as CannonContracts } from './deployments/13370/contracts.json';
+import { contracts as ArbSepoliaContracts } from './deployments/421614/contracts.json';
+import { contracts as BaseSepoliaContracts } from './deployments/84532/contracts.json';
 import { archiveNodes } from './gateways';
 import { parseIntOr } from './utils';
 
-// addresses from rollups-v2. (Probably) the addresses will be the same on all chains
-const { contracts } = rollupsV2Sepolia;
-
-type RollupContractName = keyof typeof contracts;
+// addresses from deployment/13370. (Probably) the addresses will be the same on all chains
+type RollupContractName = keyof typeof CannonContracts;
 type ContractAddress = { [k in RollupContractName]: Hex };
 
-const v2 = Object.entries(contracts).reduce(
+const v2 = Object.entries(CannonContracts).reduce(
     (prev, [name, value]): ContractAddress => ({
         ...prev,
         [name]: value.address.toLowerCase(),
@@ -142,8 +142,13 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                 }),
                 v2: {
                     from: Math.min(
-                        CartesiApplicationFactorySepolia.receipt.blockNumber,
-                        InputBoxV2Sepolia.receipt.blockNumber,
+                        parseInt(
+                            SepoliaContracts.ApplicationFactory
+                                .deployTxnBlockNumber,
+                        ),
+                        parseInt(
+                            SepoliaContracts.InputBox.deployTxnBlockNumber,
+                        ),
                     ),
                 },
             };
@@ -186,6 +191,17 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: Math.min(
+                        parseInt(
+                            OptSepoliaContracts.ApplicationFactory
+                                .deployTxnBlockNumber,
+                        ),
+                        parseInt(
+                            OptSepoliaContracts.InputBox.deployTxnBlockNumber,
+                        ),
+                    ),
+                },
             };
         case base.id:
             return {
@@ -226,6 +242,17 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: Math.min(
+                        parseInt(
+                            BaseSepoliaContracts.ApplicationFactory
+                                .deployTxnBlockNumber,
+                        ),
+                        parseInt(
+                            BaseSepoliaContracts.InputBox.deployTxnBlockNumber,
+                        ),
+                    ),
+                },
             };
         case arbitrum.id:
             return {
@@ -266,6 +293,17 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: Math.min(
+                        parseInt(
+                            ArbSepoliaContracts.ApplicationFactory
+                                .deployTxnBlockNumber,
+                        ),
+                        parseInt(
+                            ArbSepoliaContracts.InputBox.deployTxnBlockNumber,
+                        ),
+                    ),
+                },
             };
         case cannon.id:
         case foundry.id:
