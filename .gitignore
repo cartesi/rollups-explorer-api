@@ -29,6 +29,7 @@ npm-debug.log*
 # Generated folders/files
 /src/model
 /src/abi
+/src/deployments
 
 #Test outputs
 /coverage
