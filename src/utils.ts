@@ -83,6 +83,27 @@ export function parseIntOr({ value, defaultVal }: ParseIntOr) {
 }
 
 /**
+ * @description Receive a list of parseable strings and return the smallest one as a number.
+ *
+ * If list is null/undefined/empty 0 is returned.
+ * @param {string[]} list
+ * @returns {number}
+ */
+export function smallerOf(list: string[]): number {
+    if (!list || list.length === 0) return 0;
+    const copied = [...list];
+
+    const initialValue = parseIntOr({
+        value: copied.shift(),
+        defaultVal: Number.MAX_SAFE_INTEGER,
+    });
+
+    return copied.reduce((curr, next) => {
+        return Math.min(curr, parseIntOr({ value: next, defaultVal: curr }));
+    }, initialValue);
+}
+
+/**
  * Utility to generate standard format IDs based on array of values.
  * That makes the id creation between entities less error prone.
  * The separator used is "-"

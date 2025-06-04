@@ -1,5 +1,6 @@
 # squid
 /lib
+/preloaders/lib
 /builds
 
 /**Versions.json
