@@ -13,7 +13,6 @@ import {
     sepolia,
 } from 'viem/chains';
 
-//TODO: Not available yet on cannon.
 const supportedMainnets = [arbitrum.id, base.id, mainnet.id, optimism.id];
 const supportedTestnets = [
     arbitrumSepolia.id,
@@ -22,8 +21,8 @@ const supportedTestnets = [
     optimismSepolia.id,
     sepolia.id,
 ];
-//TODO: evaluate to be a env-var. But it needs to sync with npm-deps.
-const packageRef = 'cartesi-rollups:2.0.0-rc.17';
+
+const packageRef = 'cartesi-rollups:2.0.0';
 const abiFolder = join(process.cwd(), 'abi');
 const outFolder = join(process.cwd(), 'src', 'deployments');
 const codegenMetaFileName = '__meta.json';
@@ -154,11 +153,6 @@ const readABIFor = async (list) => {
     return contracts;
 };
 
-/**
- *
- * @param {string} chainId
- * @returns {void}
- */
 async function codegen(chainId) {
     const { ok } = await execCannonInspect({
         packageRef,
@@ -198,7 +192,7 @@ async function generateABIFiles(chainId) {
 }
 
 async function run() {
-    const networks = [...supportedTestnets];
+    const networks = [...supportedMainnets, ...supportedTestnets];
     const codegenPromises = networks.map((chainId) => {
         console.log(`Codegen for chain-id: ${chainId.toString()}`);
         return codegen(chainId.toString());
@@ -214,15 +208,11 @@ async function run() {
     codegenResult.forEach((data, i) => {
         if (data.status === 'fulfilled')
             console.info(
-                `Rollups contracts for chain-id ${supportedTestnets[
-                    i
-                ].toString()} generated at ${outFolder}`,
+                `Rollups contracts for chain-id ${networks[i].toString()} generated at ${outFolder}`,
             );
         else
             console.error(
-                `Rollups contracts for chain-id ${supportedTestnets[
-                    i
-                ].toString()} failed to be created. Reason: ${data.reason}`,
+                `Rollups contracts for chain-id ${networks[i].toString()} failed to be created. Reason: ${data.reason}`,
             );
     });
 }

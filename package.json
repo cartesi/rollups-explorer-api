@@ -7,7 +7,7 @@
     "build": "run-s clean sqd:typegen sqd:codegen tsc",
     "clean": "rm -rf lib",
     "test": "vitest",
-    "ci:test": "vitest run --coverage",    
+    "ci:test": "vitest run --coverage",
     "sqd": "sqd",
     "sqd:build": "sqd build",
     "sqd:codegen": "sqd codegen",
@@ -29,11 +29,11 @@
     "process:prod": "node deploy/run --npmScriptName=sqd:process:prod",
     "serve:prod": "node deploy/run --npmScriptName=sqd:graphql:prod",
     "tsc": "tsc",
-    "cannon": "cannon"    
+    "cannon": "cannon"
   },
   "dependencies": {
     "@cartesi/rollups": "1.4.0",
-    "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0-rc.17",
+    "@cartesi/rollups-v2": "npm:@cartesi/rollups@2.0.0",
     "@subsquid/evm-abi": "^0.3.1",
     "@subsquid/evm-codec": "^0.3.0",
     "@subsquid/evm-processor": "^1.4.0",
