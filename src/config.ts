@@ -34,8 +34,12 @@ import { contracts as OptSepoliaContracts } from './deployments/11155420/contrac
 import { contracts as CannonContracts } from './deployments/13370/contracts.json';
 import { contracts as ArbSepoliaContracts } from './deployments/421614/contracts.json';
 import { contracts as BaseSepoliaContracts } from './deployments/84532/contracts.json';
+import { contracts as MainnetContracts } from './deployments/1/contracts.json';
+import { contracts as OptimismContracts } from './deployments/10/contracts.json';
+import { contracts as BaseContracts } from './deployments/8453/contracts.json';
+import { contracts as ArbitrumContracts } from './deployments/42161/contracts.json';
 import { archiveNodes } from './gateways';
-import { parseIntOr } from './utils';
+import { parseIntOr, smallerOf } from './utils';
 
 // addresses from deployment/13370. (Probably) the addresses will be the same on all chains
 type RollupContractName = keyof typeof CannonContracts;
@@ -120,6 +124,13 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: smallerOf([
+                        MainnetContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        MainnetContracts.InputBox.deployTxnBlockNumber,
+                    ]),
+                },
             };
         case sepolia.id:
             return {
@@ -141,15 +152,11 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
                 v2: {
-                    from: Math.min(
-                        parseInt(
-                            SepoliaContracts.ApplicationFactory
-                                .deployTxnBlockNumber,
-                        ),
-                        parseInt(
-                            SepoliaContracts.InputBox.deployTxnBlockNumber,
-                        ),
-                    ),
+                    from: smallerOf([
+                        SepoliaContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        SepoliaContracts.InputBox.deployTxnBlockNumber,
+                    ]),
                 },
             };
         case optimism.id:
@@ -171,6 +178,13 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: smallerOf([
+                        OptimismContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        OptimismContracts.InputBox.deployTxnBlockNumber,
+                    ]),
+                },
             };
         case optimismSepolia.id: //Optimism-Sepolia
             return {
@@ -192,15 +206,11 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
                 v2: {
-                    from: Math.min(
-                        parseInt(
-                            OptSepoliaContracts.ApplicationFactory
-                                .deployTxnBlockNumber,
-                        ),
-                        parseInt(
-                            OptSepoliaContracts.InputBox.deployTxnBlockNumber,
-                        ),
-                    ),
+                    from: smallerOf([
+                        OptSepoliaContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        OptSepoliaContracts.InputBox.deployTxnBlockNumber,
+                    ]),
                 },
             };
         case base.id:
@@ -222,6 +232,12 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: smallerOf([
+                        BaseContracts.ApplicationFactory.deployTxnBlockNumber,
+                        BaseContracts.InputBox.deployTxnBlockNumber,
+                    ]),
+                },
             };
         case baseSepolia.id:
             return {
@@ -243,15 +259,11 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
                 v2: {
-                    from: Math.min(
-                        parseInt(
-                            BaseSepoliaContracts.ApplicationFactory
-                                .deployTxnBlockNumber,
-                        ),
-                        parseInt(
-                            BaseSepoliaContracts.InputBox.deployTxnBlockNumber,
-                        ),
-                    ),
+                    from: smallerOf([
+                        BaseSepoliaContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        BaseSepoliaContracts.InputBox.deployTxnBlockNumber,
+                    ]),
                 },
             };
         case arbitrum.id:
@@ -273,6 +285,13 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     defaultVal: FINALITY_CONFIRMATION,
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
+                v2: {
+                    from: smallerOf([
+                        ArbitrumContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        ArbitrumContracts.InputBox.deployTxnBlockNumber,
+                    ]),
+                },
             };
         case arbitrumSepolia.id:
             return {
@@ -294,15 +313,11 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                     value: process.env[BLOCK_CONFIRMATIONS],
                 }),
                 v2: {
-                    from: Math.min(
-                        parseInt(
-                            ArbSepoliaContracts.ApplicationFactory
-                                .deployTxnBlockNumber,
-                        ),
-                        parseInt(
-                            ArbSepoliaContracts.InputBox.deployTxnBlockNumber,
-                        ),
-                    ),
+                    from: smallerOf([
+                        ArbSepoliaContracts.ApplicationFactory
+                            .deployTxnBlockNumber,
+                        ArbSepoliaContracts.InputBox.deployTxnBlockNumber,
+                    ]),
                 },
             };
         case cannon.id:
