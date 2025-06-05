@@ -4,6 +4,7 @@ import {
     arbitrumSepolia,
     base,
     baseSepolia,
+    cannon,
     foundry,
     mainnet,
     optimism,
@@ -35,6 +36,7 @@ export const supportedChains = new Set<number>([
     mainnet.id,
     sepolia.id,
     foundry.id,
+    cannon.id,
     base.id,
     baseSepolia.id,
     optimism.id,
@@ -78,6 +80,27 @@ interface ParseIntOr {
 export function parseIntOr({ value, defaultVal }: ParseIntOr) {
     const number = parseInt(value ?? '');
     return Number.isNaN(number) ? defaultVal : number;
+}
+
+/**
+ * @description Receive a list of parseable strings and return the smallest one as a number.
+ *
+ * If list is null/undefined/empty 0 is returned.
+ * @param {string[]} list
+ * @returns {number}
+ */
+export function smallerOf(list: string[]): number {
+    if (!list || list.length === 0) return 0;
+    const copied = [...list];
+
+    const initialValue = parseIntOr({
+        value: copied.shift(),
+        defaultVal: Number.MAX_SAFE_INTEGER,
+    });
+
+    return copied.reduce((curr, next) => {
+        return Math.min(curr, parseIntOr({ value: next, defaultVal: curr }));
+    }, initialValue);
 }
 
 /**

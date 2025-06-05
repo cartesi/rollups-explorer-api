@@ -49,6 +49,7 @@
         },
         "typegen": {
             "description": "Generate data access classes for an ABI file(s) in the ./abi folder",
+            "deps": ["codegen:rollups"],
             "cmd": [
                 "squid-evm-typegen",
                 "./src/abi",
@@ -121,6 +122,10 @@
         "preload:apps": {
             "description": "Preload the address of applications created by CartesiDAppFactory",
             "cmd": ["npx", "--yes", "ts-node", "./preloaders/applicationLoader"]
+        },
+        "codegen:rollups": {
+            "description": "Fetch cartesi/rollups deployment information and necessary ABIs to be used by squid-cli ops and application logic.",
+            "cmd": ["node", "./codegen.mjs"]
         }
     }
 }

@@ -1,6 +1,6 @@
 import { afterEach } from 'node:test';
 import { MockInstance, beforeEach, describe, expect, test, vi } from 'vitest';
-import { CartesiDAppFactoryAddress } from '../src/config';
+import { CartesiDAppFactoryAddress, RollupsAddressBook } from '../src/config';
 import { createProcessor } from '../src/processor';
 import { loadApplications } from '../src/utils';
 
@@ -27,6 +27,7 @@ vi.mock('@subsquid/evm-processor', async () => {
 const sepolia = 11155111;
 const mainnet = 1;
 const local = 31337;
+const cannon = 13370;
 const optimism = 10;
 const optimismSepolia = 11155420;
 const base = 8453;
@@ -80,7 +81,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -96,6 +97,25 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: ['0xc7006f70875bade89032001262a846d3ee160051'],
+            range: {
+                from: 30910822,
+            },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: ['0xc70074bdd26d8cf983ca6a5b89b8db52d5850051'],
+            range: { from: 30910822 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -130,7 +150,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -146,6 +166,23 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: ['0xc7006f70875bade89032001262a846d3ee160051'],
+            range: { from: 26421182 },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: ['0xc70074bdd26d8cf983ca6a5b89b8db52d5850051'],
+            range: { from: 26421182 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -180,7 +217,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(4);
+        expect(addLog).toHaveBeenCalledTimes(6);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -196,7 +233,26 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
-            address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+            range: { from: 8439338 },
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            range: { from: 8439338 },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
+            address: [
+                ...applicationMetadata?.addresses[CartesiDAppFactoryAddress]!,
+            ],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -207,7 +263,7 @@ describe('Processor creation', () => {
             transaction: true,
         });
 
-        expect(addLog.mock.calls[3][0]).toEqual({
+        expect(addLog.mock.calls[5][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -239,7 +295,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -255,6 +311,86 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+            range: { from: 22 },
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            range: { from: 22 },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
+            topic0: [
+                '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            ],
+            transaction: true,
+        });
+    });
+
+    test('Required configs for local/cannon', () => {
+        const processor = createProcessor(cannon);
+
+        expect(processor.setGateway).not.toHaveBeenCalled();
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
+            'http://127.0.0.1:8545',
+        );
+
+        expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(1);
+        expect(processor.setFields).toHaveBeenCalledWith({
+            transaction: {
+                chainId: true,
+                from: true,
+                hash: true,
+                value: true,
+            },
+        });
+        expect(processor.setBlockRange).toHaveBeenCalledWith({
+            from: 22,
+        });
+
+        const addLog = processor.addLog as unknown as MockInstance;
+
+        expect(addLog).toHaveBeenCalledTimes(5);
+        expect(addLog.mock.calls[0][0]).toEqual({
+            address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
+            topic0: [
+                '0xe73165c2d277daf8713fd08b40845cb6bb7a20b2b543f3d35324a475660fcebd',
+            ],
+        });
+        expect(addLog.mock.calls[1][0]).toEqual({
+            address: ['0x59b22d57d4f067708ab0c00552767405926dc768'],
+            topic0: [
+                '0x6aaa400068bf4ca337265e2a1e1e841f66b8597fd5b452fdc52a44bed28a0784',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+            range: { from: 22 },
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            range: { from: 22 },
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -288,7 +424,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -304,6 +440,25 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: {
+                from: 136506143,
+            },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 136506143 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -337,7 +492,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -353,6 +508,23 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: { from: 28404083 },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 28404083 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -386,7 +558,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -402,6 +574,23 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: { from: 342110860 },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 342110860 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -435,7 +624,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(3);
+        expect(addLog).toHaveBeenCalledTimes(5);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -451,6 +640,23 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: { from: 158367139 },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 158367139 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -485,7 +691,7 @@ describe('Processor creation', () => {
 
         const addLog = processor.addLog as unknown as MockInstance;
 
-        expect(addLog).toHaveBeenCalledTimes(4);
+        expect(addLog).toHaveBeenCalledTimes(6);
         expect(addLog.mock.calls[0][0]).toEqual({
             address: ['0x7122cd1221c20892234186facfe8615e6743ab02'],
             topic0: [
@@ -501,6 +707,23 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: { from: 22595774 },
+            topic0: [
+                '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
+            ],
+        });
+
+        expect(addLog.mock.calls[3][0]).toEqual({
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 22595774 },
+            topic0: [
+                '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
+            ],
+            transaction: true,
+        });
+
+        expect(addLog.mock.calls[4][0]).toEqual({
             address: applicationMetadata?.addresses[CartesiDAppFactoryAddress],
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
@@ -512,7 +735,7 @@ describe('Processor creation', () => {
             transaction: true,
         });
 
-        expect(addLog.mock.calls[3][0]).toEqual({
+        expect(addLog.mock.calls[5][0]).toEqual({
             topic0: [
                 '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
             ],
@@ -561,6 +784,17 @@ describe('Processor creation', () => {
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
             'https://my-custom-local-node:9000',
+        );
+    });
+
+    test('Set correct chain for local/cannon set on environment var', () => {
+        const myRPCNodeURL = 'https://anvil:8545';
+        vi.stubEnv('RPC_URL_13370', myRPCNodeURL);
+
+        const processor = createProcessor(cannon);
+
+        expect(processor.setRpcEndpoint).toHaveBeenCalledWith(
+            'https://anvil:8545',
         );
     });
 

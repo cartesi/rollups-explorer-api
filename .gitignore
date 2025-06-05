@@ -1,5 +1,6 @@
 # squid
 /lib
+/preloaders/lib
 /builds
 
 /**Versions.json
@@ -29,6 +30,7 @@ npm-debug.log*
 # Generated folders/files
 /src/model
 /src/abi
+/src/deployments
 
 #Test outputs
 /coverage
