@@ -87,7 +87,37 @@ describe('InputAdded', () => {
     const mockChainStorage = new Map<string, Chain>();
     const expectedChain = { id: sepolia.id.toString() };
 
+    const buildValidApplication = (address: string) => ({
+        id: `${sepolia.id}-${address}-v2`,
+        address: `${address}`,
+        timestamp: BigInt(logInputAddedV2.block.timestamp) / 1000n,
+        chain: expectedChain,
+        rollupVersion: 'v2',
+        factory: {
+            id: '11155111-0xc7006f70875bade89032001262a846d3ee160051',
+            address: '0xc7006f70875bade89032001262a846d3ee160051',
+            chain: {
+                id: '11155111',
+            },
+        },
+    });
+
     beforeEach(() => {
+        mockTokenStorage.clear();
+        mockDepositStorage.clear();
+        mockApplicationStorage.clear();
+        mockInputStorage.clear();
+        mockNftStorage.clear();
+        mockErc721DepositStorage.clear();
+        mockMultiTokenStorage.clear();
+        mockErc1155DepositStorage.clear();
+
+        // add pre created valid apps
+        const appOne = buildValidApplication(
+            '0xfb92024ec789bb2fbbc5cd1390386843c5fb7694',
+        );
+        mockApplicationStorage.set(appOne.id, appOne);
+
         inputAdded = new InputAdded(
             mockTokenStorage,
             mockDepositStorage,
@@ -99,23 +129,16 @@ describe('InputAdded', () => {
             mockErc1155DepositStorage,
             mockChainStorage,
         );
-
-        mockTokenStorage.clear();
-        mockDepositStorage.clear();
-        mockApplicationStorage.clear();
-        mockInputStorage.clear();
-        mockNftStorage.clear();
-        mockErc721DepositStorage.clear();
-        mockMultiTokenStorage.clear();
-        mockErc1155DepositStorage.clear();
     });
 
     afterEach(() => {
         vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     describe('handle', async () => {
         test('should ignore events other than InputAdded', async () => {
+            mockApplicationStorage.clear();
             await inputAdded.handle(logs[1], block, ctx);
             expect(mockInputStorage.size).toBe(0);
             expect(mockApplicationStorage.size).toBe(0);
@@ -128,19 +151,23 @@ describe('InputAdded', () => {
             expect(mockInputStorage.size).toBe(1);
         });
 
-        test('when creating a non-existing app it should also set the timestamp in seconds', async () => {
+        test('should ignore and log inputs to non-existing application', async () => {
+            mockApplicationStorage.clear();
+            const warnLog = vi.spyOn(ctx.log, 'warn');
             await inputAdded.handle(logInputAddedV2, block, ctx);
-
-            const timestamp = BigInt(logInputAddedV2.block.timestamp) / 1000n;
-
             const [application] = mockApplicationStorage.values();
-            expect(application).toEqual({
-                id: `${sepolia.id}-0xfb92024ec789bb2fbbc5cd1390386843c5fb7694-v2`,
-                address: '0xfb92024ec789bb2fbbc5cd1390386843c5fb7694',
-                timestamp,
-                chain: expectedChain,
-                rollupVersion: 'v2',
-            });
+            const [input] = mockInputStorage.values();
+
+            expect(application).toBeUndefined();
+            expect(input).toBeUndefined();
+
+            expect(warnLog).toHaveBeenCalledTimes(2);
+            expect(warnLog.mock.calls[0][0]).toEqual(
+                '11155111-0xfb92024ec789bb2fbbc5cd1390386843c5fb7694-v2 (Application v2) not found',
+            );
+            expect(warnLog.mock.calls[1][0]).toEqual(
+                'Ignoring event(InputAdded v2) [index: 0]',
+            );
         });
 
         test('should throw error when chain-id information is not available in the Log ', async () => {
@@ -156,257 +183,283 @@ describe('InputAdded', () => {
             }
         });
 
-        describe('ERC-20 deposit', () => {
-            const name = 'Wrapped Ether';
-            const symbol = 'WETH';
-            const decimals = 18;
-
+        describe('deposits', () => {
             beforeEach(() => {
-                // some default returns for the ERC20 contract calls
-                ERC20Mock.prototype.name.mockResolvedValue(name);
-                ERC20Mock.prototype.symbol.mockResolvedValue(symbol);
-                ERC20Mock.prototype.decimals.mockResolvedValue(decimals);
+                const appTwo = buildValidApplication(
+                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8',
+                );
+                mockApplicationStorage.set(appTwo.id, appTwo);
             });
 
-            afterEach(() => {
-                vi.clearAllMocks();
-            });
+            describe('ERC-20 deposit', () => {
+                const name = 'Wrapped Ether';
+                const symbol = 'WETH';
+                const decimals = 18;
 
-            test('Should store the token information', async () => {
-                await inputAdded.handle(logErc20TransferV2, block, ctx);
-                expect(mockTokenStorage.size).toBe(1);
-                const [token] = mockTokenStorage.values();
-
-                expect(token).toEqual({
-                    chain: expectedChain,
-                    decimals: decimals,
-                    id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
-                    address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
-                    name: name,
-                    symbol: symbol,
+                beforeEach(() => {
+                    // some default returns for the ERC20 contract calls
+                    ERC20Mock.prototype.name.mockResolvedValue(name);
+                    ERC20Mock.prototype.symbol.mockResolvedValue(symbol);
+                    ERC20Mock.prototype.decimals.mockResolvedValue(decimals);
                 });
-            });
 
-            test('should store the deposit information', async () => {
-                await inputAdded.handle(logErc20TransferV2, block, ctx);
+                afterEach(() => {
+                    vi.clearAllMocks();
+                });
 
-                expect(mockDepositStorage.size).toBe(1);
-                const [deposit] = mockDepositStorage.values();
-
-                expect(deposit).toEqual({
-                    chain: expectedChain,
-                    id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-10`,
-                    amount: 111000000000000000n,
-                    from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
-                    token: {
-                        id: `${sepolia.id.toString()}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
-                        address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
-                        decimals: 18,
-                        name: 'Wrapped Ether',
-                        symbol: 'WETH',
+                test('Should store the token information', async () => {
+                    await inputAdded.handle(logErc20TransferV2, block, ctx);
+                    expect(mockTokenStorage.size).toBe(1);
+                    const [token] = mockTokenStorage.values();
+                    expect(token).toEqual({
                         chain: expectedChain,
-                    },
-                });
-            });
-
-            test('should assign the erc20 deposit information correctly into the input', async () => {
-                await inputAdded.handle(logErc20TransferV2, block, ctx);
-
-                expect(mockInputStorage.size).toEqual(1);
-                const [input] =
-                    mockInputStorage.values() as IterableIterator<Input>;
-
-                expect(input.erc20Deposit).toEqual({
-                    chain: expectedChain,
-                    amount: 111000000000000000n,
-                    from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
-                    id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-10`,
-                    token: {
-                        decimals: 18,
+                        decimals: decimals,
                         id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
                         address: '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
-                        name: 'Wrapped Ether',
-                        symbol: 'WETH',
+                        name: name,
+                        symbol: symbol,
+                    });
+                });
+
+                test('should store the deposit information', async () => {
+                    await inputAdded.handle(logErc20TransferV2, block, ctx);
+
+                    expect(mockDepositStorage.size).toBe(1);
+                    const [deposit] = mockDepositStorage.values();
+
+                    expect(deposit).toEqual({
                         chain: expectedChain,
-                    },
+                        id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-10`,
+                        amount: 111000000000000000n,
+                        from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
+                        token: {
+                            id: `${sepolia.id.toString()}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
+                            address:
+                                '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                            decimals: 18,
+                            name: 'Wrapped Ether',
+                            symbol: 'WETH',
+                            chain: expectedChain,
+                        },
+                    });
                 });
 
-                expect(input.erc721Deposit).toBeUndefined;
-            });
-        });
+                test('should assign the erc20 deposit information correctly into the input', async () => {
+                    await inputAdded.handle(logErc20TransferV2, block, ctx);
 
-        describe('ERC-721 deposits', () => {
-            const name = 'BrotherNFT';
-            const symbol = 'BRUH';
+                    expect(mockInputStorage.size).toEqual(1);
+                    const [input] =
+                        mockInputStorage.values() as IterableIterator<Input>;
 
-            beforeEach(() => {
-                ERC721Mock.prototype.name.mockResolvedValue(name);
-                ERC721Mock.prototype.symbol.mockResolvedValue(symbol);
-            });
+                    expect(input.erc20Deposit).toEqual({
+                        chain: expectedChain,
+                        amount: 111000000000000000n,
+                        from: '0xf9e958241c1ca380cfcd50170ec43974bded0bff',
+                        id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-10`,
+                        token: {
+                            decimals: 18,
+                            id: `${sepolia.id}-0x813ae0539daf858599a1b2a7083380542a7b1bb5`,
+                            address:
+                                '0x813ae0539daf858599a1b2a7083380542a7b1bb5',
+                            name: 'Wrapped Ether',
+                            symbol: 'WETH',
+                            chain: expectedChain,
+                        },
+                    });
 
-            afterEach(() => {
-                vi.clearAllMocks();
-            });
-
-            test('should store the token information', async () => {
-                await inputAdded.handle(logErc721TransferV2, block, ctx);
-
-                expect(mockNftStorage.size).toBe(1);
-                const [token] =
-                    mockNftStorage.values() as IterableIterator<NFT>;
-
-                expect(token).toEqual({
-                    chain: expectedChain,
-                    id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
-                    address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
-                    name,
-                    symbol,
+                    expect(input.erc721Deposit).toBeUndefined;
                 });
             });
 
-            test('should store the deposit information', async () => {
-                await inputAdded.handle(logErc721TransferV2, block, ctx);
+            describe('ERC-721 deposits', () => {
+                const name = 'BrotherNFT';
+                const symbol = 'BRUH';
 
-                expect(mockErc721DepositStorage.size).toBe(1);
-                const [deposit] =
-                    mockErc721DepositStorage.values() as IterableIterator<Erc721Deposit>;
+                beforeEach(() => {
+                    ERC721Mock.prototype.name.mockResolvedValue(name);
+                    ERC721Mock.prototype.symbol.mockResolvedValue(symbol);
+                });
 
-                expect(deposit).toEqual({
-                    chain: expectedChain,
-                    id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-1`,
-                    from: logErc721Transfer.transaction?.from,
-                    token: {
+                afterEach(() => {
+                    vi.clearAllMocks();
+                });
+
+                test('should store the token information', async () => {
+                    await inputAdded.handle(logErc721TransferV2, block, ctx);
+
+                    expect(mockNftStorage.size).toBe(1);
+                    const [token] =
+                        mockNftStorage.values() as IterableIterator<NFT>;
+
+                    expect(token).toEqual({
                         chain: expectedChain,
                         id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
                         address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
                         name,
                         symbol,
-                    },
-                    tokenIndex: 1n,
+                    });
                 });
-            });
 
-            test('should assign the erc721 deposit information correctly into the input', async () => {
-                await inputAdded.handle(logErc721TransferV2, block, ctx);
+                test('should store the deposit information', async () => {
+                    await inputAdded.handle(logErc721TransferV2, block, ctx);
 
-                expect(mockInputStorage.size).toBe(1);
-                const [input] =
-                    mockInputStorage.values() as IterableIterator<Input>;
+                    expect(mockErc721DepositStorage.size).toBe(1);
+                    const [deposit] =
+                        mockErc721DepositStorage.values() as IterableIterator<Erc721Deposit>;
 
-                expect(input.erc721Deposit).toEqual({
-                    chain: expectedChain,
-                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-1`,
-                    token: {
+                    expect(deposit).toEqual({
                         chain: expectedChain,
+                        id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-1`,
+                        from: logErc721Transfer.transaction?.from,
+                        token: {
+                            chain: expectedChain,
+                            id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                            address:
+                                '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                            name,
+                            symbol,
+                        },
+                        tokenIndex: 1n,
+                    });
+                });
+
+                test('should assign the erc721 deposit information correctly into the input', async () => {
+                    await inputAdded.handle(logErc721TransferV2, block, ctx);
+
+                    expect(mockInputStorage.size).toBe(1);
+                    const [input] =
+                        mockInputStorage.values() as IterableIterator<Input>;
+
+                    expect(input.erc721Deposit).toEqual({
+                        chain: expectedChain,
+                        from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+                        id: `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-1`,
+                        token: {
+                            chain: expectedChain,
+                            id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
+                            address:
+                                '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
+                            name,
+                            symbol,
+                        },
+                        tokenIndex: 1n,
+                    });
+                });
+
+                test('should handle the absence of name and symbol methods in the ERC-721 contract', async () => {
+                    ERC721Mock.prototype.name.mockRejectedValue(
+                        new Error('No name method implemented on contract'),
+                    );
+                    ERC721Mock.prototype.symbol.mockRejectedValue(
+                        new Error('No symbol method implemented on contract'),
+                    );
+
+                    await inputAdded.handle(logErc721TransferV2, block, ctx);
+
+                    expect(mockInputStorage.size).toBe(1);
+                    const [input] =
+                        mockInputStorage.values() as IterableIterator<Input>;
+                    expect(input.erc721Deposit?.token).toEqual({
                         id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
                         address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
-                        name,
-                        symbol,
-                    },
-                    tokenIndex: 1n,
-                });
-            });
-
-            test('should handle the absence of name and symbol methods in the ERC-721 contract', async () => {
-                ERC721Mock.prototype.name.mockRejectedValue(
-                    new Error('No name method implemented on contract'),
-                );
-                ERC721Mock.prototype.symbol.mockRejectedValue(
-                    new Error('No symbol method implemented on contract'),
-                );
-
-                await inputAdded.handle(logErc721TransferV2, block, ctx);
-
-                expect(mockInputStorage.size).toBe(1);
-                const [input] =
-                    mockInputStorage.values() as IterableIterator<Input>;
-                expect(input.erc721Deposit?.token).toEqual({
-                    id: `${sepolia.id}-0x7a3cc9c0408887a030a0354330c36a9cd681aa7e`,
-                    address: '0x7a3cc9c0408887a030a0354330c36a9cd681aa7e',
-                    name: null,
-                    symbol: null,
-                    chain: expectedChain,
-                });
-            });
-        });
-
-        describe('ERC-1155 deposits', () => {
-            const tokenAddress = `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`;
-
-            afterEach(() => {
-                vi.clearAllMocks();
-            });
-
-            test('should store the token information', async () => {
-                expect(mockMultiTokenStorage.size).toBe(0);
-
-                await inputAdded.handle(logErc1155SingleTransferV2, block, ctx);
-
-                expect(mockMultiTokenStorage.size).toBe(1);
-                const token = mockMultiTokenStorage.get(tokenAddress);
-                expect(token?.id).toEqual(tokenAddress);
-                expect(token?.address).toEqual(
-                    '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
-                );
-                expect(token?.chain).toEqual({ id: '11155111' });
-            });
-
-            test('should store the deposit information for single transfer', async () => {
-                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-2`;
-                expect(mockErc1155DepositStorage.size).toBe(0);
-                await inputAdded.handle(logErc1155SingleTransferV2, block, ctx);
-
-                expect(mockErc1155DepositStorage.size).toBe(1);
-
-                const deposit = mockErc1155DepositStorage.get(inputId);
-
-                expect(deposit).toEqual({
-                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: inputId,
-                    chain: expectedChain,
-                    token: {
-                        id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
-                        address: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                        name: null,
+                        symbol: null,
                         chain: expectedChain,
-                    },
-                    transfers: [
-                        {
-                            amount: 100n,
-                            tokenIndex: 0n,
-                        },
-                    ],
+                    });
                 });
             });
 
-            test('should store the deposit information for batch transfer', async () => {
-                const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-2`;
-                expect(mockErc1155DepositStorage.size).toBe(0);
-                await inputAdded.handle(logErc1155BatchTransferV2, block, ctx);
+            describe('ERC-1155 deposits', () => {
+                const tokenAddress = `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`;
 
-                expect(mockErc1155DepositStorage.size).toBe(1);
+                afterEach(() => {
+                    vi.clearAllMocks();
+                });
 
-                const deposit = mockErc1155DepositStorage.get(inputId);
+                test('should store the token information', async () => {
+                    expect(mockMultiTokenStorage.size).toBe(0);
 
-                expect(deposit).toEqual({
-                    from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
-                    id: inputId,
-                    chain: expectedChain,
-                    token: {
-                        id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
-                        address: '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                    await inputAdded.handle(
+                        logErc1155SingleTransferV2,
+                        block,
+                        ctx,
+                    );
+
+                    expect(mockMultiTokenStorage.size).toBe(1);
+                    const token = mockMultiTokenStorage.get(tokenAddress);
+                    expect(token?.id).toEqual(tokenAddress);
+                    expect(token?.address).toEqual(
+                        '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                    );
+                    expect(token?.chain).toEqual({ id: '11155111' });
+                });
+
+                test('should store the deposit information for single transfer', async () => {
+                    const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-2`;
+                    expect(mockErc1155DepositStorage.size).toBe(0);
+                    await inputAdded.handle(
+                        logErc1155SingleTransferV2,
+                        block,
+                        ctx,
+                    );
+
+                    expect(mockErc1155DepositStorage.size).toBe(1);
+
+                    const deposit = mockErc1155DepositStorage.get(inputId);
+
+                    expect(deposit).toEqual({
+                        from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+                        id: inputId,
                         chain: expectedChain,
-                    },
-                    transfers: [
-                        {
-                            amount: 100n,
-                            tokenIndex: 1n,
+                        token: {
+                            id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
+                            address:
+                                '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                            chain: expectedChain,
                         },
-                        {
-                            amount: 200n,
-                            tokenIndex: 2n,
+                        transfers: [
+                            {
+                                amount: 100n,
+                                tokenIndex: 0n,
+                            },
+                        ],
+                    });
+                });
+
+                test('should store the deposit information for batch transfer', async () => {
+                    const inputId = `${sepolia.id}-0x4ca2f6935200b9a782a78f408f640f17b29809d8-v2-2`;
+                    expect(mockErc1155DepositStorage.size).toBe(0);
+                    await inputAdded.handle(
+                        logErc1155BatchTransferV2,
+                        block,
+                        ctx,
+                    );
+
+                    expect(mockErc1155DepositStorage.size).toBe(1);
+
+                    const deposit = mockErc1155DepositStorage.get(inputId);
+
+                    expect(deposit).toEqual({
+                        from: '0xa074683b5be015f053b5dceb064c41fc9d11b6e5',
+                        id: inputId,
+                        chain: expectedChain,
+                        token: {
+                            id: `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`,
+                            address:
+                                '0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e',
+                            chain: expectedChain,
                         },
-                    ],
+                        transfers: [
+                            {
+                                amount: 100n,
+                                tokenIndex: 1n,
+                            },
+                            {
+                                amount: 200n,
+                                tokenIndex: 2n,
+                            },
+                        ],
+                    });
                 });
             });
         });
