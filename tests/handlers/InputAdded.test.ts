@@ -85,7 +85,38 @@ describe('InputAdded', () => {
     const mockChainStorage = new Map<string, Chain>();
     const expectedChain = { id: sepolia.id.toString() };
 
+    const buildValidApplication = (address: string) => ({
+        id: `${sepolia.id}-${address}-v1`,
+        address: `${address}`,
+        timestamp: BigInt(logs[0].block.timestamp) / 1000n,
+        chain: expectedChain,
+        rollupVersion: 'v1',
+        factory: {
+            id: '11155111-0x7122cd1221c20892234186facfe8615e6743ab02',
+            address: '0x7122cd1221c20892234186facfe8615e6743ab02',
+            chain: {
+                id: '11155111',
+            },
+        },
+    });
+
     beforeEach(() => {
+        mockTokenStorage.clear();
+        mockDepositStorage.clear();
+        mockApplicationStorage.clear();
+        mockInputStorage.clear();
+        mockNftStorage.clear();
+        mockErc721DepositStorage.clear();
+        mockMultiTokenStorage.clear();
+        mockErc1155DepositStorage.clear();
+
+        // add pre created valid apps
+        const appOne = buildValidApplication(
+            '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
+        );
+
+        mockApplicationStorage.set(appOne.id, appOne);
+
         inputAdded = new InputAdded(
             mockTokenStorage,
             mockDepositStorage,
@@ -97,15 +128,6 @@ describe('InputAdded', () => {
             mockErc1155DepositStorage,
             mockChainStorage,
         );
-
-        mockTokenStorage.clear();
-        mockDepositStorage.clear();
-        mockApplicationStorage.clear();
-        mockInputStorage.clear();
-        mockNftStorage.clear();
-        mockErc721DepositStorage.clear();
-        mockMultiTokenStorage.clear();
-        mockErc1155DepositStorage.clear();
     });
 
     afterEach(() => {
@@ -114,6 +136,7 @@ describe('InputAdded', () => {
 
     describe('handle', async () => {
         test('should ignore events other than InputAdded', async () => {
+            mockApplicationStorage.clear();
             await inputAdded.handle(logs[1], block, ctx);
             expect(mockInputStorage.size).toBe(0);
             expect(mockApplicationStorage.size).toBe(0);
@@ -126,19 +149,21 @@ describe('InputAdded', () => {
             expect(mockInputStorage.size).toBe(1);
         });
 
-        test('when creating a non-existing app it should also set the timestamp in seconds', async () => {
+        test('should ignore inputs to non-existing applications', async () => {
+            mockApplicationStorage.clear();
             await inputAdded.handle(logs[0], block, ctx);
 
-            const timestamp = BigInt(logs[0].block.timestamp) / 1000n;
-
             const [application] = mockApplicationStorage.values();
-            expect(application).toEqual({
-                id: `${sepolia.id}-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1`,
-                address: '0x0be010fa7e70d74fa8b6729fe1ae268787298f54',
-                timestamp,
-                chain: expectedChain,
-                rollupVersion: 'v1',
-            });
+            expect(application).toEqual(undefined);
+
+            expect(ctx.log.warn).toHaveBeenCalledTimes(2);
+            expect(ctx.log.warn).toHaveBeenCalledWith(
+                '11155111-0x0be010fa7e70d74fa8b6729fe1ae268787298f54-v1 (Application) not found',
+            );
+
+            expect(ctx.log.warn).toHaveBeenCalledWith(
+                'Ignoring event(InputAdded v1) [index: 1]',
+            );
         });
 
         test('should throw error when chain-id information is not available in the Log ', async () => {
@@ -332,13 +357,21 @@ describe('InputAdded', () => {
         describe('ERC-1155 deposits', () => {
             const tokenAddress = `${sepolia.id}-0x2960f4db2b0993ae5b59bc4a0f5ec7a1767e905e`;
 
+            beforeEach(() => {
+                // add pre created valid apps
+                const appOne = buildValidApplication(
+                    '0x4ca2f6935200b9a782a78f408f640f17b29809d8',
+                );
+
+                mockApplicationStorage.set(appOne.id, appOne);
+            });
+
             afterEach(() => {
                 vi.clearAllMocks();
             });
 
             test('should store the token information', async () => {
                 expect(mockMultiTokenStorage.size).toBe(0);
-
                 await inputAdded.handle(logErc1155SingleTransfer, block, ctx);
 
                 expect(mockMultiTokenStorage.size).toBe(1);

@@ -245,17 +245,13 @@ export default class InputAdded implements Handler {
             let application =
                 this.applicationStorage.get(dappId) ??
                 (await ctx.store.get(Application, dappId));
+
             if (!application) {
                 ctx.log.warn(`${dappId} (Application) not found`);
-                application = new Application({
-                    id: dappId,
-                    timestamp: timestampInSeconds,
-                    chain: chain,
-                    address: dappAddress,
-                    rollupVersion: RollupVersion.v1,
-                });
-                this.applicationStorage.set(dappId, application);
-                ctx.log.info(`${dappId} (Application) stored`);
+                ctx.log.warn(
+                    `Ignoring event(InputAdded v1) [index: ${event.inboxInputIndex}]`,
+                );
+                return false;
             }
 
             const inputId = generateIDFrom([dappId, event.inboxInputIndex]);
