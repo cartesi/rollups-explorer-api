@@ -22,7 +22,7 @@ const supportedTestnets = [
     sepolia.id,
 ];
 
-const packageRef = 'cartesi-rollups:2.0.0';
+const packageRef = 'cartesi-rollups:2.1.0';
 const abiFolder = join(process.cwd(), 'abi');
 const outFolder = join(process.cwd(), 'src', 'deployments');
 const codegenMetaFileName = '__meta.json';
