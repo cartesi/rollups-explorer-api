@@ -48,7 +48,7 @@ describe('Processor creation', () => {
         try {
             const processor = createProcessor(999);
             expect.unreachable('Should not pass createProcessor');
-        } catch (error) {
+        } catch (error: any) {
             expect(error).toBeInstanceOf(Error);
             expect(error.message).toEqual('Unsupported chainId: 999');
         }
@@ -97,9 +97,9 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
-            address: ['0xc7006f70875bade89032001262a846d3ee160051'],
+            address: [RollupsAddressBook.v2.ApplicationFactory],
             range: {
-                from: 30910822,
+                from: 37737524,
             },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
@@ -107,8 +107,8 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[3][0]).toEqual({
-            address: ['0xc70074bdd26d8cf983ca6a5b89b8db52d5850051'],
-            range: { from: 30910822 },
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 37737524 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -166,16 +166,16 @@ describe('Processor creation', () => {
         });
 
         expect(addLog.mock.calls[2][0]).toEqual({
-            address: ['0xc7006f70875bade89032001262a846d3ee160051'],
-            range: { from: 26421182 },
+            address: [RollupsAddressBook.v2.ApplicationFactory],
+            range: { from: 33247802 },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
         });
 
         expect(addLog.mock.calls[3][0]).toEqual({
-            address: ['0xc70074bdd26d8cf983ca6a5b89b8db52d5850051'],
-            range: { from: 26421182 },
+            address: [RollupsAddressBook.v2.InputBox],
+            range: { from: 33247802 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -237,7 +237,7 @@ describe('Processor creation', () => {
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
-            range: { from: 8439338 },
+            range: { from: 9559121 },
         });
 
         expect(addLog.mock.calls[3][0]).toEqual({
@@ -245,7 +245,7 @@ describe('Processor creation', () => {
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
-            range: { from: 8439338 },
+            range: { from: 9559121 },
             transaction: true,
         });
 
@@ -442,7 +442,7 @@ describe('Processor creation', () => {
         expect(addLog.mock.calls[2][0]).toEqual({
             address: [RollupsAddressBook.v2.ApplicationFactory],
             range: {
-                from: 136506143,
+                from: 9007199254740991,
             },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
@@ -451,7 +451,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[3][0]).toEqual({
             address: [RollupsAddressBook.v2.InputBox],
-            range: { from: 136506143 },
+            range: { from: 9007199254740991 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -509,7 +509,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[2][0]).toEqual({
             address: [RollupsAddressBook.v2.ApplicationFactory],
-            range: { from: 28404083 },
+            range: { from: 9007199254740991 },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
@@ -517,7 +517,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[3][0]).toEqual({
             address: [RollupsAddressBook.v2.InputBox],
-            range: { from: 28404083 },
+            range: { from: 9007199254740991 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -575,7 +575,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[2][0]).toEqual({
             address: [RollupsAddressBook.v2.ApplicationFactory],
-            range: { from: 342110860 },
+            range: { from: 396725994 },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
@@ -583,7 +583,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[3][0]).toEqual({
             address: [RollupsAddressBook.v2.InputBox],
-            range: { from: 342110860 },
+            range: { from: 396725994 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -641,7 +641,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[2][0]).toEqual({
             address: [RollupsAddressBook.v2.ApplicationFactory],
-            range: { from: 158367139 },
+            range: { from: 211735634 },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
@@ -649,7 +649,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[3][0]).toEqual({
             address: [RollupsAddressBook.v2.InputBox],
-            range: { from: 158367139 },
+            range: { from: 211735634 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
@@ -708,7 +708,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[2][0]).toEqual({
             address: [RollupsAddressBook.v2.ApplicationFactory],
-            range: { from: 22595774 },
+            range: { from: 23726340 },
             topic0: [
                 '0xd291ffe9436f2c57d5ce3e87ed33576f801053946651a2fb4fec5a406cf68cc5',
             ],
@@ -716,7 +716,7 @@ describe('Processor creation', () => {
 
         expect(addLog.mock.calls[3][0]).toEqual({
             address: [RollupsAddressBook.v2.InputBox],
-            range: { from: 22595774 },
+            range: { from: 23726340 },
             topic0: [
                 '0xc05d337121a6e8605c6ec0b72aa29c4210ffe6e5b9cefdd6a7058188a8f66f98',
             ],
