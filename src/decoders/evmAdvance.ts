@@ -18,7 +18,7 @@ export const evmAdvanceAbi = parseAbi([
 const [evmAdvanceFn] = evmAdvanceAbi;
 
 /**
- * Decode input that is abi encoded using the {@link https://github.com/cartesi/rollups-contracts/blob/v2.0.0-rc.10/contracts/common/Inputs.sol#L19}
+ * Decode input that is abi encoded using the {@link https://github.com/cartesi/rollups-contracts/blob/v2.1.1/src/common/Inputs.sol#L21}
  * Function signature
  * @param input
  * @returns
