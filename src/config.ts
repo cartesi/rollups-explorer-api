@@ -29,16 +29,16 @@ import {
     optimismSepolia,
     sepolia,
 } from 'viem/chains';
+import { contracts as MainnetContracts } from './deployments/1/contracts.json';
+import { contracts as OptimismContracts } from './deployments/10/contracts.json';
 import { contracts as SepoliaContracts } from './deployments/11155111/contracts.json';
 import { contracts as OptSepoliaContracts } from './deployments/11155420/contracts.json';
 import { contracts as CannonContracts } from './deployments/13370/contracts.json';
-import { contracts as ArbSepoliaContracts } from './deployments/421614/contracts.json';
-import { contracts as BaseSepoliaContracts } from './deployments/84532/contracts.json';
-import { contracts as MainnetContracts } from './deployments/1/contracts.json';
-import { contracts as OptimismContracts } from './deployments/10/contracts.json';
-import { contracts as BaseContracts } from './deployments/8453/contracts.json';
 import { contracts as ArbitrumContracts } from './deployments/42161/contracts.json';
-import { archiveNodes } from './gateways';
+import { contracts as ArbSepoliaContracts } from './deployments/421614/contracts.json';
+import { contracts as BaseContracts } from './deployments/8453/contracts.json';
+import { contracts as BaseSepoliaContracts } from './deployments/84532/contracts.json';
+import { getArchiveGateway } from './gateways';
 import { parseIntOr, smallerOf } from './utils';
 
 // addresses from deployment/13370. (Probably) the addresses will be the same on all chains
@@ -110,7 +110,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case mainnet.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.mainnet,
+                    archive: getArchiveGateway('mainnet'),
                     rpcEndpoint: {
                         url: process.env[RPC_URL] ?? 'https://rpc.ankr.com/eth',
                         rateLimit: rateLimit,
@@ -135,7 +135,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case sepolia.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.sepolia,
+                    archive: getArchiveGateway('sepolia'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -162,7 +162,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case optimism.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.optimism,
+                    archive: getArchiveGateway('optimism'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -189,7 +189,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case optimismSepolia.id: //Optimism-Sepolia
             return {
                 dataSource: {
-                    archive: archiveNodes.optimismSepolia,
+                    archive: getArchiveGateway('optimismSepolia'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -216,7 +216,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case base.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.base,
+                    archive: getArchiveGateway('base'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -242,7 +242,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case baseSepolia.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.baseSepolia,
+                    archive: getArchiveGateway('baseSepolia'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -269,7 +269,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case arbitrum.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.arbitrum,
+                    archive: getArchiveGateway('arbitrum'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??
@@ -296,7 +296,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case arbitrumSepolia.id:
             return {
                 dataSource: {
-                    archive: archiveNodes.arbitrumSepolia,
+                    archive: getArchiveGateway('arbitrumSepolia'),
                     rpcEndpoint: {
                         url:
                             process.env[RPC_URL] ??

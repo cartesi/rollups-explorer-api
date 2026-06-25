@@ -1,6 +1,14 @@
-import { afterEach } from 'node:test';
-import { MockInstance, beforeEach, describe, expect, test, vi } from 'vitest';
+import {
+    MockInstance,
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    test,
+    vi,
+} from 'vitest';
 import { CartesiDAppFactoryAddress, RollupsAddressBook } from '../src/config';
+import { getArchiveGateway } from '../src/gateways';
 import { createProcessor } from '../src/processor';
 import { loadApplications } from '../src/utils';
 
@@ -34,10 +42,12 @@ const base = 8453;
 const baseSepolia = 84532;
 const arbitrum = 42161;
 const arbitrumSepolia = 421614;
+const archiveApiKeyValue = 'random-key-value';
 
 describe('Processor creation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.stubEnv('ARCHIVE_GATEWAY_API_KEY', archiveApiKeyValue);
     });
 
     afterEach(() => {
@@ -59,7 +69,7 @@ describe('Processor creation', () => {
         const applicationMetadata = loadApplications(base);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/base-mainnet',
+            getArchiveGateway('base'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -128,7 +138,7 @@ describe('Processor creation', () => {
         const applicationMetadata = loadApplications(baseSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/base-sepolia',
+            getArchiveGateway('baseSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -195,7 +205,7 @@ describe('Processor creation', () => {
         const applicationMetadata = loadApplications(sepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+            getArchiveGateway('sepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -402,7 +412,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(optimism);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/optimism-mainnet',
+            getArchiveGateway('optimism'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -470,7 +480,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(optimismSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/optimism-sepolia',
+            getArchiveGateway('optimismSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -536,7 +546,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(arbitrum);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/arbitrum-one',
+            getArchiveGateway('arbitrum'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -602,7 +612,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(arbitrumSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
+            getArchiveGateway('arbitrumSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -669,7 +679,7 @@ describe('Processor creation', () => {
         const applicationMetadata = loadApplications(mainnet);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+            getArchiveGateway('mainnet'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -753,7 +763,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(sepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/ethereum-sepolia',
+            getArchiveGateway('sepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -768,7 +778,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(mainnet);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+            getArchiveGateway('mainnet'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -805,7 +815,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(base);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/base-mainnet',
+            getArchiveGateway('base'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -820,7 +830,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(baseSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/base-sepolia',
+            getArchiveGateway('baseSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -835,7 +845,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(optimism);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/optimism-mainnet',
+            getArchiveGateway('optimism'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -850,7 +860,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(optimismSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/optimism-sepolia',
+            getArchiveGateway('optimismSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -865,7 +875,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(arbitrum);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/arbitrum-one',
+            getArchiveGateway('arbitrum'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
@@ -880,7 +890,7 @@ describe('Processor creation', () => {
         const processor = createProcessor(arbitrumSepolia);
 
         expect(processor.setGateway).toHaveBeenCalledWith(
-            'https://v2.archive.subsquid.io/network/arbitrum-sepolia',
+            getArchiveGateway('arbitrumSepolia'),
         );
 
         expect(processor.setRpcEndpoint).toHaveBeenCalledWith({
