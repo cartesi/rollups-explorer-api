@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "run-s clean sqd:typegen sqd:codegen tsc",
-    "clean": "rm -rf lib",
+    "clean": "rm -rf lib && rm -rf src/abi && rm -rf src/models",
     "test": "vitest",
     "ci:test": "vitest run --coverage",
     "sqd": "sqd",
