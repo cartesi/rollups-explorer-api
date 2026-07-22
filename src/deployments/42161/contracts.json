@@ -1,0 +1,1106 @@
+{
+ "contracts": {
+  "ApplicationFactory": {
+   "address": "0x26E758238CB6eC5aB70ce0dd52aF2d7b82e1972E",
+   "abi": [
+    {
+     "type": "function",
+     "name": "calculateApplicationAddress",
+     "inputs": [
+      {
+       "name": "outputsMerkleRootValidator",
+       "type": "address",
+       "internalType": "contract IOutputsMerkleRootValidator"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "address"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "newApplication",
+     "inputs": [
+      {
+       "name": "outputsMerkleRootValidator",
+       "type": "address",
+       "internalType": "contract IOutputsMerkleRootValidator"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IApplication"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "newApplication",
+     "inputs": [
+      {
+       "name": "outputsMerkleRootValidator",
+       "type": "address",
+       "internalType": "contract IOutputsMerkleRootValidator"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IApplication"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "event",
+     "name": "ApplicationCreated",
+     "inputs": [
+      {
+       "name": "outputsMerkleRootValidator",
+       "type": "address",
+       "indexed": true,
+       "internalType": "contract IOutputsMerkleRootValidator"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "indexed": false,
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "indexed": false,
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "indexed": false,
+       "internalType": "bytes"
+      },
+      {
+       "name": "appContract",
+       "type": "address",
+       "indexed": false,
+       "internalType": "contract IApplication"
+      }
+     ],
+     "anonymous": false
+    }
+   ],
+   "constructorArgs": [],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x407ffff05e0ff0495345abb1b7e2b1419fda37e50785a213b88f093701d3f4b6",
+   "deployTxnBlockNumber": "396725994",
+   "deployTimestamp": "1762264187",
+   "sourceName": "src/dapp/ApplicationFactory.sol",
+   "contractName": "ApplicationFactory",
+   "deployedOn": "deploy.ApplicationFactory",
+   "gasUsed": 1324548,
+   "gasCost": "19401000"
+  },
+  "AuthorityFactory": {
+   "address": "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
+   "abi": [
+    {
+     "type": "function",
+     "name": "calculateAuthorityAddress",
+     "inputs": [
+      {
+       "name": "authorityOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "address"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "newAuthority",
+     "inputs": [
+      {
+       "name": "authorityOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IAuthority"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "newAuthority",
+     "inputs": [
+      {
+       "name": "authorityOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IAuthority"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "event",
+     "name": "AuthorityCreated",
+     "inputs": [
+      {
+       "name": "authority",
+       "type": "address",
+       "indexed": false,
+       "internalType": "contract IAuthority"
+      }
+     ],
+     "anonymous": false
+    }
+   ],
+   "constructorArgs": [],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x147cd6213edc0af5389483062fd444e7fe230b8d96cf3ce21fbbf2d0682c244d",
+   "deployTxnBlockNumber": "396725998",
+   "deployTimestamp": "1762264188",
+   "sourceName": "src/consensus/authority/AuthorityFactory.sol",
+   "contractName": "AuthorityFactory",
+   "deployedOn": "deploy.AuthorityFactory",
+   "gasUsed": 570130,
+   "gasCost": "19328000"
+  },
+  "ERC1155BatchPortal": {
+   "address": "0xe246Abb974B307490d9C6932F48EbE79de72338A",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "inputBox",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "depositBatchERC1155Token",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "contract IERC1155"
+      },
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "tokenIds",
+       "type": "uint256[]",
+       "internalType": "uint256[]"
+      },
+      {
+       "name": "values",
+       "type": "uint256[]",
+       "internalType": "uint256[]"
+      },
+      {
+       "name": "baseLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "execLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getInputBox",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "view"
+    }
+   ],
+   "constructorArgs": [
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x0edf689ff1dc6bcfb6abb22173aa94784f7b8cfa7168a85dc72c1d199d59ea38",
+   "deployTxnBlockNumber": "396726015",
+   "deployTimestamp": "1762264192",
+   "sourceName": "src/portals/ERC1155BatchPortal.sol",
+   "contractName": "ERC1155BatchPortal",
+   "deployedOn": "deploy.ERC1155BatchPortal",
+   "gasUsed": 315761,
+   "gasCost": "19230000"
+  },
+  "ERC1155SinglePortal": {
+   "address": "0x18558398Dd1a8cE20956287a4Da7B76aE7A96662",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "inputBox",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "depositSingleERC1155Token",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "contract IERC1155"
+      },
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "tokenId",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "value",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "baseLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "execLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getInputBox",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "view"
+    }
+   ],
+   "constructorArgs": [
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x6c01f582ccd3793bae401a2e3ae26e7bd20ee7db38d7e443c15fe6082db280d5",
+   "deployTxnBlockNumber": "396726019",
+   "deployTimestamp": "1762264193",
+   "sourceName": "src/portals/ERC1155SinglePortal.sol",
+   "contractName": "ERC1155SinglePortal",
+   "deployedOn": "deploy.ERC1155SinglePortal",
+   "gasUsed": 273329,
+   "gasCost": "19272000"
+  },
+  "ERC20Portal": {
+   "address": "0xACA6586A0Cf05bD831f2501E7B4aea550dA6562D",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "inputBox",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "depositERC20Tokens",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "contract IERC20"
+      },
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "value",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "execLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getInputBox",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "error",
+     "name": "ERC20TransferFailed",
+     "inputs": []
+    }
+   ],
+   "constructorArgs": [
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x04ca0ceb4e48b5fbfc3edaff6a756e01fa0d118d4bb552b1d0c1269cfef8e461",
+   "deployTxnBlockNumber": "396726023",
+   "deployTimestamp": "1762264194",
+   "sourceName": "src/portals/ERC20Portal.sol",
+   "contractName": "ERC20Portal",
+   "deployedOn": "deploy.ERC20Portal",
+   "gasUsed": 230623,
+   "gasCost": "19182000"
+  },
+  "ERC721Portal": {
+   "address": "0x9E8851dadb2b77103928518846c4678d48b5e371",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "inputBox",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "depositERC721Token",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "contract IERC721"
+      },
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "tokenId",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "baseLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "execLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getInputBox",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "view"
+    }
+   ],
+   "constructorArgs": [
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x39a152da99b43b79a9de2b245e831fe68d1743a80d5870fdc144154020be693b",
+   "deployTxnBlockNumber": "396726027",
+   "deployTimestamp": "1762264195",
+   "sourceName": "src/portals/ERC721Portal.sol",
+   "contractName": "ERC721Portal",
+   "deployedOn": "deploy.ERC721Portal",
+   "gasUsed": 269013,
+   "gasCost": "19754000"
+  },
+  "EtherPortal": {
+   "address": "0xA632c5c05812c6a6149B7af5C56117d1D2603828",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "inputBox",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "depositEther",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "execLayerData",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "payable"
+    },
+    {
+     "type": "function",
+     "name": "getInputBox",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IInputBox"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "error",
+     "name": "EtherTransferFailed",
+     "inputs": []
+    }
+   ],
+   "constructorArgs": [
+    "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x7a2fe813f0e82d706d4f3e276dd00aac869247e3f249d4e964e394d69cea8814",
+   "deployTxnBlockNumber": "396726033",
+   "deployTimestamp": "1762264196",
+   "sourceName": "src/portals/EtherPortal.sol",
+   "contractName": "EtherPortal",
+   "deployedOn": "deploy.EtherPortal",
+   "gasUsed": 206807,
+   "gasCost": "20109000"
+  },
+  "InputBox": {
+   "address": "0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac",
+   "abi": [
+    {
+     "type": "function",
+     "name": "addInput",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "payload",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getDeploymentBlockNumber",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "getInputHash",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "index",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "getNumberOfInputs",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "event",
+     "name": "InputAdded",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "indexed": true,
+       "internalType": "address"
+      },
+      {
+       "name": "index",
+       "type": "uint256",
+       "indexed": true,
+       "internalType": "uint256"
+      },
+      {
+       "name": "input",
+       "type": "bytes",
+       "indexed": false,
+       "internalType": "bytes"
+      }
+     ],
+     "anonymous": false
+    },
+    {
+     "type": "error",
+     "name": "InputTooLarge",
+     "inputs": [
+      {
+       "name": "appContract",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "inputLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "maxInputLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ]
+    }
+   ],
+   "constructorArgs": [],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x44c17aae34c2afd1e7f6bbaceaf8540944cfe9cba78de920ff8c49940e3b8dd3",
+   "deployTxnBlockNumber": "396726002",
+   "deployTimestamp": "1762264189",
+   "sourceName": "src/inputs/InputBox.sol",
+   "contractName": "InputBox",
+   "deployedOn": "deploy.InputBox",
+   "gasUsed": 248355,
+   "gasCost": "19262000"
+  },
+  "QuorumFactory": {
+   "address": "0x1e75aa69026B6e368Ba7d663552F1dADaf1740F9",
+   "abi": [
+    {
+     "type": "function",
+     "name": "calculateQuorumAddress",
+     "inputs": [
+      {
+       "name": "validators",
+       "type": "address[]",
+       "internalType": "address[]"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "address"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "newQuorum",
+     "inputs": [
+      {
+       "name": "validators",
+       "type": "address[]",
+       "internalType": "address[]"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IQuorum"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "newQuorum",
+     "inputs": [
+      {
+       "name": "validators",
+       "type": "address[]",
+       "internalType": "address[]"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IQuorum"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "event",
+     "name": "QuorumCreated",
+     "inputs": [
+      {
+       "name": "quorum",
+       "type": "address",
+       "indexed": false,
+       "internalType": "contract IQuorum"
+      }
+     ],
+     "anonymous": false
+    }
+   ],
+   "constructorArgs": [],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x47451b9dc2f124e99db9ded1e621a847cf0a51e8761201c48d0d630fc7bbb426",
+   "deployTxnBlockNumber": "396726007",
+   "deployTimestamp": "1762264190",
+   "sourceName": "src/consensus/quorum/QuorumFactory.sol",
+   "contractName": "QuorumFactory",
+   "deployedOn": "deploy.QuorumFactory",
+   "gasUsed": 771989,
+   "gasCost": "19088000"
+  },
+  "SafeERC20Transfer": {
+   "address": "0xb7C2bcAA4437425cfcE9d233bFf15EF461273D63",
+   "abi": [
+    {
+     "type": "function",
+     "name": "safeTransfer",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "contract IERC20"
+      },
+      {
+       "name": "to",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "value",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "outputs": [],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "error",
+     "name": "SafeERC20FailedOperation",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "address"
+      }
+     ]
+    }
+   ],
+   "constructorArgs": [],
+   "linkedLibraries": {},
+   "deployTxnHash": "0xb0e7b85e1a32035cc8abad84e109cb82e85ffc287cd2f19adecb243bf471e110",
+   "deployTxnBlockNumber": "396726011",
+   "deployTimestamp": "1762264191",
+   "sourceName": "src/delegatecall/SafeERC20Transfer.sol",
+   "contractName": "SafeERC20Transfer",
+   "deployedOn": "deploy.SafeERC20Transfer",
+   "gasUsed": 124470,
+   "gasCost": "19355000"
+  },
+  "SelfHostedApplicationFactory": {
+   "address": "0x870240e83b1181b419f18303D4ccC56574De2931",
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "authorityFactory",
+       "type": "address",
+       "internalType": "contract IAuthorityFactory"
+      },
+      {
+       "name": "applicationFactory",
+       "type": "address",
+       "internalType": "contract IApplicationFactory"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "calculateAddresses",
+     "inputs": [
+      {
+       "name": "authorityOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "application",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "authority",
+       "type": "address",
+       "internalType": "address"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "deployContracts",
+     "inputs": [
+      {
+       "name": "authorityOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "epochLength",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "appOwner",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "templateHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "dataAvailability",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "salt",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "application",
+       "type": "address",
+       "internalType": "contract IApplication"
+      },
+      {
+       "name": "authority",
+       "type": "address",
+       "internalType": "contract IAuthority"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "getApplicationFactory",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IApplicationFactory"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "getAuthorityFactory",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IAuthorityFactory"
+      }
+     ],
+     "stateMutability": "view"
+    }
+   ],
+   "constructorArgs": [
+    "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
+    "0x26E758238CB6eC5aB70ce0dd52aF2d7b82e1972E"
+   ],
+   "linkedLibraries": {},
+   "deployTxnHash": "0x2e32695146c20d0bb1db242c7c897ba1296e5a99bc5979c4b018d1d999654041",
+   "deployTxnBlockNumber": "396726037",
+   "deployTimestamp": "1762264197",
+   "sourceName": "src/dapp/SelfHostedApplicationFactory.sol",
+   "contractName": "SelfHostedApplicationFactory",
+   "deployedOn": "deploy.SelfHostedApplicationFactory",
+   "gasUsed": 369273,
+   "gasCost": "20001000"
+  }
+ }
+}

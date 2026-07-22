@@ -1,0 +1,110 @@
+{
+  "address": "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
+  "abi": [
+    {
+      "type": "function",
+      "name": "calculateAuthorityAddress",
+      "inputs": [
+        {
+          "name": "authorityOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "newAuthority",
+      "inputs": [
+        {
+          "name": "authorityOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IAuthority"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "newAuthority",
+      "inputs": [
+        {
+          "name": "authorityOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IAuthority"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "AuthorityCreated",
+      "inputs": [
+        {
+          "name": "authority",
+          "type": "address",
+          "indexed": false,
+          "internalType": "contract IAuthority"
+        }
+      ],
+      "anonymous": false
+    }
+  ],
+  "constructorArgs": [],
+  "linkedLibraries": {},
+  "deployTxnHash": "0x147cd6213edc0af5389483062fd444e7fe230b8d96cf3ce21fbbf2d0682c244d",
+  "deployTxnBlockNumber": "396725998",
+  "deployTimestamp": "1762264188",
+  "sourceName": "src/consensus/authority/AuthorityFactory.sol",
+  "contractName": "AuthorityFactory",
+  "deployedOn": "deploy.AuthorityFactory",
+  "gasUsed": 570130,
+  "gasCost": "19328000"
+}

@@ -1,0 +1,158 @@
+{
+  "address": "0x870240e83b1181b419f18303D4ccC56574De2931",
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "authorityFactory",
+          "type": "address",
+          "internalType": "contract IAuthorityFactory"
+        },
+        {
+          "name": "applicationFactory",
+          "type": "address",
+          "internalType": "contract IApplicationFactory"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "calculateAddresses",
+      "inputs": [
+        {
+          "name": "authorityOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "application",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "authority",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "deployContracts",
+      "inputs": [
+        {
+          "name": "authorityOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "epochLength",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "appOwner",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "templateHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dataAvailability",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "application",
+          "type": "address",
+          "internalType": "contract IApplication"
+        },
+        {
+          "name": "authority",
+          "type": "address",
+          "internalType": "contract IAuthority"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getApplicationFactory",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IApplicationFactory"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getAuthorityFactory",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IAuthorityFactory"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ],
+  "constructorArgs": [
+    "0x5a3368b30174d389aFd205a46bAd35BBE6709b8a",
+    "0x26E758238CB6eC5aB70ce0dd52aF2d7b82e1972E"
+  ],
+  "linkedLibraries": {},
+  "deployTxnHash": "0x7b1f84875df9676c04db6f6bd81a4fe7e9af082b11dc0af3b4b5d00ba1b8da54",
+  "deployTxnBlockNumber": "37737548",
+  "deployTimestamp": "1762264443",
+  "sourceName": "src/dapp/SelfHostedApplicationFactory.sol",
+  "contractName": "SelfHostedApplicationFactory",
+  "deployedOn": "deploy.SelfHostedApplicationFactory",
+  "gasUsed": 350138,
+  "gasCost": "12132493"
+}
