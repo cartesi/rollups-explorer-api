@@ -7,12 +7,15 @@ FROM node-with-gyp AS builder
 WORKDIR /squid
 ADD package.json .
 ADD package-lock.json .
+ADD commands.json .
 ADD assets assets 
+ADD abi abi
 ADD db db
 ADD schema.graphql .
-RUN npm ci
 ADD tsconfig.json .
+ADD codegen.mjs .
 ADD src src
+RUN npm ci
 RUN npm run build
 
 FROM node-with-gyp AS deps
