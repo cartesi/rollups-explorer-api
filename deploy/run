@@ -22,44 +22,98 @@
  */
 
 const url = require('node:url');
-const shell = require('shelljs');
+const { spawn } = require('node:child_process');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 
-const argv = yargs(hideBin(process.argv)).argv;
+const argv = yargs(hideBin(process.argv))
+    .usage('Usage: $0 --npmScriptName=<script> [-- <script arguments>]')
+    .parserConfiguration({ 'populate--': true })
+    .hide('version')
+    .hide('help')
+    .option('npmScriptName', {
+        type: 'string',
+        demandOption: true,
+        describe: 'Npm script to execute.',
+    })
+    .example(
+        '$0 --npmScriptName=sqd -- process:prod',
+        'Runs: npm run sqd -- process:prod',
+    )
+    .epilog(
+        'Arguments after "--" are forwarded unchanged to the selected npm script.',
+    )
+    .strict()
+    .parse();
 
 if (!argv.npmScriptName) {
     console.error('Npm script name is required!\n');
-    process.exitCode = 1;
+    process.exit(1);
 }
 
-/**
- * @type Config
- */
-const config = {};
-
 const scriptName = argv.npmScriptName;
+const scriptArgs = argv['--'] || [];
 const DATABASE_URL = process.env.DATABASE_URL;
-const db = url.parse(DATABASE_URL);
-const auth = db.auth.split(':');
-config.DB_HOST = db.hostname;
-config.DB_NAME = db.pathname.substring(1);
-config.DB_USER = auth[0];
-config.DB_PASS = auth[1];
-config.DB_PORT = db.port;
 
 /**
  *
- * @param {string} scriptName Existing npm-script name.
- * @param {Config} config Database environment variables to be injected.
+ * @param {string} databaseUrl PostgreSQL connection URL.
+ * @return {Config}
  */
-function runScript(scriptName, config) {
-    const vars = [];
-    for (const key in config) {
-        vars.push(`${key}=${config[key]}`);
+function deriveConfig(databaseUrl) {
+    if (!url.URL.canParse(databaseUrl)) {
+        throw new Error('DATABASE_URL is not a valid URL!');
     }
 
-    shell.exec(`${vars.join(' ')} npm run ${scriptName}`);
+    if (!databaseUrl) {
+        throw new Error('DATABASE_URL is required!');
+    }
+
+    const db = new url.URL(databaseUrl);
+
+    const databaseName = decodeURIComponent(db.pathname.slice(1));
+
+    if (!db.hostname || !databaseName || !db.username) {
+        throw new Error(
+            'DATABASE_URL must include host, database name, and username.',
+        );
+    }
+
+    return {
+        DB_HOST: db.hostname,
+        DB_NAME: databaseName,
+        DB_USER: decodeURIComponent(db.username),
+        DB_PASS: decodeURIComponent(db.password),
+        DB_PORT: db.port,
+    };
 }
 
-runScript(scriptName, config);
+/**
+ *
+ * @param {{scriptName: string, args: string[]}} scriptOpt Existing npm-script name and arguments.
+ * @param {Config} config Database environment variables to be injected.
+ */
+function runScript(scriptOpt, config) {
+    const child = spawn(
+        'npm',
+        ['run', scriptOpt.scriptName, '--', ...scriptOpt.args],
+        {
+            env: {
+                ...process.env,
+                ...config,
+            },
+            stdio: 'inherit',
+        },
+    );
+
+    child.on('exit', (code, signal) => {
+        console.log(`code: ${code}, signal: ${signal}`);
+        if (signal) {
+            process.kill(process.pid, signal);
+        } else {
+            process.exit(code ?? 1);
+        }
+    });
+}
+
+runScript({ scriptName, args: scriptArgs }, deriveConfig(DATABASE_URL));
