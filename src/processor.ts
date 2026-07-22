@@ -29,6 +29,7 @@ export const createProcessor = (chainId: number) => {
     const applicationMetadata = loadApplications(chainId);
     const config = getConfig(chainId);
     let processor = new EvmBatchProcessor()
+        .setPrometheusPort(config.prometheusPort)
         .setFinalityConfirmation(config.finalityConfirmation ?? 10)
         .setFields({
             transaction: {

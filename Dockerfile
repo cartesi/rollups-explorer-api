@@ -38,4 +38,3 @@ RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
 RUN npm i -g @subsquid/commands && mv $(which squid-commands) /usr/local/bin/sqd
 ENV CHAIN_ID 31337
 ENV RPC_ENDPOINT http://localhost:8545
-ENV PROCESSOR_PROMETHEUS_PORT 3000

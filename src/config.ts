@@ -91,10 +91,31 @@ export type ProcessorConfig = {
     v2?: {
         from: number;
     };
+    prometheusPort: number;
 };
 
 const FINALITY_CONFIRMATION = 10 as const;
 const LOCAL_GENESIS_BLOCK = 22 as const;
+const defaultPrometheusPortsPerChain = new Map<number, number>([
+    [mainnet.id, 3000],
+    [sepolia.id, 3001],
+    [optimism.id, 3002],
+    [optimismSepolia.id, 3003],
+    [base.id, 3004],
+    [baseSepolia.id, 3005],
+    [arbitrum.id, 3006],
+    [arbitrumSepolia.id, 3007],
+    [cannon.id, 3008],
+    [foundry.id, 3009],
+]);
+
+const getPrometheusPort = (chainId: number): number => {
+    const port = process.env[`PROCESSOR_PROMETHEUS_PORT_${chainId}`];
+    return parseIntOr({
+        value: port,
+        defaultVal: defaultPrometheusPortsPerChain.get(chainId) ?? 3000,
+    });
+};
 
 export const getConfig = (chainId: number): ProcessorConfig => {
     const RPC_URL = `RPC_URL_${chainId}`;
@@ -105,6 +126,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         defaultVal: 0,
     });
     const rateLimit = parsedRateLimit <= 0 ? undefined : parsedRateLimit;
+    const prometheusPort = getPrometheusPort(chainId);
 
     switch (chainId) {
         case mainnet.id:
@@ -131,9 +153,11 @@ export const getConfig = (chainId: number): ProcessorConfig => {
                         MainnetContracts.InputBox.deployTxnBlockNumber,
                     ]),
                 },
+                prometheusPort,
             };
         case sepolia.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('sepolia'),
                     rpcEndpoint: {
@@ -161,6 +185,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case optimism.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('optimism'),
                     rpcEndpoint: {
@@ -188,6 +213,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case optimismSepolia.id: //Optimism-Sepolia
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('optimismSepolia'),
                     rpcEndpoint: {
@@ -215,6 +241,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case base.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('base'),
                     rpcEndpoint: {
@@ -241,6 +268,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case baseSepolia.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('baseSepolia'),
                     rpcEndpoint: {
@@ -268,6 +296,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case arbitrum.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('arbitrum'),
                     rpcEndpoint: {
@@ -295,6 +324,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
             };
         case arbitrumSepolia.id:
             return {
+                prometheusPort,
                 dataSource: {
                     archive: getArchiveGateway('arbitrumSepolia'),
                     rpcEndpoint: {
@@ -323,6 +353,7 @@ export const getConfig = (chainId: number): ProcessorConfig => {
         case cannon.id:
         case foundry.id:
             return {
+                prometheusPort,
                 dataSource: {
                     rpcEndpoint:
                         process.env[RPC_URL] ?? 'http://127.0.0.1:8545',
