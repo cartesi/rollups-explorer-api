@@ -19,6 +19,7 @@ vi.mock('@subsquid/evm-processor', async () => {
     EvmBatchProcessor.prototype.setDataSource = vi.fn().mockReturnThis();
     EvmBatchProcessor.prototype.setGateway = vi.fn().mockReturnThis();
     EvmBatchProcessor.prototype.setRpcEndpoint = vi.fn().mockReturnThis();
+    EvmBatchProcessor.prototype.setPrometheusPort = vi.fn().mockReturnThis();
     EvmBatchProcessor.prototype.setFinalityConfirmation = vi
         .fn()
         .mockReturnThis();
@@ -48,6 +49,7 @@ describe('Processor creation', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.stubEnv('ARCHIVE_GATEWAY_API_KEY', archiveApiKeyValue);
+        vi.stubEnv('RPC_URL_11155111', 'https://rpc.ankr.com/eth_sepolia');
     });
 
     afterEach(() => {
@@ -64,6 +66,23 @@ describe('Processor creation', () => {
         }
     });
 
+    test.each([
+        ['mainnet', mainnet, 4010],
+        ['sepolia', sepolia, 4011],
+        ['optimism', optimism, 4012],
+        ['optimism sepolia', optimismSepolia, 4013],
+        ['base', base, 4014],
+        ['base sepolia', baseSepolia, 4015],
+        ['arbitrum', arbitrum, 4016],
+        ['arbitrum sepolia', arbitrumSepolia, 4017],
+        ['cannon', cannon, 4018],
+        ['local anvil', local, 4019],
+    ])('Forwards the configured Prometheus port for %s', (_, chainId, port) => {
+        vi.stubEnv(`PROCESSOR_PROMETHEUS_PORT_${chainId}`, String(port));
+        const processor = createProcessor(chainId);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(port);
+    });
+
     test('Required configs for base', () => {
         const processor = createProcessor(base);
         const applicationMetadata = loadApplications(base);
@@ -77,6 +96,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3004);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -146,6 +166,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3005);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -213,6 +234,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3001);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -291,6 +313,7 @@ describe('Processor creation', () => {
         );
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(1);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3009);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -354,6 +377,7 @@ describe('Processor creation', () => {
         );
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(1);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3008);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -420,6 +444,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3002);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -488,6 +513,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3003);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -554,6 +580,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3006);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -620,6 +647,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3007);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
@@ -687,6 +715,7 @@ describe('Processor creation', () => {
         });
 
         expect(processor.setFinalityConfirmation).toHaveBeenCalledWith(10);
+        expect(processor.setPrometheusPort).toHaveBeenCalledWith(3000);
         expect(processor.setFields).toHaveBeenCalledWith({
             transaction: {
                 chainId: true,
