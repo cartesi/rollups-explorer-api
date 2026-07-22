@@ -28,6 +28,7 @@
     "preload:apps:sepolia": "CHAIN_ID=11155111 sqd preload:apps",
     "process:prod": "node deploy/run --npmScriptName=sqd:process:prod",
     "serve:prod": "node deploy/run --npmScriptName=sqd:graphql:prod",
+    "run:migration:apply": "node deploy/run --npmScriptName=sqd -- migration:apply",
     "tsc": "tsc",
     "cannon": "cannon"
   },
