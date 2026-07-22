@@ -1,0 +1,72 @@
+x-db-environment: &db-environment
+    DB_NAME: squid
+    DB_PORT: 5432
+    DB_HOST: db
+    DB_PASS: postgres
+
+# a local simulation of a production environment
+# for the rollups-explorer-api service, with a local postgres
+# database and migrations applied. Build your devel image first: docker buildx bake
+# Check the repo docs and environment variables and modify to your needs.
+services:
+    db:
+        image: postgres:15
+        networks:
+            - squid_network
+        environment:
+            POSTGRES_DB: squid
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - "${DB_PORT}:5432"
+        shm_size: 1gb
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d squid"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+
+    migrations:
+        image: cartesi/rollups-explorer-api:devel
+        networks:
+            - squid_network
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            <<: *db-environment
+        command: ["sqd", "migration:apply"]
+
+    explorer_api:
+        networks:
+            - squid_network
+        image: cartesi/rollups-explorer-api:devel
+        environment:
+            <<: *db-environment
+            GQL_PORT: 4350
+        expose:
+            - 4350
+        command: ["sqd", "serve:prod"]
+        ports:
+            - "${GQL_PORT:-4350}:4350"
+        depends_on:
+            migrations:
+                condition: service_completed_successfully
+
+    squid_processor:
+        networks:
+            - squid_network
+        image: cartesi/rollups-explorer-api:devel
+        depends_on:
+            migrations:
+                condition: service_completed_successfully
+        environment:
+            CHAIN_IDS: "11155111"
+            RPC_URL_11155111: "${RPC_URL_11155111}"
+            RPC_RATE_LIMIT_11155111: 30
+            ARCHIVE_GATEWAY_API_KEY: "${ARCHIVE_GATEWAY_API_KEY}"
+            <<: *db-environment
+        command: ["sqd", "process:prod"]
+networks:
+    squid_network:
+        driver: bridge
