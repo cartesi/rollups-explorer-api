@@ -107,7 +107,6 @@ function runScript(scriptOpt, config) {
     );
 
     child.on('exit', (code, signal) => {
-        console.log(`code: ${code}, signal: ${signal}`);
         if (signal) {
             process.kill(process.pid, signal);
         } else {
