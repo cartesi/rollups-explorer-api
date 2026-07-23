@@ -33,9 +33,8 @@ jobs:
               run: npm run ci:test
 
             - name: Publish coveralls report
-              uses: coverallsapp/github-action@master
+              uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e #2.3.7
               with:
-                  path-to-lcov: "coverage/lcov.info"
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Docker meta
@@ -64,17 +63,16 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Set up QEMU
-              uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 #v4.2.0
+            - name: Set up Depot
+              uses: depot/setup-action@15c09a5f77a0840ad4bce955686522a257853461 #1.7.1
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c #v4.2.0
             - name: Build and push docker image
               id: docker_build
-              uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b #v7.3.0
+              uses: depot/bake-action@1d58c2668346981089b088b7ef36755b206b20e9 #1.13.0
               with:
                   files: |
                       ./docker-bake.hcl
                       ./docker-bake.platforms.hcl
                       cwd://${{ steps.docker_meta.outputs.bake-file }}
                   push: true
+                  project: ${{ vars.DEPOT_PROJECT }}
