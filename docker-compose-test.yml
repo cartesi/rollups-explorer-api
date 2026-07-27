@@ -1,8 +1,5 @@
 x-db-environment: &db-environment
-    DB_NAME: squid
-    DB_PORT: 5432
-    DB_HOST: db
-    DB_PASS: postgres
+    DATABASE_URL: postgresql://postgres:postgres@db:5432/squid
 
 # a local simulation of a production environment
 # for the rollups-explorer-api service, with a local postgres
@@ -35,7 +32,7 @@ services:
                 condition: service_healthy
         environment:
             <<: *db-environment
-        command: ["sqd", "migration:apply"]
+        command: ["npm", "run", "run:migration:apply"]
 
     explorer_api:
         networks:
@@ -46,7 +43,7 @@ services:
             GQL_PORT: 4350
         expose:
             - 4350
-        command: ["sqd", "serve:prod"]
+        command: ["npm", "run", "run:serve:prod"]
         ports:
             - "${GQL_PORT:-4350}:4350"
         depends_on:
@@ -66,7 +63,7 @@ services:
             RPC_RATE_LIMIT_11155111: 30
             ARCHIVE_GATEWAY_API_KEY: "${ARCHIVE_GATEWAY_API_KEY}"
             <<: *db-environment
-        command: ["sqd", "process:prod"]
+        command: ["npm", "run", "run:process:prod"]
 networks:
     squid_network:
         driver: bridge
