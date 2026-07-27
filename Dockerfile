@@ -33,8 +33,7 @@ COPY --from=builder /squid/lib lib
 COPY --from=builder /squid/assets assets
 COPY --from=builder /squid/db db
 COPY --from=builder /squid/schema.graphql schema.graphql
+ADD deploy deploy
 ADD commands.json .
 RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
 RUN npm i -g @subsquid/commands && mv $(which squid-commands) /usr/local/bin/sqd
-ENV CHAIN_ID 31337
-ENV RPC_ENDPOINT http://localhost:8545
